@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-008 — Verify Health Service and Renderer States
+TASK-000-009 — Integrate Startup Failure Handling
 
 ## Status
 
@@ -26,15 +26,17 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Verify the health operation against an initialized disposable database.
-2. Verify renderer loading, ready, and failure states through a mocked typed preload
-   API, strengthening assertions where needed.
-3. Run the focused health and renderer suites and baseline validation, then record
-   task completion evidence.
+1. Extract testable startup orchestration that initializes the database before IPC
+   registration and normal window creation.
+2. Integrate local technical logging, a safe initialization failure message, and
+   application exit into the Electron lifecycle.
+3. Add focused success/failure orchestration tests, run validation, and record task
+   completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not add Electron end-to-end automation, timer UI, product behavior, or a second
-process-boundary contract. Keep tests at the health service and renderer seams.
+Do not add recovery workflows, telemetry, third-party logging, product behavior, or
+new process-boundary contracts. Keep failure details out of the renderer-facing
+message.

@@ -34,7 +34,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-006 | Build the foundation health screen | Complete | TASK-000-005 | AC-000-001, AC-000-004 |
 | TASK-000-007 | Verify schema and database invariants | Complete | TASK-000-004 | AC-000-007–014 |
 | TASK-000-008 | Verify health service and renderer states | Complete | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
-| TASK-000-009 | Integrate startup failure handling | Pending | TASK-000-004–006 | AC-000-005 |
+| TASK-000-009 | Integrate startup failure handling | Complete | TASK-000-004–006 | AC-000-005 |
 | TASK-000-010 | Configure native-module packaging | Pending | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
 | TASK-000-011 | Smoke-test packaged SQLite and offline startup | Pending | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
 | TASK-000-012 | Run final acceptance and update documentation | Pending | TASK-000-007–011 | AC-000-001–019 |
@@ -496,7 +496,7 @@ TASK-000-005 and TASK-000-006.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -535,7 +535,16 @@ TASK-000-004, TASK-000-005, and TASK-000-006.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Extracted startup orchestration that initializes SQLite and runs
+  migrations before registering IPC services or creating the normal BrowserWindow.
+- 2026-08-13: Integrated local technical error logging, a generic Electron error
+  box that does not expose paths or stack traces, and application exit on critical
+  initialization failure.
+- 2026-08-13: Focused startup tests verified successful ordering and forced a real
+  disposable-database migration failure, proving the database remains unready and
+  neither IPC registration nor the normal window is exposed. The focused suite (3
+  tests), full suite (9 files, 23 tests), typecheck, lint, formatting check, and
+  `git diff --check` passed.
 
 ---
 
