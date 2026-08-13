@@ -27,7 +27,7 @@ implementation work and must be updated if the specification changes.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-000-001 | Bootstrap project and quality tooling | Complete | None | AC-000-001, AC-000-014–016 |
-| TASK-000-002 | Create the secure Electron and React shell | Pending | TASK-000-001 | AC-000-001–002 |
+| TASK-000-002 | Create the secure Electron and React shell | Complete | TASK-000-001 | AC-000-001–002 |
 | TASK-000-003 | Define and migrate the foundation schema | Pending | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
 | TASK-000-004 | Initialize and manage the database lifecycle | Pending | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
 | TASK-000-005 | Add the typed health-check boundary | Pending | TASK-000-002, TASK-000-004 | AC-000-003–004 |
@@ -100,7 +100,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -138,7 +138,18 @@ TASK-000-001.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added Electron main/preload entries, cross-platform application
+  lifecycle handling, development/production renderer loading, and a minimal React
+  shell.
+- 2026-08-13: A focused window-options test verifies `contextIsolation: true`,
+  `nodeIntegration: false`, and `sandbox: true`; a renderer test verifies the React
+  foundation shell renders.
+- 2026-08-13: `npm run dev` rebuilt the native dependency, launched the Vite
+  renderer target, built `main.js` and `preload.js`, and launched Electron without a
+  startup error. Automated desktop screen capture was unavailable because the
+  execution environment could not capture the macOS display.
+- 2026-08-13: `npm run typecheck`, `npm run lint`, `npm test`,
+  `npm run format:check`, and `git diff --check` passed (2 test files, 2 tests).
 
 ---
 
