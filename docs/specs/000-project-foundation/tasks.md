@@ -29,7 +29,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-001 | Bootstrap project and quality tooling | Complete | None | AC-000-001, AC-000-014–016 |
 | TASK-000-002 | Create the secure Electron and React shell | Complete | TASK-000-001 | AC-000-001–002 |
 | TASK-000-003 | Define and migrate the foundation schema | Complete | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
-| TASK-000-004 | Initialize and manage the database lifecycle | Pending | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
+| TASK-000-004 | Initialize and manage the database lifecycle | Complete | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
 | TASK-000-005 | Add the typed health-check boundary | Pending | TASK-000-002, TASK-000-004 | AC-000-003–004 |
 | TASK-000-006 | Build the foundation health screen | Pending | TASK-000-005 | AC-000-001, AC-000-004 |
 | TASK-000-007 | Verify schema and database invariants | Pending | TASK-000-004 | AC-000-007–014 |
@@ -218,7 +218,7 @@ TASK-000-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -257,7 +257,17 @@ TASK-000-003.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added the central typed SQLite/Drizzle context and database lifecycle,
+  including foreign-key configuration, automatic migrations, idempotent AppState
+  seeding, readiness reporting, single-connection reuse, and clean closure.
+- 2026-08-13: Wired Electron startup to resolve `time-tracker.sqlite` beneath the
+  per-user application data directory, initialize persistence before creating the
+  main window, stop startup on migration failure, and close SQLite on `will-quit`.
+- 2026-08-13: Disposable-database tests verified repeated initialization, one
+  AppState row, preserved data across reopen, enabled foreign keys, clean closure,
+  path resolution, and an unready state after migration failure.
+- 2026-08-13: Focused database tests, `npm run typecheck`, `npm run lint`,
+  `npm run format:check`, the full `npm test` suite, and `git diff --check` passed.
 
 ---
 

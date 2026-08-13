@@ -12,9 +12,9 @@ SPEC-000 — Project Foundation
 
 In Progress
 
-TASK-000-001 is complete. The next task is:
+TASK-000-001 through TASK-000-004 are complete. The next task is:
 
-    TASK-000-002 — Create the Secure Electron and React Shell
+    TASK-000-005 — Add the Typed Health-Check Boundary
 
 ---
 
@@ -39,6 +39,9 @@ Completed milestone:
 - established the main, preload, renderer, and shared source boundaries;
 - added the required development, type-checking, linting, test, and packaging
   scripts.
+- created the secure Electron/React shell and foundation SQLite schema migration;
+- added the main-process database lifecycle with per-user path resolution,
+  migrations, idempotent AppState seeding, readiness, and shutdown cleanup.
 
 ---
 
@@ -89,8 +92,8 @@ Key established decisions include:
 
 # Implementation Notes
 
-Foundation tooling is installed and validated. No product behavior has been
-implemented yet.
+Foundation tooling, the secure application shell, schema, and database lifecycle
+are implemented and validated. No product behavior has been implemented yet.
 
 Companion task breakdowns have been generated for:
 
@@ -115,4 +118,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Completed TASK-000-001 project bootstrap and quality tooling.
+2026-08-13 — Completed TASK-000-004 database initialization and lifecycle management.
