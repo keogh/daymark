@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A local-first desktop time tracker.",
   "type": "module",
-  "main": ".vite/build/main.js",
+  "main": ".vite/build/main.cjs",
   "private": true,
   "scripts": {
     "dev": "electron-forge start",

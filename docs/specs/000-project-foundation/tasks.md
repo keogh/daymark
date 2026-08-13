@@ -150,6 +150,11 @@ TASK-000-001.
   execution environment could not capture the macOS display.
 - 2026-08-13: `npm run typecheck`, `npm run lint`, `npm test`,
   `npm run format:check`, and `git diff --check` passed (2 test files, 2 tests).
+- 2026-08-13: Corrected an Electron startup regression caused by CommonJS main and
+  preload bundles using `.js` extensions inside an ESM package. Both bundles now
+  use explicit `.cjs` extensions; `npm run dev` launched Electron without the
+  previous `require is not defined in ES module scope` failure. Baseline validation
+  passed after the correction.
 
 ---
 

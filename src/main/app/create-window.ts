@@ -7,7 +7,7 @@ declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
 export const createMainWindow = (): BrowserWindow => {
-  const preloadPath = path.join(__dirname, 'preload.js');
+  const preloadPath = path.join(__dirname, 'preload.cjs');
   const window = new BrowserWindow(createMainWindowOptions(preloadPath));
 
   window.once('ready-to-show', () => {
