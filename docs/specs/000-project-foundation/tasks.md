@@ -93,6 +93,10 @@ None.
   and jsdom renderer test projects are configured for subsequent tasks.
 - 2026-08-13: `npm ls --depth=0` reported a valid top-level dependency graph, and
   `npm audit --omit=dev` reported zero production dependency vulnerabilities.
+- 2026-08-13: Added the single `@/*` source-root import alias across TypeScript,
+  every Vite target, and both Vitest projects. Migrated parent-traversing source
+  imports while retaining local `./` imports. Typecheck, lint, formatting, all 7
+  tests, and current-platform packaging passed.
 
 ---
 

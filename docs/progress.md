@@ -42,6 +42,8 @@ Completed milestone:
 - created the secure Electron/React shell and foundation SQLite schema migration;
 - added the main-process database lifecycle with per-user path resolution,
   migrations, idempotent AppState seeding, readiness, and shutdown cleanup.
+- standardized source-root imports on the single `@/*` alias across TypeScript,
+  Vite, and Vitest without adding a dependency.
 
 ---
 
@@ -118,4 +120,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Completed TASK-000-004 database initialization and lifecycle management.
+2026-08-13 — Completed the TASK-000-001 source-import alias maintenance amendment.

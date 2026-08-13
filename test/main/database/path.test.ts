@@ -6,7 +6,7 @@ import {
   DATABASE_FILENAME,
   resolveDatabasePath,
   resolveMigrationsPath,
-} from '../../../src/main/database/path';
+} from '@/main/database/path';
 
 describe('database paths', () => {
   it('places the database in the supplied per-user application directory', () => {

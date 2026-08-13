@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-004 — Initialize and Manage the Database Lifecycle
+TASK-000-001 maintenance — Configure Source Import Alias
 
 ## Status
 
@@ -26,18 +26,14 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add the central SQLite/Drizzle context, migration runner, idempotent AppState seed,
-   readiness state, and production database-path resolver.
-2. Wire database initialization before window creation and close the connection on
-   application shutdown.
-3. Add focused disposable-database tests for repeated initialization, preserved
-   data, readiness, foreign keys, and clean closure.
-4. Run focused and baseline validation, then record task completion evidence in
-   `tasks.md`.
+1. Configure `@/*` as the single alias for `src/*` in TypeScript, Vite, and Vitest.
+2. Replace imports that climb parent directories with the source alias while
+   retaining same-directory `./` imports.
+3. Document the import convention and run baseline validation plus packaging.
 
 ---
 
 # Scope Guard
 
-Do not add repositories, health-check IPC, product UI, timer behavior, or the later
-startup-failure UI. Those outcomes belong to subsequent TASK-000 items.
+Do not add dependencies or change runtime behavior, architecture boundaries, product
+features, or test placement.

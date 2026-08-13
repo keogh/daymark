@@ -433,6 +433,10 @@ Introduce complexity only when a specification or demonstrated implementation ne
 
 Prefer strict TypeScript.
 
+Use `@/*` for imports rooted at `src/*` when an import would otherwise traverse a
+parent directory. Keep `./` imports for modules in the same directory. Do not add
+more aliases without a demonstrated need.
+
 Avoid:
 
     any

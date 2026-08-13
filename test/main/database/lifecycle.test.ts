@@ -5,8 +5,8 @@ import path from 'node:path';
 import { eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { DatabaseLifecycle } from '../../../src/main/database/lifecycle';
-import { appState, tasks } from '../../../src/main/database/schema';
+import { DatabaseLifecycle } from '@/main/database/lifecycle';
+import { appState, tasks } from '@/main/database/schema';
 
 const migrationsFolder = path.join(
   process.cwd(),
