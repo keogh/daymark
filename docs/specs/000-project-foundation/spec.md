@@ -1625,4 +1625,3 @@ Before declaring completion:
 6. update `docs/progress.md`.
 
 If implementation requires changing an accepted architecture decision, update `docs/decisions.md` before making that change.
-

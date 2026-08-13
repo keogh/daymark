@@ -10,11 +10,11 @@ SPEC-000 — Project Foundation
 
 ## Current Status
 
-Not Started
+In Progress
 
-The implementation task breakdown is ready. The next task is:
+TASK-000-001 is complete. The next task is:
 
-    TASK-000-001 — Bootstrap Project and Quality Tooling
+    TASK-000-002 — Create the Secure Electron and React Shell
 
 ---
 
@@ -31,6 +31,14 @@ SPEC-000 — Project Foundation
 Objective:
 
 Create the Electron, React, TypeScript, SQLite, Drizzle, IPC, testing, and packaging foundation required for subsequent feature specifications.
+
+Completed milestone:
+
+- bootstrapped the npm-managed Electron/Forge, React/Vite, TypeScript,
+  SQLite/Drizzle, Vitest/React Testing Library, ESLint, and Prettier toolchain;
+- established the main, preload, renderer, and shared source boundaries;
+- added the required development, type-checking, linting, test, and packaging
+  scripts.
 
 ---
 
@@ -81,7 +89,8 @@ Key established decisions include:
 
 # Implementation Notes
 
-No product implementation has started yet.
+Foundation tooling is installed and validated. No product behavior has been
+implemented yet.
 
 Companion task breakdowns have been generated for:
 
@@ -106,5 +115,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Added per-spec task decomposition to the SDD workflow and prepared
-SPEC-000 and SPEC-001 task breakdowns.
+2026-08-13 — Completed TASK-000-001 project bootstrap and quality tooling.

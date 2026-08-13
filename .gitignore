@@ -1,2 +1,7 @@
+.vite/
 .idea/
+coverage/
+node_modules/
+out/
+*.log
 .DS_Store

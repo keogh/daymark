@@ -26,7 +26,7 @@ implementation work and must be updated if the specification changes.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-000-001 | Bootstrap project and quality tooling | Pending | None | AC-000-001, AC-000-014–016 |
+| TASK-000-001 | Bootstrap project and quality tooling | Complete | None | AC-000-001, AC-000-014–016 |
 | TASK-000-002 | Create the secure Electron and React shell | Pending | TASK-000-001 | AC-000-001–002 |
 | TASK-000-003 | Define and migrate the foundation schema | Pending | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
 | TASK-000-004 | Initialize and manage the database lifecycle | Pending | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
@@ -47,7 +47,7 @@ implementation work and must be updated if the specification changes.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -86,7 +86,13 @@ None.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Installed the npm dependency graph and generated
+  `package-lock.json` with npm 11.9.0 on Node.js 24.14.0.
+- 2026-08-13: `npm run format:check`, `npm run typecheck`, `npm run lint`, and
+  `npm test` passed. The empty bootstrap suite exits successfully by design; Node
+  and jsdom renderer test projects are configured for subsequent tasks.
+- 2026-08-13: `npm ls --depth=0` reported a valid top-level dependency graph, and
+  `npm audit --omit=dev` reported zero production dependency vulnerabilities.
 
 ---
 
