@@ -33,7 +33,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-005 | Add the typed health-check boundary | Complete | TASK-000-002, TASK-000-004 | AC-000-003–004 |
 | TASK-000-006 | Build the foundation health screen | Complete | TASK-000-005 | AC-000-001, AC-000-004 |
 | TASK-000-007 | Verify schema and database invariants | Complete | TASK-000-004 | AC-000-007–014 |
-| TASK-000-008 | Verify health service and renderer states | Pending | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
+| TASK-000-008 | Verify health service and renderer states | Complete | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
 | TASK-000-009 | Integrate startup failure handling | Pending | TASK-000-004–006 | AC-000-005 |
 | TASK-000-010 | Configure native-module packaging | Pending | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
 | TASK-000-011 | Smoke-test packaged SQLite and offline startup | Pending | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
@@ -442,7 +442,7 @@ TASK-000-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -478,7 +478,17 @@ TASK-000-005 and TASK-000-006.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Verified the health application operation against an initialized
+  disposable SQLite database, including unavailable-before-initialization and
+  ready-after-initialization responses.
+- 2026-08-13: Verified the renderer loading-to-ready transition plus unavailable
+  database and rejected-call failure states through a mocked `TimeTrackerAPI`.
+  Strengthened the component assertions to prove one health-check call and removal
+  of the loading state on failure.
+- 2026-08-13: Focused health-boundary tests passed (3 files, 4 tests), and focused
+  renderer tests passed (1 file, 3 tests). `npm run format:check`, `npm run
+  typecheck`, `npm run lint`, the full `npm test` suite (8 files, 20 tests), and
+  `git diff --check` passed.
 
 ---
 

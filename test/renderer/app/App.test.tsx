@@ -33,10 +33,12 @@ describe('App', () => {
 
   it('shows loading before rendering the ready database state', async () => {
     const health = deferredHealth();
-    setHealthCheck(vi.fn(() => health.promise));
+    const healthCheck = vi.fn(() => health.promise);
+    setHealthCheck(healthCheck);
 
     render(<App />);
 
+    expect(healthCheck).toHaveBeenCalledOnce();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Time Tracker' }),
     ).toBeInTheDocument();
@@ -54,18 +56,21 @@ describe('App', () => {
   });
 
   it('shows an initialization failure for an unavailable database', async () => {
-    setHealthCheck(
-      vi.fn().mockResolvedValue({
-        status: 'error',
-        database: 'unavailable',
-      } satisfies SystemHealth),
-    );
+    const healthCheck = vi.fn().mockResolvedValue({
+      status: 'error',
+      database: 'unavailable',
+    } satisfies SystemHealth);
+    setHealthCheck(healthCheck);
 
     render(<App />);
 
+    expect(healthCheck).toHaveBeenCalledOnce();
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Application initialization failed.',
     );
+    expect(
+      screen.queryByText('Checking application health…'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('Application ready.')).not.toBeInTheDocument();
   });
 
