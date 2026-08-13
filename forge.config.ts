@@ -2,9 +2,29 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 
+const packageDirectories = ['/.vite', '/node_modules'];
+const migrationsDirectory = '/src/main/database/migrations';
+const migrationsParentDirectories = ['/src', '/src/main', '/src/main/database'];
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    ignore: (filePath) => {
+      if (filePath.length === 0) {
+        return false;
+      }
+
+      const isPackageDirectory = packageDirectories.some(
+        (directory) =>
+          filePath === directory || filePath.startsWith(`${directory}/`),
+      );
+      const isMigrationInput =
+        migrationsParentDirectories.includes(filePath) ||
+        filePath === migrationsDirectory ||
+        filePath.startsWith(`${migrationsDirectory}/`);
+
+      return !isPackageDirectory && !isMigrationInput;
+    },
   },
   rebuildConfig: {},
   makers: [],

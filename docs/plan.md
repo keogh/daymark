@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-009 — Integrate Startup Failure Handling
+TASK-000-010 — Configure Native-Module Packaging
 
 ## Status
 
@@ -26,17 +26,15 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Extract testable startup orchestration that initializes the database before IPC
-   registration and normal window creation.
-2. Integrate local technical logging, a safe initialization failure message, and
-   application exit into the Electron lifecycle.
-3. Add focused success/failure orchestration tests, run validation, and record task
-   completion evidence.
+1. Verify Forge rebuild, ASAR unpacking, and main-process externalization for
+   `better-sqlite3`.
+2. Package for the current platform and inspect the application and native binary
+   artifacts.
+3. Run focused quality checks and record task completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not add recovery workflows, telemetry, third-party logging, product behavior, or
-new process-boundary contracts. Keep failure details out of the renderer-facing
-message.
+Do not add installers, signing, notarization, release automation, other-platform
+artifacts, or product behavior. Keep the packaging configuration cross-platform.

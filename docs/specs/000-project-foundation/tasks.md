@@ -35,7 +35,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-007 | Verify schema and database invariants | Complete | TASK-000-004 | AC-000-007–014 |
 | TASK-000-008 | Verify health service and renderer states | Complete | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
 | TASK-000-009 | Integrate startup failure handling | Complete | TASK-000-004–006 | AC-000-005 |
-| TASK-000-010 | Configure native-module packaging | Pending | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
+| TASK-000-010 | Configure native-module packaging | Complete | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
 | TASK-000-011 | Smoke-test packaged SQLite and offline startup | Pending | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
 | TASK-000-012 | Run final acceptance and update documentation | Pending | TASK-000-007–011 | AC-000-001–019 |
 
@@ -552,7 +552,7 @@ TASK-000-004, TASK-000-005, and TASK-000-006.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -589,7 +589,16 @@ TASK-000-002 and TASK-000-004.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Restricted Forge package inputs to Vite build output, production
+  dependencies, and read-only Drizzle migration assets while retaining ASAR
+  packaging and automatic native-module unpacking. The application continues to
+  resolve its writable SQLite path from Electron's per-user `userData` directory.
+- 2026-08-13: `npm run package` produced the macOS arm64 application. Inspection
+  verified the main bundle and migration SQL in `app.asar`, plus the
+  `better-sqlite3` native binaries in `app.asar.unpacked`; the selected Darwin
+  binary is a Mach-O arm64 bundle compatible with the package target.
+- 2026-08-13: `npm run typecheck`, `npm run lint`, `npm run format:check`, the full
+  test suite (9 files, 23 tests), packaging, and `git diff --check` passed.
 
 ---
 

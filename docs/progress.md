@@ -12,9 +12,9 @@ SPEC-000 — Project Foundation
 
 In Progress
 
-TASK-000-001 through TASK-000-006 are complete. The next task is:
+TASK-000-001 through TASK-000-010 are complete. The next task is:
 
-    TASK-000-007 — Verify Schema and Database Invariants
+    TASK-000-011 — Smoke-test packaged SQLite and offline startup
 
 ---
 
@@ -49,6 +49,11 @@ Completed milestone:
 - built the minimal foundation health screen with accessible loading,
   ready/database-connected, and initialization-failure states using only the typed
   preload API.
+- verified schema/database invariants, health-service and renderer states, and
+  deterministic startup failure handling.
+- configured portable Forge package inputs, ASAR native-module unpacking, and
+  current-platform rebuilding for `better-sqlite3`; the macOS arm64 package
+  contains the migration assets and a matching unpacked native binary.
 
 ---
 
@@ -100,7 +105,8 @@ Key established decisions include:
 # Implementation Notes
 
 Foundation tooling, the secure application shell, schema, database lifecycle, typed
-health-check boundary, and foundation health screen are implemented and validated.
+health-check boundary, foundation health screen, startup failure handling, and
+native-module packaging are implemented and validated.
 No product behavior has been implemented yet.
 
 Companion task breakdowns have been generated for:
@@ -126,4 +132,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Completed TASK-000-006, the foundation health screen.
+2026-08-13 — Completed TASK-000-010, native-module packaging.
