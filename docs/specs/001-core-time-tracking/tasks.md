@@ -28,7 +28,7 @@ verified and must be revised if the specification or foundation contracts change
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-001-001 | Define timer contracts and deterministic primitives | Complete | SPEC-000 | Supporting work for AC-001–013 |
-| TASK-001-002 | Implement task persistence and normalization | Pending | TASK-001-001 | AC-001–002 |
+| TASK-001-002 | Implement task persistence and normalization | Complete | TASK-001-001 | AC-001–002 |
 | TASK-001-003 | Implement interval and AppState persistence | Pending | TASK-001-001 | AC-004, AC-006–008, AC-012 |
 | TASK-001-004 | Implement duration projections | Pending | TASK-001-003 | AC-003, AC-005, AC-013 |
 | TASK-001-005 | Reconstruct authoritative timer state | Pending | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
@@ -107,7 +107,7 @@ SPEC-000 must be verified.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -149,7 +149,19 @@ TASK-001-001.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added a typed Task domain record and focused repository operations to
+  insert tasks, read by ID, and find exact normalized descriptions.
+- 2026-08-13: Repository insertion preserves the first stored display description,
+  performs the application-level normalized lookup, and re-reads the existing task
+  after a uniqueness conflict so equivalent inputs reuse one row.
+- 2026-08-13: Added a migration that safely consolidates pre-existing normalized
+  duplicates while preserving interval and AppState references, then replaces the
+  non-unique normalized-description index with a unique index.
+- 2026-08-13: Disposable-database repository tests passed (1 file, 7 tests),
+  covering deterministic insert/read, exact normalized lookup, equivalent input
+  reuse, database uniqueness, and inherited task-interval cascade behavior.
+- 2026-08-13: Full validation passed: typecheck, lint, formatting, all 41 tests,
+  and `git diff --check`.
 
 ---
 

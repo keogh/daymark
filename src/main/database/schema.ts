@@ -18,7 +18,9 @@ export const tasks = sqliteTable(
     updatedAt: integer('updated_at').notNull(),
   },
   (table) => [
-    index('tasks_normalized_description_idx').on(table.normalizedDescription),
+    uniqueIndex('tasks_normalized_description_unique_idx').on(
+      table.normalizedDescription,
+    ),
     index('tasks_updated_at_idx').on(table.updatedAt),
   ],
 );

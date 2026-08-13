@@ -8,6 +8,13 @@
       "when": 1786651407398,
       "tag": "0000_peaceful_echo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786660942131,
+      "tag": "0001_colossal_eddie_brock",
+      "breakpoints": true
     }
   ]
 }

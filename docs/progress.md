@@ -32,6 +32,9 @@ verified project foundation.
 Completed SPEC-001 work:
 
 - TASK-001-001 defined typed timer state and IPC result/error contracts;
+- TASK-001-002 added deterministic Task persistence, exact normalized-description
+  reuse, and database-enforced normalized uniqueness with a data-preserving
+  migration;
 - Start input validation now trims input, enforces 1–500 Unicode code points, and
   produces the normalized exact-match description;
 - Clock, SystemClock, and deterministic FakeClock primitives are available;
@@ -129,11 +132,11 @@ Companion task breakdowns have been generated for:
 The SDD workflow now requires selecting one self-contained task before creating the
 active implementation plan.
 
-TASK-001-001 is complete. TASK-001-002 and TASK-001-003 are now unblocked; select
-one and update `docs/plan.md` before changing code.
+TASK-001-001 and TASK-001-002 are complete. TASK-001-003 is unblocked; select it
+and update `docs/plan.md` before changing code.
 
 ---
 
 # Last Updated
 
-2026-08-13 — Completed SPEC-001 TASK-001-001 and exposed the next persistence tasks.
+2026-08-13 — Completed SPEC-001 TASK-001-002 task persistence and normalization.

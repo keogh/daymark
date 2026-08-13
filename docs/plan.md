@@ -6,11 +6,11 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-No active task selected.
+TASK-001-002 — Implement Task Persistence and Normalization
 
 ## Status
 
-Ready for task selection
+Complete
 
 ---
 
@@ -26,13 +26,25 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Select either unblocked TASK-001-002 (task persistence and normalization) or
-   TASK-001-003 (interval and AppState persistence).
-2. Replace this holding plan with only that task's immediate steps before changing
-   code.
+1. Add the normalized-description uniqueness migration without recreating existing
+   databases.
+2. Implement focused Task repository insert/read/exact-normalized-find operations,
+   including uniqueness-conflict reuse.
+3. Add disposable SQLite repository tests for deterministic persistence,
+   normalization reuse, and inherited cascade behavior.
+4. Run focused tests and the project validation checks, then record completion
+   evidence.
 
 ---
 
 # Scope Guard
 
-Do not implement additional SPEC-001 behavior until one unblocked task is selected.
+Do not implement timer transitions, interval/AppState repository operations, search
+UI, rename/delete operations, or suggestions in this task.
+
+---
+
+# Completion
+
+TASK-001-002 is complete. Select the next unblocked task and replace this plan
+before making further implementation changes.
