@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-002 — Create the Secure Electron and React Shell
+TASK-000-003 — Define and Migrate the Foundation Schema
 
 ## Status
 
@@ -26,15 +26,14 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add the main-process lifecycle and secure BrowserWindow construction.
-2. Add the preload and minimal React renderer entry points.
-3. Add a focused test protecting renderer security settings.
-4. Run focused and baseline validation, then manually verify development startup.
-5. Record task completion evidence in `tasks.md`.
+1. Define the typed Drizzle schema, including keys, references, checks, and indexes.
+2. Generate and inspect the initial SQLite migration artifacts.
+3. Apply the migration to a disposable database and inspect the resulting schema.
+4. Run baseline static validation and record task completion evidence in `tasks.md`.
 
 ---
 
 # Scope Guard
 
-Do not add database initialization, health-check IPC, product UI, or timer behavior.
-Those outcomes belong to later TASK-000 items.
+Do not add database lifecycle/startup integration, repositories, health-check IPC,
+product UI, or timer behavior. Those outcomes belong to later TASK-000 items.

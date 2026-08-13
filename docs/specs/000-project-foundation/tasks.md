@@ -28,7 +28,7 @@ implementation work and must be updated if the specification changes.
 | --- | --- | --- | --- | --- |
 | TASK-000-001 | Bootstrap project and quality tooling | Complete | None | AC-000-001, AC-000-014–016 |
 | TASK-000-002 | Create the secure Electron and React shell | Complete | TASK-000-001 | AC-000-001–002 |
-| TASK-000-003 | Define and migrate the foundation schema | Pending | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
+| TASK-000-003 | Define and migrate the foundation schema | Complete | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
 | TASK-000-004 | Initialize and manage the database lifecycle | Pending | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
 | TASK-000-005 | Add the typed health-check boundary | Pending | TASK-000-002, TASK-000-004 | AC-000-003–004 |
 | TASK-000-006 | Build the foundation health screen | Pending | TASK-000-005 | AC-000-001, AC-000-004 |
@@ -162,7 +162,7 @@ TASK-000-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -201,7 +201,16 @@ TASK-000-001.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added typed Drizzle definitions for `tasks`, `time_intervals`, and
+  `app_state`, including required indexes, foreign-key delete behavior, timestamp
+  and AppState checks, and the global partial unique index for open intervals.
+- 2026-08-13: Generated the initial SQLite migration and Drizzle journal/snapshot
+  artifacts. `npx drizzle-kit check --config drizzle.config.ts` passed.
+- 2026-08-13: Applied the migration to a disposable SQLite database and inspected
+  all three tables, required indexes, checks, and foreign-key actions (`CASCADE`
+  and `SET NULL`) through SQLite schema metadata.
+- 2026-08-13: `npm run typecheck`, `npm run lint`, `npm test`,
+  `npm run format:check`, and `git diff --check` passed (2 test files, 2 tests).
 
 ---
 
