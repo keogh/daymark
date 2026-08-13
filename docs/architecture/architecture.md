@@ -737,6 +737,10 @@ The MVP development can begin locally before release automation exists.
 
 Highest priority.
 
+All automated tests live beneath the top-level `test/` directory and mirror the
+production module structure beneath `src/`. Test-only support code also remains
+under `test/`; production source directories do not contain colocated tests.
+
 Test:
 
 - start;

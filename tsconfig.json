@@ -19,5 +19,11 @@
     "target": "ES2023",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["*.ts", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "*.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "test/**/*.tsx"
+  ]
 }

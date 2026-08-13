@@ -86,6 +86,10 @@ All tests required by the specification exist and pass.
 
 Tests should cover behavior, not implementation trivia.
 
+Automated tests and test-only support code live under `test/`, with test paths
+mirroring the corresponding production paths under `src/`. Tests are not
+colocated with production source files.
+
 ---
 
 # 9. Regression Safety

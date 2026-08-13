@@ -526,6 +526,12 @@ Use:
 - Vitest for TypeScript unit/integration tests;
 - React Testing Library for renderer components.
 
+Store all automated tests in the top-level `test/` directory. Test paths mirror
+their production paths beneath `src/`; for example,
+`src/main/services/timer-service.ts` is tested by
+`test/main/services/timer-service.test.ts`. Do not colocate tests in `src/`.
+Test-only setup, fixtures, fakes, and helpers also belong under `test/`.
+
 End-to-end tooling may be introduced when an executable workflow requires it.
 
 Do not make E2E tooling a prerequisite for project foundation unless SPEC-000 requires it.

@@ -9,7 +9,7 @@ export default defineConfig({
         test: {
           name: 'node',
           environment: 'node',
-          include: ['src/{main,preload,shared}/**/*.test.ts'],
+          include: ['test/{main,preload,shared}/**/*.test.ts'],
         },
       },
       {
@@ -17,8 +17,8 @@ export default defineConfig({
         test: {
           name: 'renderer',
           environment: 'jsdom',
-          include: ['src/renderer/**/*.test.{ts,tsx}'],
-          setupFiles: ['./src/renderer/test/setup.ts'],
+          include: ['test/renderer/**/*.test.{ts,tsx}'],
+          setupFiles: ['./test/renderer/setup.ts'],
         },
       },
     ],

@@ -366,6 +366,22 @@ Do not invent additional timer states without a specification.
 
 Business logic requires tests.
 
+All automated test files must live under the top-level:
+
+    test/
+
+The `test/` directory must mirror the structure of `src/`. For example:
+
+    src/main/services/timer-service.ts
+    test/main/services/timer-service.test.ts
+
+    src/renderer/components/timer.tsx
+    test/renderer/components/timer.test.tsx
+
+Do not colocate test files in `src/`. Shared test setup, fixtures, fakes, and
+helpers must also live under `test/` in the relevant mirrored layer or a clearly
+named shared test-support directory.
+
 Important timer behavior should generally have:
 
 - unit tests;
