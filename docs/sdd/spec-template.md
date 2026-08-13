@@ -284,3 +284,6 @@ Prefer the smallest implementation satisfying this specification.
 Do not expand scope.
 
 If the specification conflicts with an architectural decision, document the conflict before changing architecture.
+
+After this specification reaches `Ready for Implementation`, generate its companion
+`tasks.md` from `docs/sdd/tasks-template.md` before implementation begins.

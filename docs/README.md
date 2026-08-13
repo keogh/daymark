@@ -109,6 +109,10 @@ Each feature is implemented from an individual specification under:
 
     docs/specs/
 
+Each implementation-ready specification also has a companion `tasks.md` that breaks
+the specification into small, dependency-ordered, independently verifiable tasks.
+The specification remains the source of truth for behavior.
+
 The first feature is:
 
     docs/specs/001-core-time-tracking/spec.md

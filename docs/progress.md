@@ -12,6 +12,10 @@ SPEC-000 — Project Foundation
 
 Not Started
 
+The implementation task breakdown is ready. The next task is:
+
+    TASK-000-001 — Bootstrap Project and Quality Tooling
+
 ---
 
 # Completed Specifications
@@ -79,6 +83,14 @@ Key established decisions include:
 
 No product implementation has started yet.
 
+Companion task breakdowns have been generated for:
+
+- `docs/specs/000-project-foundation/tasks.md`;
+- `docs/specs/001-core-time-tracking/tasks.md`.
+
+The SDD workflow now requires selecting one self-contained task before creating the
+active implementation plan.
+
 SPEC-000 should establish infrastructure only.
 
 Do not implement:
@@ -94,4 +106,5 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-Initial project documentation.
+2026-08-13 — Added per-spec task decomposition to the SDD workflow and prepared
+SPEC-000 and SPEC-001 task breakdowns.

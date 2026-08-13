@@ -20,6 +20,8 @@ The normal development cycle is:
           ↓
     Specification
           ↓
+    Task Breakdown
+          ↓
     Implementation Plan
           ↓
     Implementation
@@ -82,29 +84,86 @@ Do not start implementation if a hard prerequisite is missing.
 
 ---
 
-# 5. Step 4 — Create an Implementation Plan
+# 5. Step 4 — Create a Task Breakdown
 
-For non-trivial specifications, create or update:
+Before implementation, create or update the companion task breakdown:
 
-    docs/plan.md
+    docs/specs/XXX-feature-name/tasks.md
 
-The plan should contain implementation steps, not restate the entire specification.
+Use:
 
-Example:
+    docs/sdd/tasks-template.md
 
-    1. Add database schema.
-    2. Add repositories.
-    3. Implement TimerService.
-    4. Add preload contracts.
-    5. Add renderer timer UI.
-    6. Add tests.
-    7. Verify acceptance criteria.
+as the starting structure.
 
-Keep steps small enough that progress can be validated incrementally.
+The task breakdown translates the complete specification into an ordered list of
+small, reviewable implementation tasks. It does not define product behavior and
+must not contradict or expand the specification.
+
+Every task must include:
+
+- a stable task ID;
+- one concrete outcome;
+- dependencies on earlier tasks;
+- included and excluded work;
+- expected deliverables;
+- focused verification;
+- acceptance-criteria traceability.
+
+A task is self-contained when an implementer can complete and verify it after its
+listed dependencies without discovering hidden required work. Prefer one coherent
+change that can be reviewed independently. Split a task when it contains multiple
+outcomes that can be completed or verified separately.
+
+The breakdown must cover every acceptance criterion and every required test in the
+specification. Infrastructure or documentation work that does not map directly to
+an acceptance criterion must still identify the specification section that requires
+it.
+
+Use these task statuses:
+
+    Pending
+    In Progress
+    Blocked
+    Complete
+
+Only one task should normally be `In Progress`. Completing every task does not by
+itself verify the specification; final acceptance and Definition of Done checks are
+still required.
+
+If `spec.md` changes materially, review and update `tasks.md` before continuing.
 
 ---
 
-# 6. Step 5 — Implement Vertically
+# 6. Step 5 — Create an Implementation Plan
+
+Before starting a task, create or update:
+
+    docs/plan.md
+
+The plan is the short-lived execution view for the current task. It should reference
+the active specification and task ID, and contain only the immediate implementation
+steps and checks. Do not duplicate the complete task breakdown in `docs/plan.md`.
+
+Example:
+
+    Specification: SPEC-001
+    Task: TASK-001-005 — Implement start transition
+
+    1. Add the transactional service operation.
+    2. Add focused service tests.
+    3. Run the focused test command.
+
+When the active task is complete, update its status and evidence in `tasks.md` before
+selecting the next task.
+
+---
+
+# 7. Step 6 — Implement the Active Task
+
+Implement only the selected task and work needed to satisfy its stated outcome.
+
+Where the task is a feature slice, prefer connecting the required layers vertically.
 
 Prefer feature slices that connect required layers.
 
@@ -124,7 +183,7 @@ Avoid building large speculative infrastructure for future features.
 
 ---
 
-# 7. Step 6 — Test Continuously
+# 8. Step 7 — Test Continuously
 
 Run focused tests while implementing.
 
@@ -139,7 +198,7 @@ Fix failures before expanding the implementation.
 
 ---
 
-# 8. Step 7 — Verify Acceptance Criteria
+# 9. Step 8 — Verify Acceptance Criteria
 
 At implementation completion, evaluate every acceptance criterion in the specification.
 
@@ -149,7 +208,7 @@ Where possible, acceptance criteria should correspond to automated tests.
 
 ---
 
-# 9. Step 8 — Run Project Validation
+# 10. Step 9 — Run Project Validation
 
 Run all checks required by the specification and project Definition of Done.
 
@@ -167,7 +226,7 @@ No specification should be marked complete while required validation fails.
 
 ---
 
-# 10. Step 9 — Update Documentation
+# 11. Step 10 — Update Documentation
 
 Update documentation when implementation introduces an accepted change to:
 
@@ -181,7 +240,7 @@ Do not update documentation merely to describe low-level implementation details 
 
 ---
 
-# 11. Step 10 — Update Progress
+# 12. Step 11 — Update Progress
 
 Update:
 
@@ -196,7 +255,7 @@ Record:
 
 ---
 
-# 12. Specification Statuses
+# 13. Specification Statuses
 
 Use:
 
@@ -228,7 +287,7 @@ Recommended lifecycle:
 
 ---
 
-# 13. Scope Changes During Implementation
+# 14. Scope Changes During Implementation
 
 If a new requirement appears while implementing a specification:
 
@@ -244,7 +303,7 @@ Do not silently expand current scope.
 
 ---
 
-# 14. Architectural Changes
+# 15. Architectural Changes
 
 If implementation demonstrates an architectural decision is incorrect:
 
@@ -256,7 +315,7 @@ If implementation demonstrates an architectural decision is incorrect:
 
 ---
 
-# 15. Database Changes
+# 16. Database Changes
 
 Every schema modification requires:
 
@@ -268,7 +327,7 @@ Do not modify production schema exclusively through ad-hoc initialization code.
 
 ---
 
-# 16. Bug Fixes
+# 17. Bug Fixes
 
 Small implementation bugs may be fixed directly when the expected behavior is already defined.
 
@@ -276,7 +335,7 @@ If a bug reveals unspecified product behavior, update or create a specification.
 
 ---
 
-# 17. Refactors
+# 18. Refactors
 
 Refactors should preserve behavior.
 
@@ -286,7 +345,7 @@ Tests must protect behavior during refactoring.
 
 ---
 
-# 18. Codex Execution Pattern
+# 19. Codex Execution Pattern
 
 A useful Codex task format is:
 
@@ -296,7 +355,9 @@ A useful Codex task format is:
 
     Follow docs/sdd/workflow.md.
 
-    Create/update docs/plan.md before implementation.
+    Read the specification's tasks.md and select the next unblocked task.
+
+    Create/update docs/plan.md for that task before implementation.
 
     Work only within the specification scope.
 
@@ -308,7 +369,7 @@ This allows the specification to remain the primary implementation instruction.
 
 ---
 
-# 19. Completion Rule
+# 20. Completion Rule
 
 A specification is not complete because code was generated.
 

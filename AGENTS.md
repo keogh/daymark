@@ -53,6 +53,13 @@ Read:
 
 before implementing a specification.
 
+Each implementation-ready specification must have a companion:
+
+    docs/specs/<spec-directory>/tasks.md
+
+Select and complete one unblocked task from that breakdown at a time. The
+specification remains the source of truth for behavior.
+
 ---
 
 # 3. Source of Truth Priority
@@ -94,7 +101,7 @@ Before implementing any feature, read:
     docs/sdd/workflow.md
     docs/sdd/definition-of-done.md
 
-Then read the relevant feature specification.
+Then read the relevant feature specification and its companion `tasks.md`.
 
 When necessary, also read:
 
