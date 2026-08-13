@@ -12,9 +12,9 @@ SPEC-000 — Project Foundation
 
 In Progress
 
-TASK-000-001 through TASK-000-010 are complete. The next task is:
+TASK-000-001 through TASK-000-011 are complete. The next task is:
 
-    TASK-000-011 — Smoke-test packaged SQLite and offline startup
+    TASK-000-012 — Run final acceptance and update documentation
 
 ---
 
@@ -54,6 +54,10 @@ Completed milestone:
 - configured portable Forge package inputs, ASAR native-module unpacking, and
   current-platform rebuilding for `better-sqlite3`; the macOS arm64 package
   contains the migration assets and a matching unpacked native binary.
+- smoke-tested the macOS arm64 package with fresh writable user-data directories:
+  normal startup rendered the ready/database-connected state, and startup under a
+  macOS network-denial policy created and initialized a valid SQLite database
+  without network access.
 
 ---
 
@@ -132,4 +136,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Completed TASK-000-010, native-module packaging.
+2026-08-13 — Completed TASK-000-011, packaged SQLite and offline-startup smoke test.

@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-010 — Configure Native-Module Packaging
+TASK-000-011 — Smoke-Test Packaged SQLite and Offline Startup
 
 ## Status
 
@@ -26,15 +26,14 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Verify Forge rebuild, ASAR unpacking, and main-process externalization for
-   `better-sqlite3`.
-2. Package for the current platform and inspect the application and native binary
-   artifacts.
-3. Run focused quality checks and record task completion evidence.
+1. Package and launch the current-platform application with network access denied.
+2. Confirm the packaged renderer reaches ready state and inspect the writable
+   SQLite database for migrations and initial AppState data.
+3. Record reproducible smoke-test evidence and update project progress.
 
 ---
 
 # Scope Guard
 
 Do not add installers, signing, notarization, release automation, other-platform
-artifacts, or product behavior. Keep the packaging configuration cross-platform.
+artifacts, product behavior, or permanent application-only test hooks.

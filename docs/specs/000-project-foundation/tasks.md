@@ -606,7 +606,7 @@ TASK-000-002 and TASK-000-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -643,7 +643,20 @@ TASK-000-005, TASK-000-006, and TASK-000-010.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: `npm run package` produced the macOS arm64 package, and launching its
+  executable with a fresh temporary `--user-data-dir` rendered `Application ready.`
+  and `Local database connected.`, confirming the packaged health check completed.
+- 2026-08-13: The packaged executable was also launched through macOS
+  `sandbox-exec` with `(deny network*)` and a second fresh user-data directory.
+  Because Chromium subprocesses cannot initialize their own sandbox inside this
+  outer policy, this verification process used the runtime-only `--no-sandbox`
+  flag; no shipped configuration or source was changed. A control `curl` under the
+  same policy failed DNS resolution, demonstrating that network access was
+  unavailable.
+- 2026-08-13: The offline launch created `time-tracker.sqlite`; read-only inspection
+  found one applied Drizzle migration, the singleton AppState row in the expected
+  idle state, and `PRAGMA integrity_check` returned `ok`. The process remained
+  running without initialization errors until it was stopped cleanly.
 
 ---
 
