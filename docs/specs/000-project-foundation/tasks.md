@@ -3,7 +3,7 @@
 ## Source
 
 - Specification: `docs/specs/000-project-foundation/spec.md`
-- Specification status: Ready for Implementation
+- Specification status: Verified
 - Last reviewed against specification: 2026-08-13
 
 `spec.md` is the source of truth for behavior. This file only decomposes it into
@@ -36,8 +36,8 @@ implementation work and must be updated if the specification changes.
 | TASK-000-008 | Verify health service and renderer states | Complete | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
 | TASK-000-009 | Integrate startup failure handling | Complete | TASK-000-004–006 | AC-000-005 |
 | TASK-000-010 | Configure native-module packaging | Complete | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
-| TASK-000-011 | Smoke-test packaged SQLite and offline startup | Pending | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
-| TASK-000-012 | Run final acceptance and update documentation | Pending | TASK-000-007–011 | AC-000-001–019 |
+| TASK-000-011 | Smoke-test packaged SQLite and offline startup | Complete | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
+| TASK-000-012 | Run final acceptance and update documentation | Complete | TASK-000-007–011 | AC-000-001–019 |
 
 ---
 
@@ -664,7 +664,7 @@ TASK-000-005, TASK-000-006, and TASK-000-010.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -703,11 +703,31 @@ TASK-000-007, TASK-000-008, TASK-000-009, TASK-000-010, and TASK-000-011.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: `npm run typecheck`, `npm run lint`, `npm run format:check`, the full
+  test suite (9 files, 23 tests), `npm run package`, and `git diff --check` passed.
+- 2026-08-13: Repeated `npm run dev` and visually confirmed that Electron opened
+  the React foundation screen with `Application ready.` and
+  `Local database connected.`, covering the development startup and live health
+  round trip (AC-000-001–004).
+- 2026-08-13: Repeated the macOS arm64 packaged launch with a fresh writable
+  `--user-data-dir` and visually confirmed the same ready state. The new database
+  contained one applied migration and the expected singleton idle AppState;
+  `PRAGMA integrity_check` returned `ok` (AC-000-005–009, AC-000-017–018).
+- 2026-08-13: Reviewed the automated schema tests covering foreign keys, cascade
+  deletion, interval timestamp validity, the one-open-interval rule, and AppState
+  singleton enforcement (AC-000-007–014). Typecheck and lint provide final evidence
+  for AC-000-015–016; TASK-000-011 records the network-denied packaged startup for
+  AC-000-019.
+- 2026-08-13: Completed the Definition of Done audit: process and persistence
+  boundaries match the documented architecture, renderer access is limited to the
+  typed preload bridge, all test files live under `test/`, migrations preserve the
+  required invariants, failures are renderer-safe, and no SPEC-001 timer behavior
+  or unrelated scope is present. No architecture or decision update was required.
 
 ---
 
 # Final Specification Verification
 
-TASK-000-012 owns the final cross-task verification. SPEC-000 may move to `Verified`
-only after all tasks are complete and every required automated and manual check passes.
+TASK-000-012 completed the final cross-task verification. All tasks, automated
+checks, manual checks, acceptance criteria, and Definition of Done items passed;
+SPEC-000 is `Verified`.

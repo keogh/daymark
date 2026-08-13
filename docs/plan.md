@@ -2,22 +2,22 @@
 
 ## Current Specification
 
-SPEC-000 — Project Foundation
+SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-000-011 — Smoke-Test Packaged SQLite and Offline Startup
+No active task selected.
 
 ## Status
 
-Complete
+Ready for task selection
 
 ---
 
 # Source
 
-- Specification: `docs/specs/000-project-foundation/spec.md`
-- Task breakdown: `docs/specs/000-project-foundation/tasks.md`
+- Specification: `docs/specs/001-core-time-tracking/spec.md`
+- Task breakdown: `docs/specs/001-core-time-tracking/tasks.md`
 
 The task breakdown contains the full ordered implementation sequence. This file is
 only the execution plan for the active task.
@@ -26,14 +26,13 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Package and launch the current-platform application with network access denied.
-2. Confirm the packaged renderer reaches ready state and inspect the writable
-   SQLite database for migrations and initial AppState data.
-3. Record reproducible smoke-test evidence and update project progress.
+1. Select the next unblocked SPEC-001 task from its companion task breakdown.
+2. Replace this holding plan with only that task's immediate implementation steps
+   before changing code.
 
 ---
 
 # Scope Guard
 
-Do not add installers, signing, notarization, release automation, other-platform
-artifacts, product behavior, or permanent application-only test hooks.
+Do not implement SPEC-001 behavior until one unblocked task is selected and this
+plan is updated for it.

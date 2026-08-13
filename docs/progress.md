@@ -2,37 +2,34 @@
 
 ## Current Phase
 
-Project Foundation
+Core Time Tracking
 
 ## Current Specification
 
-SPEC-000 — Project Foundation
+SPEC-001 — Core Time Tracking
 
 ## Current Status
 
-In Progress
-
-TASK-000-001 through TASK-000-011 are complete. The next task is:
-
-    TASK-000-012 — Run final acceptance and update documentation
+Ready for task selection
 
 ---
 
 # Completed Specifications
 
-None.
+- SPEC-000 — Project Foundation (Verified 2026-08-13)
 
 ---
 
 # Active Work
 
-SPEC-000 — Project Foundation
+SPEC-001 — Core Time Tracking
 
 Objective:
 
-Create the Electron, React, TypeScript, SQLite, Drizzle, IPC, testing, and packaging foundation required for subsequent feature specifications.
+Implement the authoritative idle, running, and paused timer transitions on the
+verified project foundation.
 
-Completed milestone:
+Verified foundation milestone:
 
 - bootstrapped the npm-managed Electron/Forge, React/Vite, TypeScript,
   SQLite/Drizzle, Vitest/React Testing Library, ESLint, and Prettier toolchain;
@@ -58,22 +55,24 @@ Completed milestone:
   normal startup rendered the ready/database-connected state, and startup under a
   macOS network-denial policy created and initialized a valid SQLite database
   without network access.
+- completed final acceptance across AC-000-001 through AC-000-019 and the project
+  Definition of Done; typecheck, lint, formatting, all 23 tests, packaging,
+  development startup, and packaged startup passed.
 
 ---
 
 # Upcoming Specifications
 
-1. SPEC-001 — Core Time Tracking
-2. SPEC-002 — Daily History
-3. SPEC-003 — Task Search and Reuse
-4. SPEC-004 — One-Click Task Switching
-5. SPEC-005 — Manual Time Entry
-6. SPEC-006 — Edit and Delete Intervals
-7. SPEC-007 — Task Management
-8. SPEC-008 — System Tray
-9. SPEC-009 — Analytics
-10. SPEC-010 — Settings
-11. SPEC-011 — Packaging and Release
+1. SPEC-002 — Daily History
+2. SPEC-003 — Task Search and Reuse
+3. SPEC-004 — One-Click Task Switching
+4. SPEC-005 — Manual Time Entry
+5. SPEC-006 — Edit and Delete Intervals
+6. SPEC-007 — Task Management
+7. SPEC-008 — System Tray
+8. SPEC-009 — Analytics
+9. SPEC-010 — Settings
+10. SPEC-011 — Packaging and Release
 
 ---
 
@@ -110,7 +109,7 @@ Key established decisions include:
 
 Foundation tooling, the secure application shell, schema, database lifecycle, typed
 health-check boundary, foundation health screen, startup failure handling, and
-native-module packaging are implemented and validated.
+native-module packaging are implemented and verified.
 No product behavior has been implemented yet.
 
 Companion task breakdowns have been generated for:
@@ -121,19 +120,11 @@ Companion task breakdowns have been generated for:
 The SDD workflow now requires selecting one self-contained task before creating the
 active implementation plan.
 
-SPEC-000 should establish infrastructure only.
-
-Do not implement:
-
-- timer behavior;
-- task history;
-- analytics;
-- tray behavior;
-
-during SPEC-000 except for scaffolding necessary to support future specifications.
+SPEC-001 is ready for implementation. Select one unblocked task from its companion
+breakdown and update `docs/plan.md` before changing code.
 
 ---
 
 # Last Updated
 
-2026-08-13 — Completed TASK-000-011, packaged SQLite and offline-startup smoke test.
+2026-08-13 — Verified SPEC-000 and advanced active work to SPEC-001 task selection.
