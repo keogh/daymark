@@ -1,10 +1,12 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 
 import { DatabaseLifecycle } from '@/main/database/lifecycle';
 import {
   resolveDatabasePath,
   resolveMigrationsPath,
 } from '@/main/database/path';
+import { registerSystemHealthHandler } from '@/main/ipc/system-health';
+import { SystemHealthService } from '@/main/services/system-health';
 import { createMainWindow } from './create-window';
 
 export const registerApplicationLifecycle = (): void => {
@@ -18,6 +20,10 @@ export const registerApplicationLifecycle = (): void => {
 
     try {
       databaseLifecycle.initialize();
+      registerSystemHealthHandler(
+        ipcMain,
+        new SystemHealthService(databaseLifecycle),
+      );
       createMainWindow();
 
       app.on('activate', () => {

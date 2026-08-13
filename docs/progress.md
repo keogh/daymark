@@ -12,9 +12,9 @@ SPEC-000 — Project Foundation
 
 In Progress
 
-TASK-000-001 through TASK-000-004 are complete. The next task is:
+TASK-000-001 through TASK-000-005 are complete. The next task is:
 
-    TASK-000-005 — Add the Typed Health-Check Boundary
+    TASK-000-006 — Build the Foundation Health Screen
 
 ---
 
@@ -44,6 +44,8 @@ Completed milestone:
   migrations, idempotent AppState seeding, readiness, and shutdown cleanup.
 - standardized source-root imports on the single `@/*` alias across TypeScript,
   Vite, and Vitest without adding a dependency.
+- added the typed health-check contract across the database service, explicit IPC
+  handler, contextBridge preload API, and renderer Window declaration.
 
 ---
 
@@ -94,8 +96,9 @@ Key established decisions include:
 
 # Implementation Notes
 
-Foundation tooling, the secure application shell, schema, and database lifecycle
-are implemented and validated. No product behavior has been implemented yet.
+Foundation tooling, the secure application shell, schema, database lifecycle, and
+typed health-check boundary are implemented and validated. No product behavior has
+been implemented yet.
 
 Companion task breakdowns have been generated for:
 
@@ -120,4 +123,4 @@ during SPEC-000 except for scaffolding necessary to support future specification
 
 # Last Updated
 
-2026-08-13 — Completed the TASK-000-001 source-import alias maintenance amendment.
+2026-08-13 — Completed TASK-000-005, the typed health-check boundary.

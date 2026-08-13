@@ -1,3 +1,14 @@
-// The explicit window.timeTracker bridge is introduced with the foundation IPC task.
-// Keeping this entry point empty ensures the renderer receives no privileged API yet.
-export {};
+import { contextBridge, ipcRenderer } from 'electron';
+
+import {
+  SYSTEM_HEALTH_CHECK_CHANNEL,
+  type TimeTrackerAPI,
+} from '@/shared/contracts/system-health';
+
+const timeTrackerApi: TimeTrackerAPI = {
+  system: {
+    healthCheck: () => ipcRenderer.invoke(SYSTEM_HEALTH_CHECK_CHANNEL),
+  },
+};
+
+contextBridge.exposeInMainWorld('timeTracker', timeTrackerApi);

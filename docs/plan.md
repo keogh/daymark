@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-001 maintenance — Configure Source Import Alias
+TASK-000-005 — Add the Typed Health-Check Boundary
 
 ## Status
 
@@ -26,14 +26,13 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Configure `@/*` as the single alias for `src/*` in TypeScript, Vite, and Vitest.
-2. Replace imports that climb parent directories with the source alias while
-   retaining same-directory `./` imports.
-3. Document the import convention and run baseline validation plus packaging.
+1. Define the shared health contract and renderer global API declaration.
+2. Add the database-backed health operation, explicit IPC handler, and preload bridge.
+3. Wire handler registration into startup and verify the boundary with focused tests.
 
 ---
 
 # Scope Guard
 
-Do not add dependencies or change runtime behavior, architecture boundaries, product
-features, or test placement.
+Do not add generic IPC access, timer APIs, UI behavior, dependencies, or expose
+database details, filesystem paths, or stack traces to the renderer.
