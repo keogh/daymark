@@ -6,7 +6,7 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-001-002 — Implement Task Persistence and Normalization
+TASK-001-003 — Implement Interval and AppState Persistence
 
 ## Status
 
@@ -26,25 +26,26 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add the normalized-description uniqueness migration without recreating existing
-   databases.
-2. Implement focused Task repository insert/read/exact-normalized-find operations,
-   including uniqueness-conflict reuse.
-3. Add disposable SQLite repository tests for deterministic persistence,
-   normalization reuse, and inherited cascade behavior.
-4. Run focused tests and the project validation checks, then record completion
-   evidence.
+1. Define the persisted TimeInterval and singleton AppState domain records.
+2. Implement focused interval create/read/open/close and task/session range queries.
+3. Implement singleton AppState read/update operations and a reusable SQLite
+   transaction boundary for future timer commands.
+4. Add disposable SQLite repository tests for timestamps, references, cascade,
+   singleton state, the global-open-interval invariant, and rollback.
+5. Run focused tests and project validation, then record completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not implement timer transitions, interval/AppState repository operations, search
-UI, rename/delete operations, or suggestions in this task.
+Do not implement timer transition decisions, duration projections/formatting,
+manual interval editing, history queries, IPC, or UI in this task.
 
 ---
 
 # Completion
 
-TASK-001-002 is complete. Select the next unblocked task and replace this plan
-before making further implementation changes.
+TASK-001-003 is complete. The interval and singleton AppState repositories expose
+the persistence operations required by later timer tasks, and the transaction
+runner provides the atomic boundary for timer commands. Focused and full project
+validation passed.

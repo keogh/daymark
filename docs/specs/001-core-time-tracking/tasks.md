@@ -29,7 +29,7 @@ verified and must be revised if the specification or foundation contracts change
 | --- | --- | --- | --- | --- |
 | TASK-001-001 | Define timer contracts and deterministic primitives | Complete | SPEC-000 | Supporting work for AC-001–013 |
 | TASK-001-002 | Implement task persistence and normalization | Complete | TASK-001-001 | AC-001–002 |
-| TASK-001-003 | Implement interval and AppState persistence | Pending | TASK-001-001 | AC-004, AC-006–008, AC-012 |
+| TASK-001-003 | Implement interval and AppState persistence | Complete | TASK-001-001 | AC-004, AC-006–008, AC-012 |
 | TASK-001-004 | Implement duration projections | Pending | TASK-001-003 | AC-003, AC-005, AC-013 |
 | TASK-001-005 | Reconstruct authoritative timer state | Pending | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
 | TASK-001-006 | Implement transactional Start | Pending | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
@@ -169,7 +169,7 @@ TASK-001-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -208,7 +208,17 @@ TASK-001-001.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added typed TimeInterval and AppState persistence records plus focused
+  repositories for interval insert/read/open/close, session ranges, task overlap
+  ranges, lifetime task reads, and singleton AppState read/update.
+- 2026-08-13: Added a reusable better-sqlite3 transaction runner that commits a
+  complete repository operation and rolls back all writes after a failure.
+- 2026-08-13: Disposable-database repository tests passed (3 files, 13 tests),
+  covering exact timestamps, task references and cascade, valid timestamp order,
+  one global open interval, singleton AppState behavior, range selection, commit,
+  and rollback.
+- 2026-08-13: Full validation passed: typecheck, lint, formatting, all 54 tests,
+  and `git diff --check`.
 
 ---
 
