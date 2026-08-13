@@ -27,7 +27,7 @@ verified and must be revised if the specification or foundation contracts change
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-001-001 | Define timer contracts and deterministic primitives | Pending | SPEC-000 | Supporting work for AC-001–013 |
+| TASK-001-001 | Define timer contracts and deterministic primitives | Complete | SPEC-000 | Supporting work for AC-001–013 |
 | TASK-001-002 | Implement task persistence and normalization | Pending | TASK-001-001 | AC-001–002 |
 | TASK-001-003 | Implement interval and AppState persistence | Pending | TASK-001-001 | AC-004, AC-006–008, AC-012 |
 | TASK-001-004 | Implement duration projections | Pending | TASK-001-003 | AC-003, AC-005, AC-013 |
@@ -51,7 +51,7 @@ verified and must be revised if the specification or foundation contracts change
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -69,7 +69,7 @@ SPEC-000 must be verified.
 - Add runtime validation for Start input and explicit error codes from the spec.
 - Add `Clock`, `SystemClock`, and a controllable FakeClock for tests.
 - Add pure normalization behavior for trimmed, case-insensitive exact matching and the
-  specified description length policy.
+  required 500-Unicode-code-point description length policy.
 
 ### Excluded
 
@@ -91,7 +91,15 @@ SPEC-000 must be verified.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added the shared `TimerStatus`, `TimerState`, `StartTaskInput`,
+  `TimerAPI`, `AppResult`, and closed renderer-safe error contracts.
+- 2026-08-13: Added runtime Start input validation that trims descriptions,
+  normalizes exact matching, counts Unicode code points, and enforces the required
+  1–500 character range without truncation.
+- 2026-08-13: Added `Clock`, `SystemClock`, and a deterministic `FakeClock`, with
+  focused tests for time control, validation, normalization, and safe error mapping.
+- 2026-08-13: Focused tests passed (3 files, 11 tests). Full `npm test` passed (12
+  files, 34 tests), along with typecheck, lint, formatting, and `git diff --check`.
 
 ---
 
@@ -126,6 +134,8 @@ TASK-001-001.
 ### Deliverables
 
 - Task repository/query implementation and tests.
+- A migration adding a unique constraint for `normalized_description`, with
+  uniqueness conflicts resolved by reading and reusing the existing task.
 
 ### Verification
 

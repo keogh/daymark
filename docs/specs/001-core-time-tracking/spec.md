@@ -265,11 +265,15 @@ Invalid:
 "\n"
 ```
 
-Recommendation:
+Maximum length:
 
 ```text
 max length = 500 characters
 ```
+
+Length is measured in Unicode code points after trimming. The application must not
+silently truncate descriptions. A trimmed description longer than 500 code points
+is invalid.
 
 On validation failure:
 
@@ -325,6 +329,11 @@ IMPLEMENT AUTHENTICATION
 ```
 
 This behavior may be refined by a later task-search specification.
+
+`normalized_description` must be unique in SQLite. Task creation must still perform
+an application-level lookup, and a uniqueness conflict must resolve by reading and
+reusing the existing task. Add this constraint through a migration; do not recreate
+an existing database.
 
 ---
 
@@ -850,17 +859,17 @@ reconstructs presentation.
 Preload must expose:
 
 ```ts
-window.timeTracker.timer.getState()
+window.timeTracker.timer.getState(): Promise<AppResult<TimerState>>
 
 window.timeTracker.timer.start({
   description
-})
+}): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.pause()
+window.timeTracker.timer.pause(): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.resume()
+window.timeTracker.timer.resume(): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.stop()
+window.timeTracker.timer.stop(): Promise<AppResult<TimerState>>
 ```
 
 The renderer must not invoke arbitrary IPC channels.
@@ -869,16 +878,29 @@ The renderer must not invoke arbitrary IPC channels.
 
 # 39. Error Contract
 
-Suggested renderer-safe error structure:
+Expected command failures cross IPC as values rather than rejected promises:
 
 ```ts
+type AppResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: AppError };
+
 interface AppError {
-  code: string;
+  code:
+    | 'INVALID_TASK_DESCRIPTION'
+    | 'TIMER_NOT_IDLE'
+    | 'NO_ACTIVE_TIMER'
+    | 'TIMER_ALREADY_PAUSED'
+    | 'NO_CURRENT_TASK'
+    | 'TIMER_ALREADY_RUNNING'
+    | 'INTERNAL_ERROR';
   message: string;
 }
 ```
 
-Internal stack traces should not cross IPC as user-visible errors.
+Unexpected failures must be logged in the main process and mapped to
+`INTERNAL_ERROR`. Internal stack traces and arbitrary exception properties must not
+cross IPC.
 
 ---
 

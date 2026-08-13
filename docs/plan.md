@@ -26,13 +26,13 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Select the next unblocked SPEC-001 task from its companion task breakdown.
-2. Replace this holding plan with only that task's immediate implementation steps
-   before changing code.
+1. Select either unblocked TASK-001-002 (task persistence and normalization) or
+   TASK-001-003 (interval and AppState persistence).
+2. Replace this holding plan with only that task's immediate steps before changing
+   code.
 
 ---
 
 # Scope Guard
 
-Do not implement SPEC-001 behavior until one unblocked task is selected and this
-plan is updated for it.
+Do not implement additional SPEC-001 behavior until one unblocked task is selected.
