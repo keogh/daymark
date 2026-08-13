@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-006 — Build the Foundation Health Screen
+TASK-000-007 — Verify Schema and Database Invariants
 
 ## Status
 
@@ -26,15 +26,16 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add local renderer state for the initial health check and render accessible loading,
-   ready, and initialization-failure states.
-2. Add focused renderer tests using a mocked typed preload boundary.
-3. Run focused and baseline validation, then record task completion evidence.
+1. Add an isolated disposable-database test fixture that cannot resolve the user
+   application database.
+2. Add migration and database-level invariant tests required by SPEC-000 sections
+   40–46 and acceptance criteria AC-000-007 through AC-000-014.
+3. Run the focused database suite and baseline validation, then record task
+   completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not add timer UI, state-management or component-library dependencies, direct
-Node/Electron/SQLite access, or expose database details, filesystem paths, or stack
-traces to the renderer.
+Do not add TimerService, renderer behavior, repositories, or application-level timer
+validation. Verify constraints through disposable SQLite databases only.

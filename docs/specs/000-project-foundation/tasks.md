@@ -32,7 +32,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-004 | Initialize and manage the database lifecycle | Complete | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
 | TASK-000-005 | Add the typed health-check boundary | Complete | TASK-000-002, TASK-000-004 | AC-000-003–004 |
 | TASK-000-006 | Build the foundation health screen | Complete | TASK-000-005 | AC-000-001, AC-000-004 |
-| TASK-000-007 | Verify schema and database invariants | Pending | TASK-000-004 | AC-000-007–014 |
+| TASK-000-007 | Verify schema and database invariants | Complete | TASK-000-004 | AC-000-007–014 |
 | TASK-000-008 | Verify health service and renderer states | Pending | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
 | TASK-000-009 | Integrate startup failure handling | Pending | TASK-000-004–006 | AC-000-005 |
 | TASK-000-010 | Configure native-module packaging | Pending | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
@@ -386,7 +386,7 @@ TASK-000-005.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -423,7 +423,18 @@ TASK-000-004.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added an isolated disposable-database fixture that creates a unique
+  temporary directory and explicit test-only SQLite path, closes the connection,
+  and removes all files after each test.
+- 2026-08-13: Added migrated-database integration tests for required tables and
+  initial AppState values, active foreign keys, invalid task references, task
+  cascade deletion, invalid interval timestamp ordering, the global single-open-
+  interval constraint, and the AppState singleton constraint. Existing lifecycle
+  coverage verifies repeated initialization preserves data and does not duplicate
+  AppState.
+- 2026-08-13: The focused database suite passed (3 files, 12 tests). `npm run
+  format:check`, `npm run typecheck`, `npm run lint`, the full `npm test` suite (8
+  files, 20 tests), and `git diff --check` passed.
 
 ---
 
