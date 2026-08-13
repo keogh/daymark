@@ -196,6 +196,16 @@ The renderer must not:
 
 All privileged functionality must go through the preload API.
 
+For conditional JSX that renders a component only when a condition is true, prefer:
+
+```tsx
+{condition && <Component />}
+```
+
+over a ternary whose false branch is `null`. The left operand must be an explicit
+boolean condition so values such as `0` or an empty string are not rendered
+accidentally. Use a ternary when choosing between two rendered alternatives.
+
 ---
 
 # 9. Preload Rules

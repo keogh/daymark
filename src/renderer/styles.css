@@ -38,9 +38,17 @@ body {
   letter-spacing: -0.04em;
 }
 
-.app-shell__panel p {
+.app-shell__status {
   margin: 0.75rem 0 0;
   color: #64748b;
   font-size: 1rem;
   line-height: 1.5;
+}
+
+.app-shell__status p {
+  margin: 0;
+}
+
+.app-shell__status--error {
+  color: #b42318;
 }

@@ -31,7 +31,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-003 | Define and migrate the foundation schema | Complete | TASK-000-001 | AC-000-007–008, AC-000-010–013 |
 | TASK-000-004 | Initialize and manage the database lifecycle | Complete | TASK-000-003 | AC-000-005–006, AC-000-008–009 |
 | TASK-000-005 | Add the typed health-check boundary | Complete | TASK-000-002, TASK-000-004 | AC-000-003–004 |
-| TASK-000-006 | Build the foundation health screen | Pending | TASK-000-005 | AC-000-001, AC-000-004 |
+| TASK-000-006 | Build the foundation health screen | Complete | TASK-000-005 | AC-000-001, AC-000-004 |
 | TASK-000-007 | Verify schema and database invariants | Pending | TASK-000-004 | AC-000-007–014 |
 | TASK-000-008 | Verify health service and renderer states | Pending | TASK-000-005, TASK-000-006 | AC-000-003–004, AC-000-014 |
 | TASK-000-009 | Integrate startup failure handling | Pending | TASK-000-004–006 | AC-000-005 |
@@ -331,7 +331,7 @@ TASK-000-002 and TASK-000-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -368,7 +368,17 @@ TASK-000-005.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Replaced the static renderer shell message with local React health
+  state that uses only the typed `window.timeTracker.system.healthCheck()` API and
+  renders accessible loading, ready/database-connected, and initialization-failure
+  states.
+- 2026-08-13: Added focused renderer tests with a mocked typed preload boundary for
+  the pending request, successful response, unavailable-database response, and
+  rejected health-check call. The focused suite passed (3 tests).
+- 2026-08-13: `npm run dev` built the renderer, main, and preload targets and
+  launched Electron without a startup error. `npm run typecheck`, `npm run lint`,
+  `npm run format:check`, `npm test`, and `git diff --check` passed (7 test files,
+  13 tests).
 
 ---
 

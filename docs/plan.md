@@ -6,7 +6,7 @@ SPEC-000 — Project Foundation
 
 ## Active Task
 
-TASK-000-005 — Add the Typed Health-Check Boundary
+TASK-000-006 — Build the Foundation Health Screen
 
 ## Status
 
@@ -26,13 +26,15 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Define the shared health contract and renderer global API declaration.
-2. Add the database-backed health operation, explicit IPC handler, and preload bridge.
-3. Wire handler registration into startup and verify the boundary with focused tests.
+1. Add local renderer state for the initial health check and render accessible loading,
+   ready, and initialization-failure states.
+2. Add focused renderer tests using a mocked typed preload boundary.
+3. Run focused and baseline validation, then record task completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not add generic IPC access, timer APIs, UI behavior, dependencies, or expose
-database details, filesystem paths, or stack traces to the renderer.
+Do not add timer UI, state-management or component-library dependencies, direct
+Node/Electron/SQLite access, or expose database details, filesystem paths, or stack
+traces to the renderer.
