@@ -30,7 +30,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-001 | Define timer contracts and deterministic primitives | Complete | SPEC-000 | Supporting work for AC-001–013 |
 | TASK-001-002 | Implement task persistence and normalization | Complete | TASK-001-001 | AC-001–002 |
 | TASK-001-003 | Implement interval and AppState persistence | Complete | TASK-001-001 | AC-004, AC-006–008, AC-012 |
-| TASK-001-004 | Implement duration projections | Pending | TASK-001-003 | AC-003, AC-005, AC-013 |
+| TASK-001-004 | Implement duration projections | Complete | TASK-001-003 | AC-003, AC-005, AC-013 |
 | TASK-001-005 | Reconstruct authoritative timer state | Pending | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
 | TASK-001-006 | Implement transactional Start | Pending | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
 | TASK-001-007 | Implement transactional Pause | Pending | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
@@ -226,7 +226,7 @@ TASK-001-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -263,7 +263,16 @@ TASK-001-003.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-13: Added pure duration summation with half-open range overlap, capping
+  open and future-ending intervals at the authoritative `now` without persisted
+  counters or interval mutation.
+- 2026-08-13: Added a query-backed projector for active session, current-task local
+  calendar day, and task lifetime durations.
+- 2026-08-13: Focused duration tests passed (1 file, 7 tests), covering no data,
+  multiple intervals, paused gaps, exact boundaries, open intervals, unrelated
+  tasks, and the Aug 13/14 midnight example.
+- 2026-08-13: Full validation passed: typecheck, lint, formatting, all 61 tests,
+  and `git diff --check`.
 
 ---
 
