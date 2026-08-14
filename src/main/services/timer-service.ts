@@ -175,6 +175,43 @@ export class TimerService {
 
     return { ok: true, value: this.#stateReader.getStateAt(now) };
   }
+
+  stop(): AppResult<TimerState> {
+    const now = this.#clock.now();
+    this.#transactions.run(() => {
+      const state = this.#appState.get();
+      if (state.timerStatus === 'idle') {
+        return;
+      }
+
+      this.#stateReader.getStateAt(now);
+      if (state.timerStatus === 'running') {
+        const openInterval = this.#intervals.findOpen();
+        if (openInterval === undefined) {
+          throw new InvalidPersistedTimerStateError(
+            'Running timer has no open interval.',
+          );
+        }
+
+        const closedInterval = this.#intervals.close(openInterval.id, now, now);
+        if (closedInterval === undefined) {
+          throw new InvalidPersistedTimerStateError(
+            'Running timer interval could not be closed.',
+          );
+        }
+      }
+
+      this.#appState.update({
+        id: 1,
+        timerStatus: 'idle',
+        currentTaskId: null,
+        sessionStartedAt: null,
+        updatedAt: now,
+      });
+    });
+
+    return { ok: true, value: this.#stateReader.getStateAt(now) };
+  }
 }
 
 const timerNotIdle = (): AppResult<never> => ({

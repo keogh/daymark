@@ -35,7 +35,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-006 | Implement transactional Start | Complete | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
 | TASK-001-007 | Implement transactional Pause | Complete | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
 | TASK-001-008 | Implement transactional Resume | Complete | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
-| TASK-001-009 | Implement transactional Stop | Pending | TASK-001-005–008 | AC-007–008, AC-012 |
+| TASK-001-009 | Implement transactional Stop | Complete | TASK-001-005–008 | AC-007–008, AC-012 |
 | TASK-001-010 | Verify the complete service workflow and recovery | Pending | TASK-001-006–009 | AC-001–010, AC-012–013 |
 | TASK-001-011 | Expose the typed timer IPC API | Pending | TASK-001-005–009 | Supporting boundary for AC-001–012 |
 | TASK-001-012 | Build idle loading and start UI | Pending | TASK-001-011 | AC-001–003, AC-011 |
@@ -502,7 +502,7 @@ TASK-001-005 and TASK-001-007.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -539,7 +539,16 @@ TASK-001-005, TASK-001-006, TASK-001-007, and TASK-001-008.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added transactional Stop with one injected-clock snapshot. Running
+  Stop closes the sole open interval and atomically clears AppState; paused Stop
+  clears AppState without creating or changing an interval; idle Stop returns the
+  canonical idle state without persistence.
+- 2026-08-14: Stop preserves the completed task and its timestamp-derived lifetime
+  duration, returns a zeroed renderer-facing idle state, and rolls back a running
+  interval close when the AppState update fails.
+- 2026-08-14: Focused Start/Pause/Resume/Stop service tests passed (1 file, 23
+  tests). Full validation passed: typecheck, lint, formatting, all 97 tests, and
+  `git diff --check`.
 
 ---
 

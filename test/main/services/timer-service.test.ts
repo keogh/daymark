@@ -353,6 +353,128 @@ describe('TimerService', () => {
       sessionStartedAt: startedAt,
     });
   });
+
+  it('stops a running timer atomically and preserves its final lifetime duration', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Completed Task' }).ok).toBe(true);
+    clock.advance(minutes(30));
+    const stoppedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.stop();
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'idle',
+        currentTask: null,
+        sessionStartedAt: null,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 0,
+        taskLifetimeDurationMs: 0,
+        activeIntervalStartedAt: null,
+        now: stoppedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findOpen()).toBeUndefined();
+    expect(intervals.findById('generated-2')).toMatchObject({
+      startedAt,
+      endedAt: stoppedAt,
+      updatedAt: stoppedAt,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'idle',
+      currentTaskId: null,
+      sessionStartedAt: null,
+      updatedAt: stoppedAt,
+    });
+
+    const persistedIntervals = intervals.findByTask('generated-1');
+    expect(persistedIntervals).toHaveLength(1);
+    expect(
+      new DurationProjector(intervals).project({
+        taskId: 'generated-1',
+        sessionStartedAt: startedAt,
+        now: stoppedAt,
+      }).taskLifetimeDurationMs,
+    ).toBe(minutes(30));
+  });
+
+  it('stops a paused timer without creating or modifying intervals', () => {
+    expect(service.start({ description: 'Paused Task' }).ok).toBe(true);
+    clock.advance(minutes(30));
+    expect(service.pause().ok).toBe(true);
+    const intervalBeforeStop = intervals.findById('generated-2');
+    const intervalCount = countRows(context, 'time_intervals');
+    clock.advance(minutes(15));
+    const stoppedAt = clock.now();
+
+    expect(service.stop()).toMatchObject({
+      ok: true,
+      value: { status: 'idle', now: stoppedAt },
+    });
+    expect(countRows(context, 'time_intervals')).toBe(intervalCount);
+    expect(intervals.findById('generated-2')).toEqual(intervalBeforeStop);
+    expect(
+      new DurationProjector(intervals).project({
+        taskId: 'generated-1',
+        sessionStartedAt: intervalBeforeStop?.startedAt ?? stoppedAt,
+        now: stoppedAt,
+      }).taskLifetimeDurationMs,
+    ).toBe(minutes(30));
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'idle',
+      currentTaskId: null,
+      sessionStartedAt: null,
+      updatedAt: stoppedAt,
+    });
+  });
+
+  it('returns idle idempotently without persistence when already stopped', () => {
+    const changesBefore = totalChanges(context);
+    const now = clock.now();
+
+    expect(service.stop()).toEqual({
+      ok: true,
+      value: {
+        status: 'idle',
+        currentTask: null,
+        sessionStartedAt: null,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 0,
+        taskLifetimeDurationMs: 0,
+        activeIntervalStartedAt: null,
+        now,
+      },
+    });
+    expect(totalChanges(context)).toBe(changesBefore);
+    expect(countRows(context, 'time_intervals')).toBe(0);
+  });
+
+  it('rolls back a running interval close when idle AppState cannot be persisted', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Rollback Stop' }).ok).toBe(true);
+    clock.advance(minutes(10));
+    context.sqlite
+      .prepare(
+        "create trigger reject_stop before update on app_state when new.timer_status = 'idle' begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+
+    expect(() => service.stop()).toThrow('rejected');
+    expect(intervals.findOpen()).toMatchObject({
+      id: 'generated-2',
+      startedAt,
+      endedAt: null,
+    });
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+    });
+  });
 });
 
 const minutes = (value: number): number => value * 60_000;
