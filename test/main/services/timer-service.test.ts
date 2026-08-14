@@ -262,6 +262,97 @@ describe('TimerService', () => {
       sessionStartedAt: startedAt,
     });
   });
+
+  it('resumes a paused timer atomically with a second interval and preserved session', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Active Task' }).ok).toBe(true);
+    clock.advance(minutes(30));
+    expect(service.pause().ok).toBe(true);
+    clock.advance(minutes(30));
+    const resumedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.resume();
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'generated-1',
+          description: 'Active Task',
+        },
+        sessionStartedAt: startedAt,
+        sessionDurationMs: minutes(30),
+        taskTodayDurationMs: minutes(30),
+        taskLifetimeDurationMs: minutes(30),
+        activeIntervalStartedAt: resumedAt,
+        now: resumedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findByTask('generated-1')).toHaveLength(2);
+    expect(intervals.findOpen()).toEqual({
+      id: 'generated-3',
+      taskId: 'generated-1',
+      startedAt: resumedAt,
+      endedAt: null,
+      createdAt: resumedAt,
+      updatedAt: resumedAt,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+      updatedAt: resumedAt,
+    });
+
+    clock.advance(minutes(15));
+    expect(reader.getState().sessionDurationMs).toBe(minutes(45));
+  });
+
+  it.each([
+    { status: 'idle' as const, code: 'NO_CURRENT_TASK' },
+    { status: 'running' as const, code: 'TIMER_ALREADY_RUNNING' },
+  ])(
+    'rejects Resume while the timer is $status without persistence',
+    ({ status, code }) => {
+      if (status === 'running') {
+        seedActiveState(context, status, clock.now());
+      }
+      const changesBefore = totalChanges(context);
+
+      expect(service.resume()).toMatchObject({ ok: false, error: { code } });
+      expect(totalChanges(context)).toBe(changesBefore);
+      expect(appState.get().timerStatus).toBe(status);
+      expect(countRows(context, 'time_intervals')).toBe(
+        status === 'running' ? 1 : 0,
+      );
+    },
+  );
+
+  it('rolls back the resumed interval when running AppState cannot be persisted', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Rollback Resume' }).ok).toBe(true);
+    clock.advance(minutes(10));
+    expect(service.pause().ok).toBe(true);
+    const intervalCount = countRows(context, 'time_intervals');
+    context.sqlite
+      .prepare(
+        "create trigger reject_resume before update on app_state when old.timer_status = 'paused' and new.timer_status = 'running' begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+
+    expect(() => service.resume()).toThrow('rejected');
+    expect(countRows(context, 'time_intervals')).toBe(intervalCount);
+    expect(intervals.findOpen()).toBeUndefined();
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'paused',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+    });
+  });
 });
 
 const minutes = (value: number): number => value * 60_000;

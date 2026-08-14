@@ -34,7 +34,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-005 | Reconstruct authoritative timer state | Complete | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
 | TASK-001-006 | Implement transactional Start | Complete | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
 | TASK-001-007 | Implement transactional Pause | Complete | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
-| TASK-001-008 | Implement transactional Resume | Pending | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
+| TASK-001-008 | Implement transactional Resume | Complete | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
 | TASK-001-009 | Implement transactional Stop | Pending | TASK-001-005–008 | AC-007–008, AC-012 |
 | TASK-001-010 | Verify the complete service workflow and recovery | Pending | TASK-001-006–009 | AC-001–010, AC-012–013 |
 | TASK-001-011 | Expose the typed timer IPC API | Pending | TASK-001-005–009 | Supporting boundary for AC-001–012 |
@@ -449,7 +449,7 @@ TASK-001-005 and TASK-001-006.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -485,7 +485,16 @@ TASK-001-005 and TASK-001-007.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added transactional Resume with one injected-clock snapshot,
+  paused-state validation, one new open interval for the current task, and an
+  AppState update that preserves the original session start.
+- 2026-08-14: Resume returns the authoritative running state, excludes paused time,
+  reaches the AC-006 45-minute duration after 15 resumed minutes, rejects idle and
+  already-running states without mutation, and rolls back interval creation when
+  the AppState update fails.
+- 2026-08-14: Focused Start/Pause/Resume service tests passed (1 file, 19 tests).
+  Full validation passed: typecheck, lint, formatting, all 93 tests, and
+  `git diff --check`.
 
 ---
 

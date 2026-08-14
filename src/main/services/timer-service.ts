@@ -133,6 +133,48 @@ export class TimerService {
 
     return { ok: true, value: this.#stateReader.getStateAt(now) };
   }
+
+  resume(): AppResult<TimerState> {
+    const now = this.#clock.now();
+    const transition = this.#transactions.run<AppResult<true>>(() => {
+      const state = this.#appState.get();
+      if (state.timerStatus === 'idle') {
+        return noCurrentTask();
+      }
+      if (state.timerStatus === 'running') {
+        return timerAlreadyRunning();
+      }
+
+      this.#stateReader.getStateAt(now);
+      if (state.currentTaskId === null) {
+        throw new InvalidPersistedTimerStateError(
+          'Paused timer has no current task.',
+        );
+      }
+
+      this.#intervals.insert({
+        id: this.#generateId(),
+        taskId: state.currentTaskId,
+        startedAt: now,
+        endedAt: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+      this.#appState.update({
+        ...state,
+        timerStatus: 'running',
+        updatedAt: now,
+      });
+
+      return { ok: true, value: true };
+    });
+
+    if (!transition.ok) {
+      return transition;
+    }
+
+    return { ok: true, value: this.#stateReader.getStateAt(now) };
+  }
 }
 
 const timerNotIdle = (): AppResult<never> => ({
@@ -156,5 +198,21 @@ const timerAlreadyPaused = (): AppResult<never> => ({
   error: {
     code: 'TIMER_ALREADY_PAUSED',
     message: 'The timer is already paused.',
+  },
+});
+
+const noCurrentTask = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'NO_CURRENT_TASK',
+    message: 'There is no current task to resume.',
+  },
+});
+
+const timerAlreadyRunning = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'TIMER_ALREADY_RUNNING',
+    message: 'The timer is already running.',
   },
 });
