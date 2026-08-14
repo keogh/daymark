@@ -206,6 +206,8 @@ The intended stack is:
     Electron
     TypeScript
     React
+    Tailwind CSS
+    selective source-owned shadcn/ui components
     Vite
     Electron Forge
     SQLite

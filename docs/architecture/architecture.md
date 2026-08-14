@@ -36,6 +36,17 @@ TypeScript
 
 React
 
+## Styling
+
+Tailwind CSS v4
+
+## Component Foundation
+
+Selectively adopted, source-owned shadcn/ui components from the official registry.
+Use the Radix-based Nova preset, Lucide icons, and semantic theme tokens. Custom
+product-specific components remain appropriate; do not treat shadcn/ui as a reason
+to install an exhaustive component set or impose a generic dashboard design.
+
 ## Build Tool
 
 Vite
@@ -75,7 +86,8 @@ Exact package versions belong in `package.json` and the lockfile rather than arc
 │                 Renderer                    │
 │                                             │
 │  React                                      │
-│  Components                                 │
+│  Tailwind CSS / semantic theme tokens       │
+│  Source-owned UI and product components     │
 │  View Models / Hooks                        │
 │  Presentation State                         │
 │                                             │
@@ -127,6 +139,15 @@ The renderer owns:
 - modals;
 - visual timer updates;
 - navigation.
+
+Renderer styling uses Tailwind CSS utilities for layout and composition plus
+semantic theme tokens and reviewed source-owned UI primitives. Reusable component
+variants own common visual states; feature components should not encode product
+meaning with raw palette utilities.
+
+The styling and component toolchain does not alter the renderer security boundary.
+UI components must not import Electron, Node.js, database, filesystem, or raw IPC
+capabilities.
 
 The renderer does not own:
 

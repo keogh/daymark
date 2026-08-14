@@ -2,16 +2,18 @@
 
 ## Current Phase
 
-Daily History planning
+Daily History specification review
 
 ## Current Specification
 
-SPEC-002 — Daily History
+SPEC-002 — Daily History (Draft)
 
 ## Current Status
 
-SPEC-001 is verified; ready to prepare or begin SPEC-002 according to the SDD
-workflow.
+SPEC-001 is verified. The draft SPEC-002 behavior, acceptance criteria, and task
+breakdown are prepared for review. The accepted renderer tooling decision records
+incremental Tailwind CSS v4 and selective official shadcn/ui adoption as supporting
+infrastructure for Daily History.
 
 ---
 
@@ -68,11 +70,13 @@ None.
 
 See `docs/decisions.md`. SPEC-001 remained within the established Electron, React,
 typed preload API, main-process SQLite, timestamp-based timer, injected Clock, and
-npm decisions. No new architectural decision was required.
+npm decisions. DEC-034 adds Tailwind CSS v4 and selectively adopted, source-owned
+official shadcn/ui components for the renderer without changing process boundaries
+or authorizing a wholesale redesign.
 
 ---
 
 # Last Updated
 
-2026-08-14 — Verified SPEC-001 after complete automated and packaged-application
-acceptance; next specification is SPEC-002.
+2026-08-14 — Prepared draft SPEC-002, its companion task breakdown, and the accepted
+renderer styling/component decision for review.

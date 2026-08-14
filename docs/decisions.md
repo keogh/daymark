@@ -581,3 +581,70 @@ Accepted
 All production schema changes use migrations.
 
 Never rely on deleting/recreating the user's database after release.
+
+---
+
+# DEC-034 — Renderer Styling and Component Foundation
+
+## Status
+
+Accepted
+
+## Decision
+
+Use Tailwind CSS v4 for renderer styling and selectively adopt source-owned
+shadcn/ui components from the official `@shadcn` registry.
+
+Initialize shadcn/ui for the existing Vite renderer with:
+
+- the Radix-based Nova preset;
+- the existing `@/*` source-root alias;
+- Lucide icons;
+- a neutral/slate semantic-token foundation;
+- the existing blue treatment as the semantic primary color.
+
+SPEC-002 introduces light appearance only. Semantic tokens should permit a later
+dark-mode decision without adding dark-mode product behavior now.
+
+Add only components required by the active specification. Do not install all
+components or use community registry blocks without a separate demonstrated need
+and review.
+
+Generated component files are application-owned source code. Review, test, and
+maintain them under the same standards as handwritten renderer code.
+
+Adopt the foundation incrementally. Shared controls and states may migrate when
+touched, while specialized product UI such as the primary timer display remains
+custom. Do not use this decision as authorization for a wholesale redesign.
+
+## Context
+
+Daily History and later MVP specifications require increasingly complex accessible
+controls, including expandable content, overlays, menus, forms, navigation, and
+charts. Reimplementing every primitive independently would duplicate interaction,
+focus, state, and styling work.
+
+The existing renderer also contains repeated button, input, pending, focus, and
+error styles that benefit from shared variants and semantic tokens.
+
+## Reasoning
+
+Tailwind provides compact composition and layout utilities without changing the
+renderer process boundary. shadcn/ui provides inspectable component source rather
+than an opaque runtime component framework, allowing the project to keep components
+small, accessible, and product-specific.
+
+Selective adoption preserves the project's preference for minimal dependencies and
+avoids forcing the application into a generic dashboard design.
+
+## Consequences
+
+- Tailwind and required primitive packages become renderer build dependencies.
+- Component source is committed to this repository and reviewed after CLI changes.
+- Feature components use semantic tokens instead of raw palette colors for product
+  meaning.
+- The renderer continues to access privileged behavior only through the typed
+  preload API.
+- Runtime network access is not introduced.
+- Completed specifications are not rewritten merely because their controls are
+  later migrated without behavioral change.
