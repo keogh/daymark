@@ -4,10 +4,24 @@ import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
   type TimeTrackerAPI,
 } from '@/shared/contracts/system-health';
+import {
+  TIMER_GET_STATE_CHANNEL,
+  TIMER_PAUSE_CHANNEL,
+  TIMER_RESUME_CHANNEL,
+  TIMER_START_CHANNEL,
+  TIMER_STOP_CHANNEL,
+} from '@/shared/contracts/timer';
 
 const timeTrackerApi: TimeTrackerAPI = {
   system: {
     healthCheck: () => ipcRenderer.invoke(SYSTEM_HEALTH_CHECK_CHANNEL),
+  },
+  timer: {
+    getState: () => ipcRenderer.invoke(TIMER_GET_STATE_CHANNEL),
+    start: (input) => ipcRenderer.invoke(TIMER_START_CHANNEL, input),
+    pause: () => ipcRenderer.invoke(TIMER_PAUSE_CHANNEL),
+    resume: () => ipcRenderer.invoke(TIMER_RESUME_CHANNEL),
+    stop: () => ipcRenderer.invoke(TIMER_STOP_CHANNEL),
   },
 };
 

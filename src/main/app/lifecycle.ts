@@ -1,12 +1,22 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { randomUUID } from 'node:crypto';
 
+import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
+import { TaskRepository } from '@/main/database/repositories/task-repository';
+import { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
+import { TransactionRunner } from '@/main/database/transaction-runner';
+import { SystemClock } from '@/main/domain/clock';
 import { DatabaseLifecycle } from '@/main/database/lifecycle';
 import {
   resolveDatabasePath,
   resolveMigrationsPath,
 } from '@/main/database/path';
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
+import { registerTimerHandlers } from '@/main/ipc/timer';
+import { DurationProjector } from '@/main/services/duration-projections';
 import { SystemHealthService } from '@/main/services/system-health';
+import { TimerService } from '@/main/services/timer-service';
+import { TimerStateReader } from '@/main/services/timer-state-reader';
 import { createMainWindow } from './create-window';
 import { startApplication } from './startup';
 
@@ -23,9 +33,36 @@ export const registerApplicationLifecycle = (): void => {
     const started = startApplication({
       initializeDatabase: () => lifecycle.initialize(),
       registerApplicationServices: () => {
+        const context = lifecycle.getContext();
+        const appState = new AppStateRepository(context.db);
+        const tasks = new TaskRepository(context.db);
+        const intervals = new TimeIntervalRepository(context.db);
+        const clock = new SystemClock();
+        const stateReader = new TimerStateReader({
+          appState,
+          tasks,
+          intervals,
+          durations: new DurationProjector(intervals),
+          clock,
+        });
+        const timerService = new TimerService({
+          appState,
+          tasks,
+          intervals,
+          transactions: new TransactionRunner(context.sqlite),
+          stateReader,
+          clock,
+          generateId: randomUUID,
+        });
+
         registerSystemHealthHandler(
           ipcMain,
           new SystemHealthService(lifecycle),
+        );
+        registerTimerHandlers(
+          ipcMain,
+          { getState: stateReader, commands: timerService },
+          console,
         );
       },
       createNormalWindow: createMainWindow,

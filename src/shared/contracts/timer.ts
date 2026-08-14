@@ -1,5 +1,11 @@
 import type { AppResult } from './app-result';
 
+export const TIMER_GET_STATE_CHANNEL = 'timer:get-state';
+export const TIMER_START_CHANNEL = 'timer:start';
+export const TIMER_PAUSE_CHANNEL = 'timer:pause';
+export const TIMER_RESUME_CHANNEL = 'timer:resume';
+export const TIMER_STOP_CHANNEL = 'timer:stop';
+
 export type TimerStatus = 'idle' | 'running' | 'paused';
 
 export interface TimerTask {

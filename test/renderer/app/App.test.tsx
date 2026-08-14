@@ -12,7 +12,16 @@ const setHealthCheck = (
 ) => {
   Object.defineProperty(window, 'timeTracker', {
     configurable: true,
-    value: { system: { healthCheck } } satisfies TimeTrackerAPI,
+    value: {
+      system: { healthCheck },
+      timer: {
+        getState: vi.fn(),
+        start: vi.fn(),
+        pause: vi.fn(),
+        resume: vi.fn(),
+        stop: vi.fn(),
+      },
+    } satisfies TimeTrackerAPI,
   });
 };
 

@@ -37,7 +37,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-008 | Implement transactional Resume | Complete | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
 | TASK-001-009 | Implement transactional Stop | Complete | TASK-001-005–008 | AC-007–008, AC-012 |
 | TASK-001-010 | Verify the complete service workflow and recovery | Complete | TASK-001-006–009 | AC-001–010, AC-012–013 |
-| TASK-001-011 | Expose the typed timer IPC API | Pending | TASK-001-005–009 | Supporting boundary for AC-001–012 |
+| TASK-001-011 | Expose the typed timer IPC API | Complete | TASK-001-005–009 | Supporting boundary for AC-001–012 |
 | TASK-001-012 | Build idle loading and start UI | Pending | TASK-001-011 | AC-001–003, AC-011 |
 | TASK-001-013 | Build running and paused timer UI | Pending | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
 | TASK-001-014 | Verify renderer behavior and resynchronization | Pending | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
@@ -615,7 +615,7 @@ TASK-001-006, TASK-001-007, TASK-001-008, and TASK-001-009.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -655,7 +655,19 @@ TASK-001-005, TASK-001-006, TASK-001-007, TASK-001-008, and TASK-001-009.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added explicit shared channels and thin main-process handlers for
+  getState, Start, Pause, Resume, and Stop, then composed the existing repositories,
+  state reader, service, injected SystemClock, transactions, and UUID generation at
+  application startup.
+- 2026-08-14: Start input is validated again at the IPC boundary; expected failures
+  remain typed values, while unexpected failures are logged locally and reduced to
+  the fixed renderer-safe INTERNAL_ERROR response without stack traces or arbitrary
+  properties.
+- 2026-08-14: Extended the context-isolated preload and global Window contract with
+  only the five typed timer methods; raw ipcRenderer and generic invoke/send remain
+  unavailable to renderer code.
+- 2026-08-14: Focused IPC/preload tests passed (2 files, 5 tests). Full validation
+  passed: typecheck, lint, formatting, all 107 tests, and `git diff --check`.
 
 ---
 

@@ -1,3 +1,5 @@
+import type { TimerAPI } from './timer';
+
 export const SYSTEM_HEALTH_CHECK_CHANNEL = 'system:health-check';
 
 export type SystemHealth =
@@ -14,6 +16,7 @@ export interface TimeTrackerAPI {
   readonly system: {
     healthCheck(): Promise<SystemHealth>;
   };
+  readonly timer: TimerAPI;
 }
 
 declare global {
