@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 
-import { useTimerController } from './use-timer-controller';
+import type { TimerState } from '@/shared/contracts/timer';
+import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
+import { useDisplayDuration } from './use-display-duration';
+import {
+  useTimerController,
+  type TimerController,
+} from './use-timer-controller';
 
 export const App = () => {
   const controller = useTimerController();
@@ -20,11 +26,9 @@ export const App = () => {
           )}
         {controller.loadState.status === 'ready' &&
           controller.loadState.timer.status !== 'idle' && (
-            <RestoredTimer
-              description={
-                controller.loadState.timer.currentTask?.description ?? ''
-              }
-              status={controller.loadState.timer.status}
+            <ActiveTimer
+              controller={controller}
+              timer={controller.loadState.timer}
             />
           )}
       </section>
@@ -47,7 +51,7 @@ const LoadError = () => (
 );
 
 interface IdleTimerProps {
-  readonly controller: ReturnType<typeof useTimerController>;
+  readonly controller: TimerController;
 }
 
 const IdleTimer = ({ controller }: IdleTimerProps) => {
@@ -56,7 +60,7 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, [controller.startError]);
+  }, [controller.commandError]);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,16 +77,16 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
           </label>
           <input
             aria-describedby={
-              controller.startError === null ? undefined : 'start-error'
+              controller.commandError === null ? undefined : 'start-error'
             }
-            aria-invalid={controller.startError !== null}
+            aria-invalid={controller.commandError !== null}
             autoComplete="off"
-            disabled={controller.isStarting}
+            disabled={controller.activeCommand === 'start'}
             id="task-description"
             onChange={(event) => {
               setDescription(event.target.value);
-              if (controller.startError !== null) {
-                controller.clearStartError();
+              if (controller.commandError !== null) {
+                controller.clearCommandError();
               }
             }}
             placeholder="Task description..."
@@ -90,31 +94,93 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
             type="text"
             value={description}
           />
-          {controller.startError !== null && (
+          {controller.commandError !== null && (
             <p className="start-form__error" id="start-error" role="alert">
-              {controller.startError.message}
+              {controller.commandError.message}
             </p>
           )}
         </div>
         <button
-          disabled={controller.isStarting || description.trim().length === 0}
+          disabled={
+            controller.activeCommand === 'start' ||
+            description.trim().length === 0
+          }
           type="submit"
         >
-          {controller.isStarting ? 'Starting…' : 'Start'}
+          {controller.activeCommand === 'start' ? 'Starting…' : 'Start'}
         </button>
       </form>
     </div>
   );
 };
 
-interface RestoredTimerProps {
-  readonly description: string;
-  readonly status: 'running' | 'paused';
+interface ActiveTimerProps {
+  readonly controller: TimerController;
+  readonly timer: TimerState;
 }
 
-const RestoredTimer = ({ description, status }: RestoredTimerProps) => (
-  <div aria-label={`${status} timer`} className="restored-timer" role="region">
-    <h2>{description}</h2>
-    <p role="status">{status === 'running' ? 'Running' : 'Paused'}</p>
-  </div>
-);
+const ActiveTimer = ({ controller, timer }: ActiveTimerProps) => {
+  const displayDuration = useDisplayDuration(timer);
+  const isPending = controller.activeCommand !== null;
+
+  if (timer.status === 'idle') {
+    return null;
+  }
+
+  return (
+    <div
+      aria-label={`${timer.status} timer`}
+      className="active-timer"
+      role="region"
+    >
+      <h2>{timer.currentTask?.description}</h2>
+      <output
+        aria-label="Current session duration"
+        className="active-timer__clock"
+      >
+        {formatClockDuration(displayDuration)}
+      </output>
+      <p className="active-timer__status" role="status">
+        {timer.status === 'running' ? 'Current session' : 'Paused'}
+      </p>
+      <p className="active-timer__totals">
+        Today {formatHoursAndMinutes(timer.taskTodayDurationMs)}
+        <span> · </span>
+        Total {formatHoursAndMinutes(timer.taskLifetimeDurationMs)}
+      </p>
+      <div aria-label="Timer controls" className="timer-controls" role="group">
+        {timer.status === 'running' && (
+          <button
+            disabled={isPending}
+            onClick={() => void controller.pause()}
+            type="button"
+          >
+            {controller.activeCommand === 'pause' ? 'Pausing…' : 'Pause'}
+          </button>
+        )}
+        {timer.status === 'paused' && (
+          <button
+            disabled={isPending}
+            onClick={() => void controller.resume()}
+            type="button"
+          >
+            {controller.activeCommand === 'resume' ? 'Resuming…' : 'Resume'}
+          </button>
+        )}
+        <button
+          className="timer-controls__stop"
+          disabled={isPending}
+          onClick={() => void controller.stop()}
+          type="button"
+        >
+          {controller.activeCommand === 'stop' ? 'Stopping…' : 'Stop'}
+        </button>
+      </div>
+      {controller.commandError !== null && (
+        <p className="active-timer__error" role="alert">
+          {controller.commandError.message}
+        </p>
+      )}
+    </div>
+  );
+};

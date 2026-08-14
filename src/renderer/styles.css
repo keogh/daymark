@@ -62,7 +62,7 @@ input:focus-visible {
 }
 
 .idle-timer h2,
-.restored-timer h2,
+.active-timer h2,
 .timer-message h2 {
   margin: 0;
   color: #111827;
@@ -153,13 +153,13 @@ input:focus-visible {
 }
 
 .timer-message,
-.restored-timer {
+.active-timer {
   padding-bottom: 6rem;
   text-align: center;
 }
 
 .timer-message p,
-.restored-timer p {
+.active-timer p {
   margin: 0.875rem 0 0;
   color: #667085;
   font-size: 1rem;
@@ -181,10 +181,92 @@ input:focus-visible {
   font-size: 2rem;
 }
 
-.restored-timer p {
+.active-timer {
+  width: min(100%, 44rem);
+}
+
+.active-timer h2 {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.active-timer__clock {
+  display: block;
+  margin-top: 1.75rem;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3.5rem, 10vw, 6.5rem);
+  font-weight: 620;
+  letter-spacing: -0.065em;
+  line-height: 1;
+}
+
+.active-timer .active-timer__status {
+  margin-top: 0.75rem;
   color: #3156d3;
   font-weight: 650;
-  text-transform: capitalize;
+}
+
+.active-timer[aria-label='paused timer'] .active-timer__status {
+  color: #9a6700;
+}
+
+.active-timer .active-timer__totals {
+  margin-top: 1.5rem;
+  color: #667085;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.timer-controls button {
+  min-width: 7rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: #3156d3;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 680;
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.timer-controls button:hover:not(:disabled) {
+  background: #2748b9;
+}
+
+.timer-controls button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.timer-controls .timer-controls__stop {
+  border: 1px solid #c9d1df;
+  background: #fff;
+  color: #344054;
+}
+
+.timer-controls .timer-controls__stop:hover:not(:disabled) {
+  border-color: #aab5c6;
+  background: #f9fafb;
+}
+
+.timer-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.active-timer .active-timer__error {
+  margin-top: 1rem;
+  color: #b42318;
+  font-size: 0.875rem;
 }
 
 .visually-hidden {
@@ -224,6 +306,10 @@ input:focus-visible {
 
   .start-form button {
     width: 100%;
+  }
+
+  .active-timer__clock {
+    font-size: clamp(3rem, 17vw, 5rem);
   }
 }
 

@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from '@/renderer/app/App';
@@ -25,13 +31,23 @@ const runningState: TimerState = {
   taskTodayDurationMs: 500,
   taskLifetimeDurationMs: 500,
   activeIntervalStartedAt: 1_000,
-  now: 1_500,
+  now: Date.now(),
+};
+
+const pausedState: TimerState = {
+  ...runningState,
+  status: 'paused',
+  sessionDurationMs: 3_900_000,
+  taskTodayDurationMs: 7_500_000,
+  taskLifetimeDurationMs: 18_900_000,
+  activeIntervalStartedAt: null,
 };
 
 describe('App', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('loads authoritative timer state before showing the focused idle form', async () => {
@@ -166,7 +182,7 @@ describe('App', () => {
       });
       expect(region).toHaveTextContent('Implement authentication');
       expect(region).toHaveTextContent(
-        status === 'running' ? 'Running' : 'Paused',
+        status === 'running' ? 'Current session' : 'Paused',
       );
       expect(api.timer.start).not.toHaveBeenCalled();
       expect(api.timer.pause).not.toHaveBeenCalled();
@@ -187,11 +203,102 @@ describe('App', () => {
     );
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
+
+  it('renders active durations and applies Pause, Resume, and Stop responses', async () => {
+    const nextRunningState: TimerState = {
+      ...pausedState,
+      status: 'running',
+      activeIntervalStartedAt: pausedState.now,
+    };
+    const pauseResult = deferred<AppResult<TimerState>>();
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
+      pause: vi.fn(() => pauseResult.promise),
+      resume: vi.fn().mockResolvedValue({ ok: true, value: nextRunningState }),
+      stop: vi.fn().mockResolvedValue({ ok: true, value: idleState }),
+    });
+    render(<App />);
+
+    expect(await screen.findByRole('button', { name: 'Pause' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:00:00',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pause' }));
+    expect(screen.getByRole('button', { name: 'Pausing…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeDisabled();
+    pauseResult.resolve({ ok: true, value: pausedState });
+
+    expect(await screen.findByRole('button', { name: 'Resume' })).toBeEnabled();
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '01:05:00',
+    );
+    expect(screen.getByText(/Today 2h 5m/)).toHaveTextContent(
+      'Today 2h 5m · Total 5h 15m',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Resume' }));
+    expect(await screen.findByRole('button', { name: 'Pause' })).toBeEnabled();
+    expect(api.timer.resume).toHaveBeenCalledOnce();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    expect(
+      await screen.findByRole('textbox', { name: 'Task description' }),
+    ).toHaveFocus();
+    expect(api.timer.pause).toHaveBeenCalledOnce();
+    expect(api.timer.stop).toHaveBeenCalledOnce();
+  });
+
+  it('shows a safe command error and re-enables active controls', async () => {
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
+      pause: vi.fn().mockResolvedValue({
+        ok: false,
+        error: {
+          code: 'NO_ACTIVE_TIMER',
+          message: 'There is no active timer to pause.',
+        },
+      }),
+    });
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Pause' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'There is no active timer to pause.',
+    );
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+    expect(api.timer.pause).toHaveBeenCalledOnce();
+  });
+
+  it('periodically refreshes an active snapshot without issuing commands', async () => {
+    vi.useFakeTimers();
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: pausedState }),
+    });
+    render(<App />);
+    await act(async () => Promise.resolve());
+    expect(api.timer.getState).toHaveBeenCalledOnce();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+
+    expect(api.timer.getState).toHaveBeenCalledTimes(2);
+    expect(api.timer.pause).not.toHaveBeenCalled();
+    expect(api.timer.resume).not.toHaveBeenCalled();
+    expect(api.timer.stop).not.toHaveBeenCalled();
+  });
 });
 
 interface TimerApiOverrides {
   readonly getState?: TimeTrackerAPI['timer']['getState'];
   readonly start?: TimeTrackerAPI['timer']['start'];
+  readonly pause?: TimeTrackerAPI['timer']['pause'];
+  readonly resume?: TimeTrackerAPI['timer']['resume'];
+  readonly stop?: TimeTrackerAPI['timer']['stop'];
 }
 
 const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
@@ -204,9 +311,9 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       start:
         overrides.start ??
         vi.fn().mockResolvedValue({ ok: true, value: runningState }),
-      pause: vi.fn(),
-      resume: vi.fn(),
-      stop: vi.fn(),
+      pause: overrides.pause ?? vi.fn(),
+      resume: overrides.resume ?? vi.fn(),
+      stop: overrides.stop ?? vi.fn(),
     },
   };
 

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { AppError } from '@/shared/contracts/app-result';
+import type { AppError, AppResult } from '@/shared/contracts/app-result';
 import type { TimerState } from '@/shared/contracts/timer';
 import { validateStartTaskInput } from '@/shared/validation/task-description';
 
@@ -9,13 +9,20 @@ type TimerLoadState =
   | { readonly status: 'error' }
   | { readonly status: 'ready'; readonly timer: TimerState };
 
+export type TimerCommand = 'start' | 'pause' | 'resume' | 'stop';
+
 export interface TimerController {
   readonly loadState: TimerLoadState;
-  readonly isStarting: boolean;
-  readonly startError: AppError | null;
+  readonly activeCommand: TimerCommand | null;
+  readonly commandError: AppError | null;
   readonly start: (description: string) => Promise<void>;
-  readonly clearStartError: () => void;
+  readonly pause: () => Promise<void>;
+  readonly resume: () => Promise<void>;
+  readonly stop: () => Promise<void>;
+  readonly clearCommandError: () => void;
 }
+
+const AUTHORITATIVE_SYNC_MS = 60_000;
 
 const unexpectedError: AppError = {
   code: 'INTERNAL_ERROR',
@@ -26,8 +33,9 @@ export const useTimerController = (): TimerController => {
   const [loadState, setLoadState] = useState<TimerLoadState>({
     status: 'loading',
   });
-  const [isStarting, setIsStarting] = useState(false);
-  const [startError, setStartError] = useState<AppError | null>(null);
+  const [activeCommand, setActiveCommand] = useState<TimerCommand | null>(null);
+  const [commandError, setCommandError] = useState<AppError | null>(null);
+  const requestVersion = useRef(0);
 
   useEffect(() => {
     let isActive = true;
@@ -58,38 +66,98 @@ export const useTimerController = (): TimerController => {
     };
   }, []);
 
-  const start = useCallback(async (description: string): Promise<void> => {
-    const validation = validateStartTaskInput({ description });
-    if (!validation.ok) {
-      setStartError(validation.error);
+  const runCommand = useCallback(
+    async (
+      command: TimerCommand,
+      operation: () => Promise<AppResult<TimerState>>,
+    ): Promise<void> => {
+      const version = ++requestVersion.current;
+      setActiveCommand(command);
+      setCommandError(null);
+      try {
+        const result = await operation();
+        if (version !== requestVersion.current) {
+          return;
+        }
+        if (result.ok) {
+          setLoadState({ status: 'ready', timer: result.value });
+        } else {
+          setCommandError(result.error);
+        }
+      } catch {
+        if (version === requestVersion.current) {
+          setCommandError(unexpectedError);
+        }
+      } finally {
+        if (version === requestVersion.current) {
+          setActiveCommand(null);
+        }
+      }
+    },
+    [],
+  );
+
+  const start = useCallback(
+    async (description: string): Promise<void> => {
+      const validation = validateStartTaskInput({ description });
+      if (!validation.ok) {
+        setCommandError(validation.error);
+        return;
+      }
+
+      await runCommand('start', () =>
+        window.timeTracker.timer.start({
+          description: validation.value.description,
+        }),
+      );
+    },
+    [runCommand],
+  );
+
+  const pause = useCallback(
+    () => runCommand('pause', window.timeTracker.timer.pause),
+    [runCommand],
+  );
+  const resume = useCallback(
+    () => runCommand('resume', window.timeTracker.timer.resume),
+    [runCommand],
+  );
+  const stop = useCallback(
+    () => runCommand('stop', window.timeTracker.timer.stop),
+    [runCommand],
+  );
+
+  const timer = loadState.status === 'ready' ? loadState.timer : null;
+  useEffect(() => {
+    if (timer === null || timer.status === 'idle' || activeCommand !== null) {
       return;
     }
 
-    setIsStarting(true);
-    setStartError(null);
-    try {
-      const result = await window.timeTracker.timer.start({
-        description: validation.value.description,
-      });
-      if (result.ok) {
-        setLoadState({ status: 'ready', timer: result.value });
-      } else {
-        setStartError(result.error);
-      }
-    } catch {
-      setStartError(unexpectedError);
-    } finally {
-      setIsStarting(false);
-    }
-  }, []);
+    const interval = window.setInterval(() => {
+      const version = requestVersion.current;
+      void window.timeTracker.timer
+        .getState()
+        .then((result) => {
+          if (result.ok && version === requestVersion.current) {
+            setLoadState({ status: 'ready', timer: result.value });
+          }
+        })
+        .catch(() => undefined);
+    }, AUTHORITATIVE_SYNC_MS);
 
-  const clearStartError = useCallback(() => setStartError(null), []);
+    return () => window.clearInterval(interval);
+  }, [activeCommand, timer]);
+
+  const clearCommandError = useCallback(() => setCommandError(null), []);
 
   return {
     loadState,
-    isStarting,
-    startError,
+    activeCommand,
+    commandError,
     start,
-    clearStartError,
+    pause,
+    resume,
+    stop,
+    clearCommandError,
   };
 };

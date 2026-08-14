@@ -6,7 +6,7 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-001-012 — Build Idle Loading and Start UI
+TASK-001-013 — Build Running and Paused Timer UI
 
 ## Status
 
@@ -26,29 +26,30 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add a focused renderer controller that loads authoritative timer state and submits
-   Start without duplicating business state.
-2. Replace the foundation health screen with accessible loading, idle form, pending,
-   error, and restored-active branches.
-3. Add focused component tests for loading, button/Enter submission, validation,
-   application errors, focus, and initial running/paused restoration.
-4. Run focused tests, rendered QA where available, then project validation and record
-   completion evidence.
+1. Add pure duration formatters and a local display-time hook driven from the latest
+   authoritative snapshot.
+2. Extend the renderer controller with Pause, Resume, Stop, command errors, pending
+   state, and conservative authoritative resynchronization.
+3. Build accessible running and paused views with session, today, lifetime, and
+   semantic action controls.
+4. Add fake-timer and component tests, run rendered QA where available, then run full
+   project validation and record completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not implement suggestions, switching, live timer animation, Pause/Resume/Stop
-interaction, or the finished running/paused presentation in this task.
+Do not implement history, suggestions, switching, tray behavior, or background timer
+persistence in this task.
 
 ---
 
 # Completion
 
-TASK-001-012 is complete. The renderer now loads authoritative timer state, presents
-an accessible and responsive idle Start form, handles pending and safe error states,
-and restores running or paused snapshots without persistence mutation. Focused
-component tests and full project validation passed. Rendered browser QA was not
-available because this session has neither the Browser plugin nor a preinstalled
+TASK-001-013 is complete. Running and paused states now render the required task,
+session/today/lifetime durations, explicit status, and accessible controls. The
+session display advances locally only while running, commands replace the snapshot
+with authoritative results, and active states resynchronize once per minute without
+per-second IPC. Focused and full automated validation passed. Rendered browser QA was
+not available because this session has neither the Browser plugin nor a preinstalled
 Playwright runtime.

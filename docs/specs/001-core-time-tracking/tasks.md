@@ -39,7 +39,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-010 | Verify the complete service workflow and recovery | Complete | TASK-001-006–009 | AC-001–010, AC-012–013 |
 | TASK-001-011 | Expose the typed timer IPC API | Complete | TASK-001-005–009 | Supporting boundary for AC-001–012 |
 | TASK-001-012 | Build idle loading and start UI | Complete | TASK-001-011 | AC-001–003, AC-011 |
-| TASK-001-013 | Build running and paused timer UI | Pending | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
+| TASK-001-013 | Build running and paused timer UI | Complete | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
 | TASK-001-014 | Verify renderer behavior and resynchronization | Pending | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
 | TASK-001-015 | Run final acceptance and update documentation | Pending | TASK-001-010, TASK-001-011, TASK-001-014 | AC-001–013 |
 
@@ -735,7 +735,7 @@ TASK-001-011.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -774,7 +774,19 @@ TASK-001-011 and TASK-001-012.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added complete running and paused presentations with task description,
+  tabular HH:MM:SS session time, explicit Current session/Paused status, today and
+  lifetime summaries, and semantic Pause/Resume/Stop control groups.
+- 2026-08-14: Added a local display-duration hook that advances once per second only
+  while running from the latest authoritative `sessionDurationMs` and `now`; paused
+  time remains fixed and no per-second IPC or database writes occur.
+- 2026-08-14: Extended the timer controller with pending and safe error states for
+  Pause, Resume, and Stop, authoritative command-response replacement, stale-response
+  protection, and one-minute active-state resynchronization.
+- 2026-08-14: Focused renderer tests passed (3 files, 16 tests), covering formatting,
+  running advancement, paused freezing, pending controls, the full active control
+  workflow, safe errors, and periodic resynchronization. Full validation passed:
+  typecheck, lint, formatting, all 120 tests, and `git diff --check`.
 
 ---
 
