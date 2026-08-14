@@ -33,7 +33,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-004 | Implement duration projections | Complete | TASK-001-003 | AC-003, AC-005, AC-013 |
 | TASK-001-005 | Reconstruct authoritative timer state | Complete | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
 | TASK-001-006 | Implement transactional Start | Complete | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
-| TASK-001-007 | Implement transactional Pause | Pending | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
+| TASK-001-007 | Implement transactional Pause | Complete | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
 | TASK-001-008 | Implement transactional Resume | Pending | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
 | TASK-001-009 | Implement transactional Stop | Pending | TASK-001-005–008 | AC-007–008, AC-012 |
 | TASK-001-010 | Verify the complete service workflow and recovery | Pending | TASK-001-006–009 | AC-001–010, AC-012–013 |
@@ -396,7 +396,7 @@ TASK-001-002, TASK-001-003, and TASK-001-005.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -433,7 +433,15 @@ TASK-001-005 and TASK-001-006.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added transactional Pause with one injected-clock snapshot, persisted
+  running-state validation, interval closure, and an AppState update that preserves
+  the current task and original session start.
+- 2026-08-14: Pause returns the authoritative paused state with no open interval,
+  excludes later paused time, rejects idle and already-paused states without
+  mutation, and rolls back the interval close when the AppState update fails.
+- 2026-08-14: Focused Pause and Start service tests passed (1 file, 15 tests). Full
+  validation passed: typecheck, lint, formatting, all 89 tests, and
+  `git diff --check`.
 
 ---
 

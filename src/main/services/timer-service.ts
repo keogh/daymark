@@ -3,7 +3,10 @@ import type { TaskRepository } from '@/main/database/repositories/task-repositor
 import type { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
 import type { TransactionRunner } from '@/main/database/transaction-runner';
 import type { Clock } from '@/main/domain/clock';
-import type { TimerStateReader } from '@/main/services/timer-state-reader';
+import {
+  InvalidPersistedTimerStateError,
+  type TimerStateReader,
+} from '@/main/services/timer-state-reader';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { TimerState } from '@/shared/contracts/timer';
 import { validateStartTaskInput } from '@/shared/validation/task-description';
@@ -88,6 +91,48 @@ export class TimerService {
 
     return { ok: true, value: this.#stateReader.getStateAt(now) };
   }
+
+  pause(): AppResult<TimerState> {
+    const now = this.#clock.now();
+    const transition = this.#transactions.run<AppResult<true>>(() => {
+      const state = this.#appState.get();
+      if (state.timerStatus === 'idle') {
+        return noActiveTimer();
+      }
+      if (state.timerStatus === 'paused') {
+        return timerAlreadyPaused();
+      }
+
+      this.#stateReader.getStateAt(now);
+      const openInterval = this.#intervals.findOpen();
+      if (openInterval === undefined) {
+        throw new InvalidPersistedTimerStateError(
+          'Running timer has no open interval.',
+        );
+      }
+
+      const closedInterval = this.#intervals.close(openInterval.id, now, now);
+      if (closedInterval === undefined) {
+        throw new InvalidPersistedTimerStateError(
+          'Running timer interval could not be closed.',
+        );
+      }
+
+      this.#appState.update({
+        ...state,
+        timerStatus: 'paused',
+        updatedAt: now,
+      });
+
+      return { ok: true, value: true };
+    });
+
+    if (!transition.ok) {
+      return transition;
+    }
+
+    return { ok: true, value: this.#stateReader.getStateAt(now) };
+  }
 }
 
 const timerNotIdle = (): AppResult<never> => ({
@@ -95,5 +140,21 @@ const timerNotIdle = (): AppResult<never> => ({
   error: {
     code: 'TIMER_NOT_IDLE',
     message: 'The timer must be idle before starting a task.',
+  },
+});
+
+const noActiveTimer = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'NO_ACTIVE_TIMER',
+    message: 'There is no active timer to pause.',
+  },
+});
+
+const timerAlreadyPaused = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'TIMER_ALREADY_PAUSED',
+    message: 'The timer is already paused.',
   },
 });

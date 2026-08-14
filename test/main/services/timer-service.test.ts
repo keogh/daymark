@@ -15,7 +15,7 @@ import {
 } from '../database/support/disposable-database';
 import { FakeClock } from '../domain/support/fake-clock';
 
-describe('TimerService.start', () => {
+describe('TimerService', () => {
   let fixture: DisposableDatabase;
   let context: DatabaseContext;
   let clock: FakeClock;
@@ -176,6 +176,91 @@ describe('TimerService.start', () => {
     expect(countRows(context, 'tasks')).toBe(0);
     expect(countRows(context, 'time_intervals')).toBe(0);
     expect(appState.get().timerStatus).toBe('idle');
+  });
+
+  it('pauses a running timer atomically and returns its authoritative duration', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Active Task' }).ok).toBe(true);
+    clock.advance(minutes(30));
+    const pausedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.pause();
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'paused',
+        currentTask: {
+          id: 'generated-1',
+          description: 'Active Task',
+        },
+        sessionStartedAt: startedAt,
+        sessionDurationMs: minutes(30),
+        taskTodayDurationMs: minutes(30),
+        taskLifetimeDurationMs: minutes(30),
+        activeIntervalStartedAt: null,
+        now: pausedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findOpen()).toBeUndefined();
+    expect(intervals.findById('generated-2')).toMatchObject({
+      startedAt,
+      endedAt: pausedAt,
+      updatedAt: pausedAt,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'paused',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+      updatedAt: pausedAt,
+    });
+
+    clock.advance(minutes(30));
+    expect(reader.getState().sessionDurationMs).toBe(minutes(30));
+  });
+
+  it.each([
+    { status: 'idle' as const, code: 'NO_ACTIVE_TIMER' },
+    { status: 'paused' as const, code: 'TIMER_ALREADY_PAUSED' },
+  ])(
+    'rejects Pause while the timer is $status without persistence',
+    ({ status, code }) => {
+      if (status === 'paused') {
+        seedActiveState(context, status, clock.now());
+      }
+      const changesBefore = totalChanges(context);
+
+      expect(service.pause()).toMatchObject({ ok: false, error: { code } });
+      expect(totalChanges(context)).toBe(changesBefore);
+      expect(appState.get().timerStatus).toBe(status);
+      expect(intervals.findOpen()).toBeUndefined();
+    },
+  );
+
+  it('rolls back the interval close when paused AppState cannot be persisted', () => {
+    const startedAt = clock.now();
+    expect(service.start({ description: 'Rollback Pause' }).ok).toBe(true);
+    clock.advance(minutes(10));
+    context.sqlite
+      .prepare(
+        "create trigger reject_pause before update on app_state when new.timer_status = 'paused' begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+
+    expect(() => service.pause()).toThrow('rejected');
+    expect(intervals.findOpen()).toMatchObject({
+      id: 'generated-2',
+      startedAt,
+      endedAt: null,
+    });
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+    });
   });
 });
 
