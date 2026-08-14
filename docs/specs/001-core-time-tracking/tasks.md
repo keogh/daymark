@@ -32,7 +32,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-003 | Implement interval and AppState persistence | Complete | TASK-001-001 | AC-004, AC-006–008, AC-012 |
 | TASK-001-004 | Implement duration projections | Complete | TASK-001-003 | AC-003, AC-005, AC-013 |
 | TASK-001-005 | Reconstruct authoritative timer state | Complete | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
-| TASK-001-006 | Implement transactional Start | Pending | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
+| TASK-001-006 | Implement transactional Start | Complete | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
 | TASK-001-007 | Implement transactional Pause | Pending | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
 | TASK-001-008 | Implement transactional Resume | Pending | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
 | TASK-001-009 | Implement transactional Stop | Pending | TASK-001-005–008 | AC-007–008, AC-012 |
@@ -340,7 +340,7 @@ Pending.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -378,7 +378,17 @@ TASK-001-002, TASK-001-003, and TASK-001-005.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added transactional Start with runtime description validation, one
+  injected-clock snapshot, exact normalized task reuse, deterministic task and
+  interval IDs, one open interval, and the running AppState update.
+- 2026-08-14: Start returns the authoritative timestamp-derived running state after
+  commit, rejects running and paused states without mutation, and leaves all writes
+  rolled back when the final AppState update fails.
+- 2026-08-14: Focused Start tests passed (1 file, 11 tests), covering new task
+  creation, normalized reuse, interval/AppState timestamps, duration, invalid input,
+  invalid transitions, a single clock read, and rollback.
+- 2026-08-14: Full validation passed: typecheck, lint, formatting, all 85 tests, and
+  `git diff --check`.
 
 ---
 

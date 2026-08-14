@@ -39,7 +39,10 @@ export class TimerStateReader {
   }
 
   getState(): TimerState {
-    const now = this.#clock.now();
+    return this.getStateAt(this.#clock.now());
+  }
+
+  getStateAt(now: number): TimerState {
     const state = this.#appState.get();
     const openInterval = this.#intervals.findOpen();
 
