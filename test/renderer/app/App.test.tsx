@@ -273,6 +273,63 @@ describe('App', () => {
     expect(api.timer.pause).toHaveBeenCalledOnce();
   });
 
+  it('keeps the active view usable when a command promise rejects', async () => {
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
+      stop: vi.fn().mockRejectedValue(new Error('IPC disconnected')),
+    });
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Stop' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The timer could not be updated. Please try again.',
+    );
+    expect(
+      screen.getByRole('region', { name: 'running timer' }),
+    ).toHaveTextContent('Implement authentication');
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+    expect(api.timer.stop).toHaveBeenCalledOnce();
+  });
+
+  it('restores authoritative elapsed time after the renderer remounts', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const restoredState: TimerState = {
+      ...runningState,
+      sessionDurationMs: 125_000,
+      now: 1_005_000,
+    };
+    const getState = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        value: { ...runningState, sessionDurationMs: 120_000, now: 1_000_000 },
+      })
+      .mockResolvedValueOnce({ ok: true, value: restoredState });
+    setTimerApi({ getState });
+
+    const firstRenderer = render(<App />);
+    await act(async () => Promise.resolve());
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:02:00',
+    );
+
+    await act(() => vi.advanceTimersByTime(5_000));
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:02:05',
+    );
+    firstRenderer.unmount();
+
+    render(<App />);
+    await act(async () => Promise.resolve());
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:02:05',
+    );
+    expect(getState).toHaveBeenCalledTimes(2);
+  });
+
   it('periodically refreshes an active snapshot without issuing commands', async () => {
     vi.useFakeTimers();
     const api = setTimerApi({
@@ -290,6 +347,41 @@ describe('App', () => {
     expect(api.timer.pause).not.toHaveBeenCalled();
     expect(api.timer.resume).not.toHaveBeenCalled();
     expect(api.timer.stop).not.toHaveBeenCalled();
+  });
+
+  it('corrects local display drift from the periodic authoritative snapshot', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    const initialState: TimerState = {
+      ...runningState,
+      sessionDurationMs: 600_000,
+      now: 1_000_000,
+    };
+    const correctedState: TimerState = {
+      ...initialState,
+      sessionDurationMs: 630_000,
+      now: 1_060_000,
+    };
+    const api = setTimerApi({
+      getState: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: initialState })
+        .mockResolvedValueOnce({ ok: true, value: correctedState }),
+    });
+    render(<App />);
+    await act(async () => Promise.resolve());
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:10:00',
+    );
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
+    });
+
+    expect(api.timer.getState).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
+      '00:10:30',
+    );
   });
 });
 

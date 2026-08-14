@@ -40,7 +40,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-011 | Expose the typed timer IPC API | Complete | TASK-001-005–009 | Supporting boundary for AC-001–012 |
 | TASK-001-012 | Build idle loading and start UI | Complete | TASK-001-011 | AC-001–003, AC-011 |
 | TASK-001-013 | Build running and paused timer UI | Complete | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
-| TASK-001-014 | Verify renderer behavior and resynchronization | Pending | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
+| TASK-001-014 | Verify renderer behavior and resynchronization | Complete | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
 | TASK-001-015 | Run final acceptance and update documentation | Pending | TASK-001-010, TASK-001-011, TASK-001-014 | AC-001–013 |
 
 ---
@@ -794,7 +794,7 @@ TASK-001-011 and TASK-001-012.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -832,7 +832,16 @@ TASK-001-012 and TASK-001-013.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Expanded the renderer component suite to verify safe recovery from a
+  rejected command, authoritative elapsed-time restoration after renderer remount,
+  and correction of deliberately drifted local display time at the one-minute
+  resynchronization boundary.
+- 2026-08-14: Added an automated renderer architecture-boundary test covering every
+  renderer TypeScript source file and rejecting Electron, raw `ipcRenderer`,
+  `better-sqlite3`, Node built-in imports, CommonJS `require`, and the Node `process`
+  global.
+- 2026-08-14: Focused renderer validation passed (4 files, 25 tests). Full validation
+  passed: typecheck, lint, formatting, all 129 tests, and `git diff --check`.
 
 ---
 

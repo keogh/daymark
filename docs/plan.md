@@ -6,7 +6,7 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-001-013 — Build Running and Paused Timer UI
+TASK-001-014 — Verify Renderer Behavior and Resynchronization
 
 ## Status
 
@@ -26,14 +26,14 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add pure duration formatters and a local display-time hook driven from the latest
-   authoritative snapshot.
-2. Extend the renderer controller with Pause, Resume, Stop, command errors, pending
-   state, and conservative authoritative resynchronization.
-3. Build accessible running and paused views with session, today, lifetime, and
-   semantic action controls.
-4. Add fake-timer and component tests, run rendered QA where available, then run full
-   project validation and record completion evidence.
+1. Audit the existing renderer suite against specification section 44 and the task's
+   reload, command-error, accessibility, resynchronization, and boundary requirements.
+2. Add focused component tests for renderer remount restoration, correction of local
+   display drift from authoritative state, and rejected command recovery.
+3. Add automated renderer-boundary verification for forbidden Node, Electron, SQLite,
+   and raw IPC access.
+4. Run the focused renderer suite and required project checks, then record completion
+   evidence in the task breakdown.
 
 ---
 
@@ -46,10 +46,10 @@ persistence in this task.
 
 # Completion
 
-TASK-001-013 is complete. Running and paused states now render the required task,
-session/today/lifetime durations, explicit status, and accessible controls. The
-session display advances locally only while running, commands replace the snapshot
-with authoritative results, and active states resynchronize once per minute without
-per-second IPC. Focused and full automated validation passed. Rendered browser QA was
-not available because this session has neither the Browser plugin nor a preinstalled
-Playwright runtime.
+TASK-001-014 is complete. The renderer suite now explicitly proves restoration after
+remount, authoritative correction of local display drift, and usable accessible
+controls after both typed command errors and rejected command promises. A static
+architecture test also prevents renderer access to Electron, raw IPC, SQLite, and
+Node APIs. Focused and full automated validation passed. Rendered browser QA was not
+available because this session has neither the Browser plugin nor a configured
+Playwright workflow; TASK-001-014 excludes cross-platform end-to-end automation.

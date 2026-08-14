@@ -140,10 +140,14 @@ Companion task breakdowns have been generated for:
 The SDD workflow now requires selecting one self-contained task before creating the
 active implementation plan.
 
-TASK-001-001 through TASK-001-005 are complete. TASK-001-006 is unblocked.
+TASK-001-001 through TASK-001-014 are complete. TASK-001-015 final acceptance is
+unblocked. Renderer verification now covers all required idle/running/paused UI
+behavior, renderer reload restoration, periodic authoritative drift correction,
+command-error recovery, and automated renderer architecture boundaries.
 
 ---
 
 # Last Updated
 
-2026-08-14 — Completed SPEC-001 TASK-001-005 authoritative timer-state reconstruction.
+2026-08-14 — Completed SPEC-001 TASK-001-014 renderer behavior and resynchronization
+verification; 25 focused renderer tests and all 129 project tests pass.
