@@ -6,7 +6,7 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-001-011 — Expose the Typed Timer IPC API
+TASK-001-012 — Build Idle Loading and Start UI
 
 ## Status
 
@@ -26,25 +26,29 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Define explicit timer IPC channels and register thin, safe handlers.
-2. Compose the timer service during application startup and expose five narrow
-   preload methods with renderer-global typing.
-3. Add focused IPC and preload boundary tests for success, validation, expected
-   failures, and sanitized unexpected failures.
-4. Run focused tests, then project validation and record completion evidence.
+1. Add a focused renderer controller that loads authoritative timer state and submits
+   Start without duplicating business state.
+2. Replace the foundation health screen with accessible loading, idle form, pending,
+   error, and restored-active branches.
+3. Add focused component tests for loading, button/Enter submission, validation,
+   application errors, focus, and initial running/paused restoration.
+4. Run focused tests, rendered QA where available, then project validation and record
+   completion evidence.
 
 ---
 
 # Scope Guard
 
-Do not implement switching, renderer behavior, UI, or non-timer APIs in this task.
+Do not implement suggestions, switching, live timer animation, Pause/Resume/Stop
+interaction, or the finished running/paused presentation in this task.
 
 ---
 
 # Completion
 
-TASK-001-011 is complete. The application now registers five explicit timer IPC
-handlers backed by the real timer service, validates Start at the boundary, maps
-expected and unexpected failures to safe result values, and exposes only the typed
-timer methods through preload. Focused boundary tests and full project validation
-passed.
+TASK-001-012 is complete. The renderer now loads authoritative timer state, presents
+an accessible and responsive idle Start form, handles pending and safe error states,
+and restores running or paused snapshots without persistence mutation. Focused
+component tests and full project validation passed. Rendered browser QA was not
+available because this session has neither the Browser plugin nor a preinstalled
+Playwright runtime.

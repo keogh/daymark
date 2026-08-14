@@ -1,6 +1,6 @@
 :root {
-  color: #1f2937;
-  background: #f8fafc;
+  color: #172033;
+  background: #f5f7fb;
   font-family:
     Inter,
     ui-sans-serif,
@@ -21,34 +21,219 @@ body {
   min-width: 320px;
 }
 
-.app-shell {
-  display: grid;
-  min-height: 100vh;
-  place-items: center;
-  padding: 2rem;
+button,
+input {
+  font: inherit;
 }
 
-.app-shell__panel {
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgb(76 110 245 / 28%);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.app-header {
+  margin: 0 auto;
+  max-width: 68rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.timer-view {
+  display: grid;
+  min-height: calc(100vh - 8rem);
+  place-items: center;
+}
+
+.idle-timer {
+  width: min(100%, 46rem);
+  padding: 3rem 0 7rem;
   text-align: center;
 }
 
-.app-shell__panel h1 {
+.idle-timer h2,
+.restored-timer h2,
+.timer-message h2 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 3rem);
-  letter-spacing: -0.04em;
+  color: #111827;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 670;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
 }
 
-.app-shell__status {
-  margin: 0.75rem 0 0;
-  color: #64748b;
+.start-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  margin-top: 2.25rem;
+  text-align: left;
+}
+
+.start-form__field {
+  min-width: 0;
+}
+
+.start-form input {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid #c9d1df;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
+  color: #172033;
+  font-size: 1rem;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.start-form input::placeholder {
+  color: #7b879b;
+}
+
+.start-form input:hover:not(:disabled) {
+  border-color: #aab5c6;
+}
+
+.start-form input:focus {
+  border-color: #4c6ef5;
+  box-shadow: 0 0 0 4px rgb(76 110 245 / 12%);
+}
+
+.start-form input[aria-invalid='true'] {
+  border-color: #d92d20;
+}
+
+.start-form button {
+  min-height: 3.5rem;
+  padding: 0.875rem 1.5rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: #3156d3;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 680;
+  transition:
+    background 140ms ease,
+    transform 140ms ease;
+}
+
+.start-form button:hover:not(:disabled) {
+  background: #2748b9;
+}
+
+.start-form button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.start-form button:disabled,
+.start-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.start-form__error {
+  margin: 0.625rem 0 0 0.25rem;
+  color: #b42318;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.timer-message,
+.restored-timer {
+  padding-bottom: 6rem;
+  text-align: center;
+}
+
+.timer-message p,
+.restored-timer p {
+  margin: 0.875rem 0 0;
+  color: #667085;
   font-size: 1rem;
   line-height: 1.5;
 }
 
-.app-shell__status p {
-  margin: 0;
+.timer-message__spinner {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0 auto;
+  border: 3px solid #d8deea;
+  border-top-color: #3156d3;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
 }
 
-.app-shell__status--error {
-  color: #b42318;
+.timer-message--error h2 {
+  font-size: 2rem;
+}
+
+.restored-timer p {
+  color: #3156d3;
+  font-weight: 650;
+  text-transform: capitalize;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding: 1.25rem;
+  }
+
+  .timer-view {
+    min-height: calc(100vh - 5rem);
+  }
+
+  .idle-timer {
+    padding-bottom: 3rem;
+  }
+
+  .start-form {
+    grid-template-columns: 1fr;
+  }
+
+  .start-form button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

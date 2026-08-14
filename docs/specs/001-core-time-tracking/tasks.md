@@ -38,7 +38,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-009 | Implement transactional Stop | Complete | TASK-001-005–008 | AC-007–008, AC-012 |
 | TASK-001-010 | Verify the complete service workflow and recovery | Complete | TASK-001-006–009 | AC-001–010, AC-012–013 |
 | TASK-001-011 | Expose the typed timer IPC API | Complete | TASK-001-005–009 | Supporting boundary for AC-001–012 |
-| TASK-001-012 | Build idle loading and start UI | Pending | TASK-001-011 | AC-001–003, AC-011 |
+| TASK-001-012 | Build idle loading and start UI | Complete | TASK-001-011 | AC-001–003, AC-011 |
 | TASK-001-013 | Build running and paused timer UI | Pending | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
 | TASK-001-014 | Verify renderer behavior and resynchronization | Pending | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
 | TASK-001-015 | Run final acceptance and update documentation | Pending | TASK-001-010, TASK-001-011, TASK-001-014 | AC-001–013 |
@@ -675,7 +675,7 @@ TASK-001-005, TASK-001-006, TASK-001-007, TASK-001-008, and TASK-001-009.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -715,7 +715,19 @@ TASK-001-011.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Replaced the foundation health screen with a timer application shell
+  and focused renderer controller that requests authoritative state on mount without
+  mutating or resetting timer persistence.
+- 2026-08-14: Added the accessible idle form with automatic input focus, empty-input
+  disabled state, button and Enter submission, trimmed descriptions, pending control
+  states, inline validation/application errors, and focus recovery after errors.
+- 2026-08-14: Running and paused snapshots now restore into distinct named
+  presentation branches without issuing timer commands; their complete controls and
+  duration presentation remain scoped to TASK-001-013.
+- 2026-08-14: Focused renderer tests passed (1 file, 8 tests), covering loading,
+  idle focus, button/Enter Start, pending state, validation and application errors,
+  load failure, and running/paused restoration. Full validation passed: typecheck,
+  lint, formatting, all 112 tests, and `git diff --check`.
 
 ---
 

@@ -29,9 +29,9 @@ export interface StartTaskInput {
 }
 
 export interface TimerAPI {
-  getState(): Promise<AppResult<TimerState>>;
-  start(input: StartTaskInput): Promise<AppResult<TimerState>>;
-  pause(): Promise<AppResult<TimerState>>;
-  resume(): Promise<AppResult<TimerState>>;
-  stop(): Promise<AppResult<TimerState>>;
+  getState(this: void): Promise<AppResult<TimerState>>;
+  start(this: void, input: StartTaskInput): Promise<AppResult<TimerState>>;
+  pause(this: void): Promise<AppResult<TimerState>>;
+  resume(this: void): Promise<AppResult<TimerState>>;
+  stop(this: void): Promise<AppResult<TimerState>>;
 }
