@@ -41,7 +41,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-012 | Build idle loading and start UI | Complete | TASK-001-011 | AC-001–003, AC-011 |
 | TASK-001-013 | Build running and paused timer UI | Complete | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
 | TASK-001-014 | Verify renderer behavior and resynchronization | Complete | TASK-001-012–0013 | AC-001, AC-004–006, AC-011 |
-| TASK-001-015 | Run final acceptance and update documentation | Pending | TASK-001-010, TASK-001-011, TASK-001-014 | AC-001–013 |
+| TASK-001-015 | Run final acceptance and update documentation | Complete | TASK-001-010, TASK-001-011, TASK-001-014 | AC-001–013 |
 
 ---
 
@@ -849,7 +849,7 @@ TASK-001-012 and TASK-001-013.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -890,7 +890,25 @@ TASK-001-010, TASK-001-011, and TASK-001-014.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Reviewed AC-001 through AC-013 against unit, disposable-database
+  repository, real-service SQLite integration, IPC/preload, renderer, and
+  architecture-boundary evidence. All criteria and every required test in sections
+  41–44 are covered and pass.
+- 2026-08-14: Confirmed transitions use injected application clocks and atomic
+  SQLite transactions; migrations preserve timestamp, foreign-key, singleton,
+  normalized-description uniqueness, and one-open-interval invariants. No feature
+  assigned to SPEC-002 or later was introduced.
+- 2026-08-14: Full validation passed: `npm run typecheck`, `npm run lint`,
+  `npm run format:check`, all 129 tests in 24 files, `npm run package`, and
+  `git diff --check`.
+- 2026-08-14: Exercised the packaged macOS arm64 application with an isolated
+  user-data directory. Start, Pause, Resume, Stop, running and paused renderer
+  reload restoration, and full application restart recovery while running and
+  paused all passed; the recovered running timer advanced from persisted timestamps
+  and Stop returned the application to idle.
+- 2026-08-14: Completed the project Definition of Done review. Updated the domain
+  documentation for the implemented description limit and unique normalized-task
+  constraint; no architecture or decision update was required.
 
 ---
 

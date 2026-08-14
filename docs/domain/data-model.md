@@ -53,14 +53,15 @@ A task is independent from calendar days.
 
 - must not be empty;
 - is trimmed;
-- has a reasonable maximum length;
-- recommendation: 500 characters maximum.
+- has a maximum length of 500 Unicode code points after trimming;
+- is rejected rather than truncated when it exceeds that maximum.
 
-`normalized_description` may initially use:
+`normalized_description` uses:
 
     trim(description).toLocaleLowerCase()
 
-It is intended for convenience matching, not user-visible display.
+It is intended for exact case-insensitive matching, not user-visible display. It is
+unique so equivalent normalized descriptions reuse one persistent Task.
 
 ---
 
@@ -130,7 +131,7 @@ CREATE TABLE tasks (
     updated_at INTEGER NOT NULL
 );
 
-CREATE INDEX tasks_normalized_description_idx
+CREATE UNIQUE INDEX tasks_normalized_description_unique_idx
 ON tasks(normalized_description);
 
 CREATE INDEX tasks_updated_at_idx
