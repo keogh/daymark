@@ -6,7 +6,7 @@ SPEC-001 — Core Time Tracking
 
 ## Active Task
 
-TASK-001-009 — Implement Transactional Stop
+TASK-001-010 — Verify the Complete Service Workflow and Recovery
 
 ## Status
 
@@ -26,12 +26,12 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Implement Stop using one clock snapshot and the existing transaction boundary.
-2. Close a running interval when needed, clear the current task and session, and
-   return the canonical authoritative idle state.
-3. Add deterministic disposable-database tests for running, paused, idle,
-   persisted lifetime totals, and rollback.
-4. Run focused tests and project validation, then record completion evidence.
+1. Add a real-service, real-repository integration fixture over disposable SQLite.
+2. Verify the complete Start/Pause/Resume/Stop workflow and exact persisted totals.
+3. Verify running and paused restart recovery, invalid transitions, the independent
+   open-interval database constraint, and cross-midnight projections.
+4. Run the focused integration suite repeatedly, then run project validation and
+   record completion evidence.
 
 ---
 
@@ -44,9 +44,9 @@ this task.
 
 # Completion
 
-TASK-001-009 is complete. Stop now uses one clock snapshot and the existing
-transaction boundary to close a running interval when necessary and clear the
-current task and session. Paused Stop creates no interval, idle Stop performs no
-persistence, completed lifetime time remains queryable, and a failed AppState
-update rolls back the running interval close. Focused and full project validation
-passed.
+TASK-001-010 is complete. A real-service integration suite now exercises the full
+09:00–10:20 workflow over disposable SQLite, verifies exact persisted intervals and
+65 active minutes, reconstructs running and paused timers across database lifecycle
+restarts, checks every invalid transition, proves the database independently rejects
+a second open interval, and verifies cross-midnight daily and lifetime projections.
+Focused repeat runs and full project validation passed.

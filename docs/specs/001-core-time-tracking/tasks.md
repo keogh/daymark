@@ -36,7 +36,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-007 | Implement transactional Pause | Complete | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
 | TASK-001-008 | Implement transactional Resume | Complete | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
 | TASK-001-009 | Implement transactional Stop | Complete | TASK-001-005–008 | AC-007–008, AC-012 |
-| TASK-001-010 | Verify the complete service workflow and recovery | Pending | TASK-001-006–009 | AC-001–010, AC-012–013 |
+| TASK-001-010 | Verify the complete service workflow and recovery | Complete | TASK-001-006–009 | AC-001–010, AC-012–013 |
 | TASK-001-011 | Expose the typed timer IPC API | Pending | TASK-001-005–009 | Supporting boundary for AC-001–012 |
 | TASK-001-012 | Build idle loading and start UI | Pending | TASK-001-011 | AC-001–003, AC-011 |
 | TASK-001-013 | Build running and paused timer UI | Pending | TASK-001-011, TASK-001-012 | AC-004–006, AC-011 |
@@ -556,7 +556,7 @@ TASK-001-005, TASK-001-006, TASK-001-007, and TASK-001-008.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -594,7 +594,20 @@ TASK-001-006, TASK-001-007, TASK-001-008, and TASK-001-009.
 
 ### Completion Evidence
 
-Pending.
+- 2026-08-14: Added a six-scenario integration suite using FakeClock, disposable
+  SQLite, real repositories, real transactions, TimerStateReader, and TimerService.
+- 2026-08-14: The required 09:00 Start, 09:45 Pause, 10:00 Resume, and 10:20 Stop
+  workflow persists exactly two intervals (45 and 20 minutes), projects 65 active
+  minutes, closes every interval, and leaves the singleton AppState idle.
+- 2026-08-14: Lifecycle close/reopen tests reconstruct running elapsed time and
+  paused active-only time from persisted timestamps without process-local counters.
+- 2026-08-14: Integration coverage verifies all invalid transition codes without
+  extra rows, SQLite independently rejects a second open interval, and a persisted
+  Aug 13 23:45–Aug 14 00:15 interval projects 15 minutes to each local day and 30
+  minutes lifetime.
+- 2026-08-14: The focused integration suite passed three consecutive clean-database
+  runs (6 tests each). Full validation passed: typecheck, lint, formatting, all 103
+  tests across 20 files, and `git diff --check`.
 
 ---
 
