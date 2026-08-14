@@ -31,7 +31,7 @@ verified and must be revised if the specification or foundation contracts change
 | TASK-001-002 | Implement task persistence and normalization | Complete | TASK-001-001 | AC-001–002 |
 | TASK-001-003 | Implement interval and AppState persistence | Complete | TASK-001-001 | AC-004, AC-006–008, AC-012 |
 | TASK-001-004 | Implement duration projections | Complete | TASK-001-003 | AC-003, AC-005, AC-013 |
-| TASK-001-005 | Reconstruct authoritative timer state | Pending | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
+| TASK-001-005 | Reconstruct authoritative timer state | Complete | TASK-001-002–004 | AC-003, AC-005, AC-009–010, AC-013 |
 | TASK-001-006 | Implement transactional Start | Pending | TASK-001-002, TASK-001-003, TASK-001-005 | AC-001–003, AC-012 |
 | TASK-001-007 | Implement transactional Pause | Pending | TASK-001-005, TASK-001-006 | AC-004–005, AC-012 |
 | TASK-001-008 | Implement transactional Resume | Pending | TASK-001-005, TASK-001-007 | AC-006, AC-012 |
@@ -280,7 +280,7 @@ TASK-001-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -318,6 +318,19 @@ TASK-001-002, TASK-001-003, and TASK-001-004.
 - Specification sections: 7, 22–27, 31–32, 41
 
 ### Completion Evidence
+
+- 2026-08-14: Added a read-only `TimerStateReader` that takes one injected-clock
+  snapshot, validates status-specific persisted invariants, resolves the current
+  task and open interval, and returns the exact idle, running, or paused public
+  `TimerState` with timestamp-derived durations.
+- 2026-08-14: Invalid idle session residue, missing active state, mismatched or
+  impossible open intervals, and future timestamps now fail explicitly with an
+  internal typed persistence error; normal reads do not repair or mutate data.
+- 2026-08-14: Focused reconstruction tests passed (1 file, 13 tests), including
+  idle/running/paused snapshots, database non-mutation, and the specified running
+  and paused application-restart scenarios.
+- 2026-08-14: Full validation passed: typecheck, lint, formatting, all 74 tests,
+  and `git diff --check`.
 
 Pending.
 

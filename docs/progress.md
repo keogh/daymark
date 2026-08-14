@@ -10,7 +10,7 @@ SPEC-001 — Core Time Tracking
 
 ## Current Status
 
-Ready for next task selection
+TASK-001-005 complete; ready for TASK-001-006
 
 ---
 
@@ -40,6 +40,13 @@ Completed SPEC-001 work:
 - Clock, SystemClock, and deterministic FakeClock primitives are available;
 - expected command failures are returned as typed values and unexpected errors are
   reduced to a renderer-safe `INTERNAL_ERROR`.
+- TASK-001-003 added focused TimeInterval and singleton AppState repositories plus
+  an atomic transaction boundary while preserving database invariants;
+- TASK-001-004 added pure/query-backed session, local-today, and lifetime duration
+  projections from persisted intervals;
+- TASK-001-005 added read-only authoritative idle, running, and paused state
+  reconstruction, explicit corruption detection, and deterministic restart
+  recovery from persisted timestamps.
 
 Verified foundation milestone:
 
@@ -122,7 +129,8 @@ Key established decisions include:
 Foundation tooling, the secure application shell, schema, database lifecycle, typed
 health-check boundary, foundation health screen, startup failure handling, and
 native-module packaging are implemented and verified.
-No product behavior has been implemented yet.
+The persistence, duration projection, and authoritative state-read foundations for
+core timer behavior are implemented. Timer transitions, IPC, and UI remain pending.
 
 Companion task breakdowns have been generated for:
 
@@ -132,11 +140,10 @@ Companion task breakdowns have been generated for:
 The SDD workflow now requires selecting one self-contained task before creating the
 active implementation plan.
 
-TASK-001-001 and TASK-001-002 are complete. TASK-001-003 is unblocked; select it
-and update `docs/plan.md` before changing code.
+TASK-001-001 through TASK-001-005 are complete. TASK-001-006 is unblocked.
 
 ---
 
 # Last Updated
 
-2026-08-13 — Completed SPEC-001 TASK-001-002 task persistence and normalization.
+2026-08-14 — Completed SPEC-001 TASK-001-005 authoritative timer-state reconstruction.
