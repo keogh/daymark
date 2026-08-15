@@ -131,6 +131,63 @@ input {
   min-width: 0;
 }
 
+.task-combobox {
+  position: relative;
+  z-index: 1;
+}
+
+.task-suggestions {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--popover);
+  box-shadow: 0 1rem 2rem rgb(23 32 51 / 12%);
+}
+
+.task-suggestion {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  color: var(--popover-foreground);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.task-suggestion + .task-suggestion {
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.task-suggestion:hover,
+.task-suggestion[data-highlighted='true'] {
+  background: var(--accent);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.task-suggestion__description {
+  overflow-wrap: anywhere;
+  font-weight: 620;
+}
+
+.task-suggestion__totals,
+.task-suggestions__error {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.task-suggestions__error {
+  margin: 0 0 0 0.25rem;
+}
+
 .start-form__error {
   margin: 0.625rem 0 0 0.25rem;
   line-height: 1.4;
@@ -387,7 +444,7 @@ input {
     grid-template-columns: 1fr;
   }
 
-  .start-form [data-slot='button'] {
+  .start-form > [data-slot='button'] {
     width: 100%;
   }
 

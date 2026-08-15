@@ -6,7 +6,7 @@ SPEC-003 — Task Search and Reuse
 
 ## Active Task
 
-TASK-003-004 — Expose the Validated Task Suggestion Boundary
+TASK-003-005 — Build the Accessible Idle-Task Combobox
 
 ## Status
 
@@ -16,28 +16,29 @@ Complete
 
 # Immediate Plan
 
-1. Add a thin, runtime-validated task-suggestion IPC handler with safe errors.
-2. Compose TaskService and its query repository in the main process.
-3. Expose the narrow tasks API through preload and the public Window contract,
-   preserving both timer Start variants end to end.
-4. Add IPC, preload, composition, and boundary tests; run focused and full project
-   validation and record evidence.
+1. Add generation-safe suggestion loading and explicit-ID Start support to the
+   renderer controller layer.
+2. Compose the idle input as an accessible asynchronous combobox with keyboard,
+   pointer, focus, Escape, blur, loading, empty, and error behavior.
+3. Preserve typed-description Start and authoritative history refresh behavior.
+4. Add focused interaction, stale-response, recoverable-error, and accessibility
+   tests, then run renderer regressions and project validation.
 
 ---
 
 # Scope Guard
 
-Do not add renderer combobox behavior, generic IPC access, active-task switching,
-schema changes, or new query behavior.
+Do not add history-row Play, active-task switching, task management, interval
+management, schema changes, or a new general-purpose design-system dependency.
 
 ---
 
 # Completion
 
-TASK-003-004 is complete. The main process registers one validated suggestion
-channel backed by the composed TaskService and bounded SQLite query repository.
-Preload exposes only `tasks.getSuggestions`, the public Window contract includes
-that API, and both discriminated timer Start variants traverse the existing typed
-channel. Controlled failures remain safe and unexpected failures are logged without
-request content and returned as generic errors. Focused tests, formatting,
-typecheck, lint, all 222 tests, and diff checks pass.
+TASK-003-005 is complete. The idle input now provides generation-safe asynchronous
+suggestions with accessible combobox/listbox/option semantics, bounded rows,
+duration summaries, wrapping keyboard navigation, pointer reuse, typed Start
+independence, predictable close/reopen behavior, and recoverable failures. Exact-ID
+Start uses the existing pending and authoritative history-refresh path. Focused
+renderer tests, desktop/mobile Electron CDP QA, formatting, typecheck, lint, all 232
+tests, and diff checks pass.

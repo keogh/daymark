@@ -16,6 +16,7 @@ export interface TimerController {
   readonly activeCommand: TimerCommand | null;
   readonly commandError: AppError | null;
   readonly start: (description: string) => Promise<void>;
+  readonly startExistingTask: (taskId: string) => Promise<void>;
   readonly pause: () => Promise<void>;
   readonly resume: () => Promise<void>;
   readonly stop: () => Promise<void>;
@@ -129,6 +130,16 @@ export const useTimerController = (): TimerController => {
     () => runCommand('pause', window.timeTracker.timer.pause),
     [runCommand],
   );
+  const startExistingTask = useCallback(
+    (taskId: string) =>
+      runCommand('start', () =>
+        window.timeTracker.timer.start({
+          source: 'existing-task',
+          taskId,
+        }),
+      ),
+    [runCommand],
+  );
   const resume = useCallback(
     () => runCommand('resume', window.timeTracker.timer.resume),
     [runCommand],
@@ -167,6 +178,7 @@ export const useTimerController = (): TimerController => {
     activeCommand,
     commandError,
     start,
+    startExistingTask,
     pause,
     resume,
     stop,

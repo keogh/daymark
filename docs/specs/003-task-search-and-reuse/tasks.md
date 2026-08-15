@@ -34,7 +34,7 @@ to match the specification.
 | TASK-003-002 | Implement bounded suggestion queries and projections | Complete | TASK-003-001 | AC-003-001–004, AC-003-015 |
 | TASK-003-003 | Implement task suggestion and explicit-reuse services | Complete | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
 | TASK-003-004 | Expose the validated task suggestion boundary | Complete | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
-| TASK-003-005 | Build the accessible idle-task combobox | Pending | TASK-003-004 | AC-003-001–011, AC-003-016 |
+| TASK-003-005 | Build the accessible idle-task combobox | Complete | TASK-003-004 | AC-003-001–011, AC-003-016 |
 | TASK-003-006 | Verify Task Search and Reuse and update documentation | Pending | TASK-003-005 | AC-003-001–017 |
 
 ---
@@ -326,7 +326,7 @@ TASK-003-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -375,7 +375,40 @@ TASK-003-004.
 
 ### Completion Evidence
 
-Record commands run, results, and accessibility evidence when complete.
+- Added a focused suggestion controller that hides prior results while loading,
+  limits renderer rows to five, highlights the first successful result, invalidates
+  stale responses by request generation, and provides retryable controlled errors.
+- Extended the timer controller with exact-ID Start through the existing pending,
+  error, authoritative-state, and Daily History revision path.
+- Composed the existing source-owned Input and Field into an asynchronous
+  combobox/listbox/option pattern with `aria-expanded`, `aria-controls`,
+  `aria-activedescendant`, `aria-autocomplete`, `aria-busy`, selected state, a
+  polite result-count announcement, and a visible recoverable error status.
+- Implemented wrapping Arrow Up/Down, highlighted Enter, pointer selection,
+  Escape, blur/click ordering, typing-after-Escape, silent empty results, and a
+  Start button that remains bound to the typed description.
+- Renderer tests cover recent focus loading, five-row limiting, duration display,
+  pending usability, keyboard and pointer reuse, typed Start independence,
+  Escape/blur, stale response ordering, recoverable suggestion errors, empty
+  results, `TASK_NOT_FOUND`, ARIA relationships, retained focus, and history
+  refresh.
+- Browser plugin was unavailable, so rendered QA used Electron CDP with an isolated
+  `/tmp` profile. At 1100×800 and 390×844, page identity/content, focused
+  combobox state, two suggestion rows, highlighted selection, ArrowDown + Enter
+  exact reuse, running-state transition, responsive width, and zero horizontal
+  overflow passed with no renderer console warnings/errors.
+- Visual screenshot inspection found and fixed a mobile stacking defect where the
+  submit button painted over the first option; the repeated desktop/mobile QA and
+  final screenshots show clean list geometry and no overlap.
+- `npm test -- test/renderer/app/App.test.tsx
+  test/renderer/app/DailyHistory.test.tsx
+  test/renderer/app/use-display-duration.test.tsx
+  test/renderer/app/duration-format.test.ts` — passed, 42 tests.
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 232 tests.
+- `git diff --check` — passed.
 
 ---
 

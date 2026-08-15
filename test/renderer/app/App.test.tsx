@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '@/renderer/app/App';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import type { TaskSuggestionPage } from '@/shared/contracts/tasks';
 import type { TimerState } from '@/shared/contracts/timer';
 
 const idleState: TimerState = {
@@ -58,11 +59,11 @@ describe('App', () => {
 
     expect(api.timer.getState).toHaveBeenCalledOnce();
     expect(screen.getByText('Loading timer…')).toBeVisible();
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
 
     state.resolve({ ok: true, value: idleState });
 
-    const input = await screen.findByRole('textbox', {
+    const input = await screen.findByRole('combobox', {
       name: 'Task description',
     });
     expect(input).toHaveFocus();
@@ -77,7 +78,7 @@ describe('App', () => {
     const start = deferred<AppResult<TimerState>>();
     const api = setTimerApi({ start: vi.fn(() => start.promise) });
     render(<App />);
-    const input = await screen.findByRole('textbox', {
+    const input = await screen.findByRole('combobox', {
       name: 'Task description',
     });
 
@@ -105,7 +106,7 @@ describe('App', () => {
   it('starts with Enter from the task input', async () => {
     const api = setTimerApi();
     render(<App />);
-    const input = await screen.findByRole('textbox', {
+    const input = await screen.findByRole('combobox', {
       name: 'Task description',
     });
 
@@ -119,10 +120,301 @@ describe('App', () => {
     });
   });
 
+  it('loads five recent tasks on focus with accessible highlighted suggestions and totals', async () => {
+    const page = suggestionPage(
+      Array.from({ length: 6 }, (_, index) => ({
+        task: { id: `task-${index}`, description: `Task ${index}` },
+        todayDurationMs: index === 0 ? 6_300_000 : 0,
+        lifetimeDurationMs: index === 0 ? 18_900_000 : 0,
+        mostRecentActivityAt: 900 - index,
+      })),
+    );
+    const api = setTimerApi({
+      getSuggestions: vi.fn().mockResolvedValue({ ok: true, value: page }),
+    });
+
+    render(<App />);
+
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    const listbox = await screen.findByRole('listbox', {
+      name: 'Task suggestions',
+    });
+    const options = screen.getAllByRole('option');
+    expect(api.tasks.getSuggestions).toHaveBeenCalledWith({ query: '' });
+    expect(options).toHaveLength(5);
+    expect(options[0]).toHaveTextContent('Task 0Today 1h 45m · Total 5h 15m');
+    expect(options[1]).toHaveTextContent('Today 0h 0m · Total 0h 0m');
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(input).toHaveAttribute('aria-activedescendant', options[0]?.id);
+    expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    expect(input).toHaveFocus();
+    expect(screen.getByText('5 task suggestions available.')).toHaveClass(
+      'visually-hidden',
+    );
+  });
+
+  it('keeps typing and typed Start available while a newer search is pending', async () => {
+    const search = deferred<AppResult<TaskSuggestionPage>>();
+    const getSuggestions = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: suggestionPage([]) })
+      .mockReturnValueOnce(search.promise);
+    setTimerApi({ getSuggestions });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    await act(async () => Promise.resolve());
+
+    fireEvent.change(input, { target: { value: 'Auth' } });
+
+    expect(input).toHaveValue('Auth');
+    expect(input).toHaveAttribute('aria-busy', 'true');
+    expect(input).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    search.resolve({
+      ok: true,
+      value: suggestionPage([suggestion('auth', 'Authentication')]),
+    });
+    expect(await screen.findByRole('option')).toHaveTextContent(
+      'Authentication',
+    );
+  });
+
+  it('wraps keyboard highlight and starts the highlighted task by ID', async () => {
+    const api = setTimerApi({
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: suggestionPage([
+          suggestion('task-a', 'Alpha'),
+          suggestion('task-b', 'Beta'),
+        ]),
+      }),
+    });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    const options = await screen.findAllByRole('option');
+
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    expect(options[1]).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveAttribute('aria-activedescendant', options[1]?.id);
+    expect(input).toHaveFocus();
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'existing-task',
+      taskId: 'task-a',
+    });
+    expect(
+      await screen.findByRole('region', { name: 'running timer' }),
+    ).toBeVisible();
+    await act(async () => Promise.resolve());
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
+  });
+
+  it('starts a clicked suggestion while keeping focus in the input until Start', async () => {
+    const api = setTimerApi({
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: suggestionPage([suggestion('task-b', 'Beta')]),
+      }),
+    });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    const option = await screen.findByRole('option', { name: /Beta/ });
+
+    fireEvent.mouseDown(option);
+    expect(input).toHaveFocus();
+    fireEvent.click(option);
+
+    expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'existing-task',
+      taskId: 'task-b',
+    });
+  });
+
+  it('keeps the Start button bound to typed text instead of the highlight', async () => {
+    const api = setTimerApi({
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: suggestionPage([suggestion('existing', 'Existing Task')]),
+      }),
+    });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    fireEvent.change(input, { target: { value: 'New task' } });
+    await screen.findByRole('option');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+
+    expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'description',
+      description: 'New task',
+    });
+  });
+
+  it('closes on Escape and blur, then reopens when text changes', async () => {
+    const getSuggestions = vi.fn().mockResolvedValue({
+      ok: true,
+      value: suggestionPage([suggestion('task-a', 'Alpha')]),
+    });
+    setTimerApi({ getSuggestions });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    await screen.findByRole('listbox');
+
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(input).toHaveValue('');
+
+    fireEvent.change(input, { target: { value: 'A' } });
+    expect(await screen.findByRole('listbox')).toBeVisible();
+    fireEvent.blur(input);
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('does not render an older suggestion response that resolves last', async () => {
+    const older = deferred<AppResult<TaskSuggestionPage>>();
+    const newer = deferred<AppResult<TaskSuggestionPage>>();
+    const getSuggestions = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: suggestionPage([]) })
+      .mockReturnValueOnce(older.promise)
+      .mockReturnValueOnce(newer.promise);
+    setTimerApi({ getSuggestions });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    await act(async () => Promise.resolve());
+
+    fireEvent.change(input, { target: { value: 'old' } });
+    fireEvent.change(input, { target: { value: 'new' } });
+    newer.resolve({
+      ok: true,
+      value: suggestionPage([suggestion('new', 'New result')]),
+    });
+    expect(await screen.findByRole('option')).toHaveTextContent('New result');
+
+    older.resolve({
+      ok: true,
+      value: suggestionPage([suggestion('old', 'Old result')]),
+    });
+    await act(async () => Promise.resolve());
+    expect(screen.getByRole('option')).toHaveTextContent('New result');
+    expect(screen.queryByText('Old result')).not.toBeInTheDocument();
+  });
+
+  it('shows a recoverable suggestion error without blocking typed Start and retries', async () => {
+    const getSuggestions = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          code: 'TASK_SUGGESTIONS_UNAVAILABLE',
+          message: 'Task suggestions are temporarily unavailable.',
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        value: suggestionPage([suggestion('retry', 'Retry result')]),
+      });
+    setTimerApi({ getSuggestions });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+
+    expect(
+      await screen.findByText('Task suggestions are temporarily unavailable.'),
+    ).toHaveTextContent('Task suggestions are temporarily unavailable.');
+    expect(input).toBeEnabled();
+    fireEvent.change(input, { target: { value: 'retry' } });
+    expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled();
+    expect(await screen.findByRole('option')).toHaveTextContent('Retry result');
+    expect(getSuggestions).toHaveBeenLastCalledWith({ query: 'retry' });
+  });
+
+  it('keeps empty results silent and permits a new typed task', async () => {
+    const api = setTimerApi({
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: suggestionPage([]),
+      }),
+    });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    await act(async () => Promise.resolve());
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.queryByText(/No .*suggest/i)).not.toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'Brand new task' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+    expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'description',
+      description: 'Brand new task',
+    });
+  });
+
+  it('closes a stale selection, shows TASK_NOT_FOUND inline, and retries on focus', async () => {
+    const getSuggestions = vi.fn().mockResolvedValue({
+      ok: true,
+      value: suggestionPage([suggestion('deleted', 'Deleted task')]),
+    });
+    const api = setTimerApi({
+      getSuggestions,
+      start: vi.fn().mockResolvedValue({
+        ok: false,
+        error: {
+          code: 'TASK_NOT_FOUND',
+          message: 'The selected task no longer exists.',
+        },
+      }),
+    });
+    render(<App />);
+    const input = await screen.findByRole('combobox', {
+      name: 'Task description',
+    });
+    fireEvent.click(await screen.findByRole('option'));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The selected task no longer exists.',
+    );
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(input).toBeEnabled();
+    expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'existing-task',
+      taskId: 'deleted',
+    });
+
+    fireEvent.blur(input);
+    fireEvent.focus(input);
+    expect(getSuggestions).toHaveBeenCalledTimes(2);
+  });
+
   it('shows validation feedback and returns focus for an overlong description', async () => {
     const api = setTimerApi();
     render(<App />);
-    const input = await screen.findByRole('textbox', {
+    const input = await screen.findByRole('combobox', {
       name: 'Task description',
     });
 
@@ -152,7 +444,7 @@ describe('App', () => {
       }),
     });
     render(<App />);
-    const input = await screen.findByRole('textbox', {
+    const input = await screen.findByRole('combobox', {
       name: 'Task description',
     });
 
@@ -213,7 +505,7 @@ describe('App', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'The timer could not be loaded. Please restart the application.',
     );
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
   it('renders active durations and applies Pause, Resume, and Stop responses', async () => {
@@ -224,7 +516,10 @@ describe('App', () => {
     };
     const pauseResult = deferred<AppResult<TimerState>>();
     const api = setTimerApi({
-      getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
+      getState: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { ...runningState, now: Date.now() },
+      }),
       pause: vi.fn(() => pauseResult.promise),
       resume: vi.fn().mockResolvedValue({ ok: true, value: nextRunningState }),
       stop: vi.fn().mockResolvedValue({ ok: true, value: idleState }),
@@ -258,7 +553,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
     expect(
-      await screen.findByRole('textbox', { name: 'Task description' }),
+      await screen.findByRole('combobox', { name: 'Task description' }),
     ).toHaveFocus();
     expect(api.timer.pause).toHaveBeenCalledOnce();
     expect(api.timer.stop).toHaveBeenCalledOnce();
@@ -407,6 +702,7 @@ interface TimerApiOverrides {
   readonly pause?: TimeTrackerAPI['timer']['pause'];
   readonly resume?: TimeTrackerAPI['timer']['resume'];
   readonly stop?: TimeTrackerAPI['timer']['stop'];
+  readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
 }
 
 const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
@@ -441,10 +737,12 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       }),
     },
     tasks: {
-      getSuggestions: vi.fn().mockResolvedValue({
-        ok: true,
-        value: { suggestions: [], now: 1_000 },
-      }),
+      getSuggestions:
+        overrides.getSuggestions ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: { suggestions: [], now: 1_000 },
+        }),
     },
   };
 
@@ -454,6 +752,17 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
   });
   return api;
 };
+
+const suggestion = (id: string, description: string) => ({
+  task: { id, description },
+  todayDurationMs: 0,
+  lifetimeDurationMs: 0,
+  mostRecentActivityAt: 900,
+});
+
+const suggestionPage = (
+  suggestions: TaskSuggestionPage['suggestions'],
+): TaskSuggestionPage => ({ suggestions, now: 1_000 });
 
 const deferred = <Value,>() => {
   let resolve!: (value: Value) => void;

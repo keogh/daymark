@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react';
 
 import {
   Alert,
@@ -13,6 +20,7 @@ import type { TimerState } from '@/shared/contracts/timer';
 import { DailyHistory } from './DailyHistory';
 import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
 import { useDisplayDuration } from './use-display-duration';
+import { useTaskSuggestions } from './use-task-suggestions';
 import {
   useTimerController,
   type TimerController,
@@ -70,6 +78,17 @@ interface IdleTimerProps {
 const IdleTimer = ({ controller }: IdleTimerProps) => {
   const [description, setDescription] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const listboxId = useId();
+  const suggestions = useTaskSuggestions();
+  const listIsVisible =
+    suggestions.isOpen &&
+    !suggestions.isLoading &&
+    suggestions.error === null &&
+    suggestions.suggestions.length > 0;
+  const highlightedSuggestion =
+    suggestions.highlightedIndex === null
+      ? undefined
+      : suggestions.suggestions[suggestions.highlightedIndex];
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -77,7 +96,34 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    suggestions.close();
     void controller.start(description);
+  };
+
+  const startSuggestion = (taskId: string) => {
+    suggestions.close();
+    void controller.startExistingTask(taskId);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (listIsVisible) {
+        event.preventDefault();
+        suggestions.moveHighlight(event.key === 'ArrowDown' ? 1 : -1);
+      }
+      return;
+    }
+    if (event.key === 'Escape') {
+      if (suggestions.isOpen) {
+        event.preventDefault();
+        suggestions.close();
+      }
+      return;
+    }
+    if (event.key === 'Enter' && highlightedSuggestion !== undefined) {
+      event.preventDefault();
+      startSuggestion(highlightedSuggestion.task.id);
+    }
   };
 
   return (
@@ -91,26 +137,85 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
           <FieldLabel className="visually-hidden" htmlFor="task-description">
             Task description
           </FieldLabel>
-          <Input
-            className="min-h-14 px-4 text-base"
-            aria-describedby={
-              controller.commandError === null ? undefined : 'start-error'
-            }
-            aria-invalid={controller.commandError !== null}
-            autoComplete="off"
-            disabled={controller.activeCommand === 'start'}
-            id="task-description"
-            onChange={(event) => {
-              setDescription(event.target.value);
-              if (controller.commandError !== null) {
-                controller.clearCommandError();
+          <div className="task-combobox">
+            <Input
+              className="min-h-14 px-4 text-base"
+              aria-activedescendant={
+                listIsVisible && suggestions.highlightedIndex !== null
+                  ? `${listboxId}-option-${suggestions.highlightedIndex}`
+                  : undefined
               }
-            }}
-            placeholder="Task description..."
-            ref={inputRef}
-            type="text"
-            value={description}
-          />
+              aria-autocomplete="list"
+              aria-busy={suggestions.isLoading}
+              aria-controls={listboxId}
+              aria-describedby={
+                controller.commandError === null ? undefined : 'start-error'
+              }
+              aria-expanded={listIsVisible}
+              aria-invalid={controller.commandError !== null}
+              autoComplete="off"
+              disabled={controller.activeCommand === 'start'}
+              id="task-description"
+              onBlur={suggestions.close}
+              onChange={(event) => {
+                const nextDescription = event.target.value;
+                setDescription(nextDescription);
+                if (controller.commandError !== null) {
+                  controller.clearCommandError();
+                }
+                void suggestions.load(nextDescription);
+              }}
+              onFocus={() => void suggestions.load(description)}
+              onKeyDown={handleKeyDown}
+              placeholder="Task description..."
+              ref={inputRef}
+              role="combobox"
+              type="text"
+              value={description}
+            />
+            {listIsVisible && (
+              <div
+                aria-label="Task suggestions"
+                className="task-suggestions"
+                id={listboxId}
+                role="listbox"
+              >
+                {suggestions.suggestions.map((suggestion, index) => (
+                  <button
+                    aria-selected={suggestions.highlightedIndex === index}
+                    className="task-suggestion"
+                    data-highlighted={suggestions.highlightedIndex === index}
+                    id={`${listboxId}-option-${index}`}
+                    key={suggestion.task.id}
+                    onClick={() => startSuggestion(suggestion.task.id)}
+                    onMouseDown={(event) => event.preventDefault()}
+                    role="option"
+                    tabIndex={-1}
+                    type="button"
+                  >
+                    <span className="task-suggestion__description">
+                      {suggestion.task.description}
+                    </span>
+                    <span className="task-suggestion__totals">
+                      Today {formatHoursAndMinutes(suggestion.todayDurationMs)}{' '}
+                      · Total{' '}
+                      {formatHoursAndMinutes(suggestion.lifetimeDurationMs)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {suggestions.error !== null && (
+            <p className="task-suggestions__error" role="status">
+              {suggestions.error.message}
+            </p>
+          )}
+          <p aria-live="polite" className="visually-hidden" role="status">
+            {listIsVisible
+              ? `${suggestions.suggestions.length} task suggestions available.`
+              : ''}
+          </p>
           {controller.commandError !== null && (
             <FieldError className="start-form__error" id="start-error">
               {controller.commandError.message}
