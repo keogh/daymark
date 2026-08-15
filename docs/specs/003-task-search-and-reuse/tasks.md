@@ -31,7 +31,7 @@ to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-003-001 | Define suggestion and explicit-start contracts | Complete | None | AC-003-007, AC-003-012–014 |
-| TASK-003-002 | Implement bounded suggestion queries and projections | Pending | TASK-003-001 | AC-003-001–004, AC-003-015 |
+| TASK-003-002 | Implement bounded suggestion queries and projections | Complete | TASK-003-001 | AC-003-001–004, AC-003-015 |
 | TASK-003-003 | Implement task suggestion and explicit-reuse services | Pending | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
 | TASK-003-004 | Expose the validated task suggestion boundary | Pending | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
 | TASK-003-005 | Build the accessible idle-task combobox | Pending | TASK-003-004 | AC-003-001–011, AC-003-016 |
@@ -110,7 +110,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -152,8 +152,26 @@ TASK-003-001.
 
 ### Completion Evidence
 
-Record commands run, results, query-count evidence, and implementation notes when
-complete.
+- Added one grouped, parameterized SQLite query that performs literal normalized
+  substring matching, prefix classification, deterministic ordering, recency, and
+  today/lifetime aggregation with a hard five-row limit.
+- Reused the SPEC-002 local calendar helper for DST-safe day boundaries and clipped
+  closed/open durations to the supplied authoritative snapshot.
+- Disposable-database tests cover empty-query recency, five-row limiting, prefix
+  priority, recency/description/ID tie-breakers, literal `%`/`_` matching, orphan
+  tasks, repeated/open/cross-midnight/exact-boundary intervals, and DST.
+- A prepared-statement spy demonstrates one query for the complete result rather
+  than one query per suggestion; serialized database comparison demonstrates the
+  operation is read-only. No schema change or migration was needed.
+- `npm test -- test/main/database/repositories/task-suggestion-query-repository.test.ts
+  test/main/services/history-projections.test.ts
+  test/main/database/repositories/history-query-repository.test.ts` — passed, 17
+  tests.
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 207 tests.
+- `git diff --check` — passed.
 
 ---
 
