@@ -773,6 +773,7 @@ interface TimerApiOverrides {
   readonly resume?: TimeTrackerAPI['timer']['resume'];
   readonly stop?: TimeTrackerAPI['timer']['stop'];
   readonly getHistoryPage?: TimeTrackerAPI['history']['getPage'];
+  readonly createManualInterval?: TimeTrackerAPI['manualTime']['createInterval'];
   readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
 }
 
@@ -810,6 +811,14 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
             nextBeforeDayStartedAt: null,
             now: 1_000,
           },
+        }),
+    },
+    manualTime: {
+      createInterval:
+        overrides.createManualInterval ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: { intervalId: 'interval-1' },
         }),
     },
     tasks: {

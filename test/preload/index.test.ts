@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SYSTEM_HEALTH_CHECK_CHANNEL } from '@/shared/contracts/system-health';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
+import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
 import {
   TIMER_GET_STATE_CHANNEL,
@@ -55,7 +56,13 @@ describe('preload API', () => {
     if (api === undefined) {
       throw new Error('Preload API was not exposed.');
     }
-    expect(Object.keys(api)).toEqual(['system', 'timer', 'history', 'tasks']);
+    expect(Object.keys(api)).toEqual([
+      'system',
+      'timer',
+      'history',
+      'manualTime',
+      'tasks',
+    ]);
     expect(Object.keys(api.timer)).toEqual([
       'getState',
       'start',
@@ -65,6 +72,7 @@ describe('preload API', () => {
       'stop',
     ]);
     expect(Object.keys(api.history)).toEqual(['getPage']);
+    expect(Object.keys(api.manualTime)).toEqual(['createInterval']);
     expect(Object.keys(api.tasks)).toEqual(['getSuggestions']);
     await expect(api.system.healthCheck()).resolves.toEqual(response);
     await api.timer.getState();
@@ -75,6 +83,12 @@ describe('preload API', () => {
     await api.timer.resume();
     await api.timer.stop();
     await api.history.getPage({ beforeDayStartedAt: 0 });
+    await api.manualTime.createInterval({
+      taskDescription: 'Focus',
+      date: '2026-08-14',
+      startTime: '09:00',
+      endTime: '10:00',
+    });
     await api.tasks.getSuggestions({ query: 'focus' });
     expect(electronMocks.invoke.mock.calls).toEqual([
       [SYSTEM_HEALTH_CHECK_CHANNEL],
@@ -86,6 +100,15 @@ describe('preload API', () => {
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],
       [HISTORY_GET_PAGE_CHANNEL, { beforeDayStartedAt: 0 }],
+      [
+        MANUAL_TIME_CREATE_INTERVAL_CHANNEL,
+        {
+          taskDescription: 'Focus',
+          date: '2026-08-14',
+          startTime: '09:00',
+          endTime: '10:00',
+        },
+      ],
       [TASKS_GET_SUGGESTIONS_CHANNEL, { query: 'focus' }],
     ]);
   });

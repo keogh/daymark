@@ -2,41 +2,42 @@
 
 ## Current Specification
 
-SPEC-004 — One-Click Task Switching
+SPEC-005 — Manual Time Entry
 
 ## Active Task
 
-TASK-004-005 — Verify One-Click Task Switching and Update Documentation
+TASK-005-001 — Define Manual-Entry Contracts and Validation
 
 ## Status
 
-Complete
+In Progress
 
 ---
 
 # Immediate Plan
 
-1. Trace every SPEC-004 acceptance criterion to existing service, IPC, preload,
-   integration, and renderer coverage, and patch only if verification exposes a
-   gap.
-2. Run the required validation set for final SPEC-004 closeout:
-   `npm run typecheck`, `npm run lint`, `npm test`, and `npm run package`.
-3. Update SPEC-004 documentation artifacts (`tasks.md`, `spec.md` status if
-   warranted, and `docs/progress.md`) with verification evidence and final
-   completion state.
+1. Add the shared manual-entry contract module and extend shared API/error
+   typing for the new validated boundary surface.
+2. Implement exact-shape runtime validation for manual-entry task-source
+   exclusivity, trimmed string requirements, and local date/time validity.
+3. Add focused contract, validation, and preload tests for the new boundary
+   definitions.
+4. Run `npm test -- manual`, `npm run typecheck`, and `npm run lint`.
+5. Update `docs/specs/005-manual-time-entry/tasks.md` and `docs/progress.md`
+   with status and verification evidence.
 
 ---
 
 # Scope Guard
 
-Do not add new product behavior beyond SPEC-004 or broaden scope into later
-switching entry points, interval actions, tray controls, or unrelated refactors.
+Do not add persistence behavior, IPC registration, or renderer UI for manual
+entry in this task. Keep scope limited to shared contracts, runtime validation,
+and supporting tests.
 
 ---
 
 # Completion
 
-TASK-004-005 is complete. SPEC-004 is verified against AC-004-001 through
-AC-004-010, the required validation suite and macOS arm64 packaging passed, and
-completion evidence is recorded in the specification task breakdown and project
-progress log.
+Completion is reached when the manual-entry contract and validator are in place,
+focused tests pass, and the task breakdown/progress docs record the evidence for
+`TASK-005-001`.

@@ -2,20 +2,19 @@
 
 ## Current Phase
 
-One-Click Task Switching verified
+Manual Time Entry in progress
 
 ## Current Specification
 
-SPEC-004 — One-Click Task Switching (Verified)
+SPEC-005 — Manual Time Entry (Task TASK-005-001 complete)
 
 ## Current Status
 
-SPEC-004 is complete and verified. Daily History now exposes one-click,
-state-aware task restart and switching by stable task ID across idle, running,
-and paused timer states; the renderer refreshes authoritatively after successful
-history-row starts/switches and controlled stale-task failures; and the narrow
-typed preload/IPC boundary preserves transactional timer semantics and runtime
-input validation.
+SPEC-005 implementation has started with `TASK-005-001` complete. The shared
+manual-entry boundary now defines explicit IPC/preload contracts, renderer-safe
+error typing, and runtime validation for exact object shape, task-source
+exclusivity, trimmed fields, local date/time syntax, and same-day end-after-start
+rejection before service or persistence work.
 
 ---
 
@@ -135,26 +134,25 @@ None.
 
 # Active Work
 
-No active specification is currently in progress. The next planned work is
-SPEC-005 — Manual Time Entry.
+SPEC-005 — Manual Time Entry is active. `TASK-005-001` is complete and the next
+planned task is `TASK-005-002` to implement transactional manual interval
+creation, task reuse/creation, local-time conversion, and overlap rejection.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-004 remained within the established typed preload
-API, main-process SQLite, timestamp-based interval, injected Clock, and npm
-decisions. It reused SPEC-002 local-calendar projections and SPEC-003 stable
-task-ID reuse semantics. No schema migration, dependency, decision, or
-architectural deviation was required.
+See `docs/decisions.md`. `TASK-005-001` remains within the established typed
+preload API, main-process SQLite ownership, timestamp-based interval source of
+truth, injected Clock, and npm decisions. No schema migration, dependency,
+decision, or architectural deviation was required for the shared manual-entry
+contracts and validation layer.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Verified SPEC-004 and completed TASK-004-005. Final acceptance
-confirmed one-click Daily History switching across idle, running, paused,
-same-task resume/no-op, and stale-task handling. `npm run typecheck`,
-`npm run lint`, `npm test`, and `npm run package` passed, and the packaged
-macOS arm64 app passed isolated CDP-driven history-row switching acceptance
-using `/tmp/timetracker-spec004-user-data`.
+2026-08-15 — Completed `TASK-005-001` for SPEC-005. Added the shared
+`manual-time:create-interval` contract, manual-entry runtime validation, new
+renderer-safe error coverage, and typed preload API surface updates.
+`npm test -- manual-time`, `npm run typecheck`, and `npm run lint` passed.

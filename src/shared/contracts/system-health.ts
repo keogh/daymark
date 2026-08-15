@@ -1,5 +1,6 @@
 import type { TimerAPI } from './timer';
 import type { HistoryAPI } from './history';
+import type { ManualTimeAPI } from './manual-time';
 import type { TasksAPI } from './tasks';
 
 export const SYSTEM_HEALTH_CHECK_CHANNEL = 'system:health-check';
@@ -20,6 +21,7 @@ export interface TimeTrackerAPI {
   };
   readonly timer: TimerAPI;
   readonly history: HistoryAPI;
+  readonly manualTime: ManualTimeAPI;
   readonly tasks: TasksAPI;
 }
 

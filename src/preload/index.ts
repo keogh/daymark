@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
+import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
 import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
@@ -30,6 +31,10 @@ const timeTrackerApi: TimeTrackerAPI = {
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),
+  },
+  manualTime: {
+    createInterval: (input) =>
+      ipcRenderer.invoke(MANUAL_TIME_CREATE_INTERVAL_CHANNEL, input),
   },
   tasks: {
     getSuggestions: (input) =>

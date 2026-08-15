@@ -31,6 +31,20 @@ describe('renderer-safe application errors', () => {
     });
   });
 
+  it('accepts INVALID_MANUAL_INTERVAL as a known renderer-safe application error', () => {
+    const error = {
+      code: 'INVALID_MANUAL_INTERVAL' as const,
+      message: 'Manual interval input is invalid.',
+      detail: 'must not cross IPC',
+    };
+
+    expect(isAppError(error)).toBe(true);
+    expect(toRendererSafeError(error)).toEqual({
+      code: 'INVALID_MANUAL_INTERVAL',
+      message: 'Manual interval input is invalid.',
+    });
+  });
+
   it('maps unknown failures to a stable internal error without leaking details', () => {
     expect(toRendererSafeError(new Error('database path is secret'))).toEqual({
       code: 'INTERNAL_ERROR',

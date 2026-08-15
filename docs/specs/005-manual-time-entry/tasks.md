@@ -31,7 +31,7 @@ breakdown to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-005-001 | Define manual-entry contracts and validation | Pending | None | AC-005-009 |
+| TASK-005-001 | Define manual-entry contracts and validation | Complete | None | AC-005-009 |
 | TASK-005-002 | Implement transactional manual interval creation | Pending | TASK-005-001 | AC-005-003–008 |
 | TASK-005-003 | Expose the validated manual-entry boundary | Pending | TASK-005-002 | AC-005-009 |
 | TASK-005-004 | Add accessible manual-entry UI and refresh flows | Pending | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
@@ -45,7 +45,7 @@ breakdown to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -85,8 +85,24 @@ None.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when
-complete.
+- Implemented shared manual-entry boundary definitions in
+  `src/shared/contracts/manual-time.ts`, including the explicit
+  `manual-time:create-interval` channel, `CreateManualIntervalInput`, and
+  `ManualIntervalCreateResult`.
+- Added `validateCreateManualIntervalInput` in
+  `src/shared/validation/manual-time-input.ts` with allowed-key enforcement,
+  task-source exclusivity, trimmed string handling, local date/time validation,
+  and same-day end-after-start checks.
+- Extended shared error typing with `INVALID_MANUAL_INTERVAL` and
+  `TIME_INTERVAL_OVERLAP`, and added the typed `manualTime` surface to the
+  shared preload API contract.
+- Added focused tests in `test/shared/contracts/manual-time.test.ts`,
+  `test/shared/validation/manual-time-input.test.ts`, `test/preload/index.test.ts`,
+  and `test/shared/contracts/app-result.test.ts`.
+- Verification commands run on 2026-08-15:
+  - `npm test -- manual-time` ✅
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅
 
 ---
 
