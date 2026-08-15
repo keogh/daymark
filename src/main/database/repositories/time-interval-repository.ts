@@ -71,6 +71,14 @@ export class TimeIntervalRepository {
       .get();
   }
 
+  deleteClosed(id: string): TimeInterval | undefined {
+    return this.#db
+      .delete(timeIntervals)
+      .where(and(eq(timeIntervals.id, id), isNotNull(timeIntervals.endedAt)))
+      .returning()
+      .get();
+  }
+
   findForSession(
     taskId: string,
     sessionStartedAt: number,

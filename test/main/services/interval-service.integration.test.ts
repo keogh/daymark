@@ -151,6 +151,68 @@ describe('IntervalService SQLite integration', () => {
       activeIntervalStartedAt: localTime(2026, 8, 15, 11),
     });
   });
+
+  it("deletes a task's last interval while preserving the task and refreshing history", () => {
+    intervals.insert({
+      id: 'only-interval',
+      taskId: 'task-1',
+      startedAt: localTime(2026, 8, 15, 9),
+      endedAt: localTime(2026, 8, 15, 10),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+
+    expect(service.delete({ intervalId: 'only-interval' })).toEqual({
+      ok: true,
+      value: { intervalId: 'only-interval' },
+    });
+    expect(tasks.findById('task-1')).toBeDefined();
+    expect(intervals.findByTask('task-1')).toEqual([]);
+    expect(
+      history.getPage({}).days.flatMap((day) => day.tasks),
+    ).toEqual([]);
+  });
+
+  it('deletes a closed current-session interval while preserving running state and refreshing timer totals', () => {
+    const sessionStartedAt = localTime(2026, 8, 15, 9);
+    intervals.insert({
+      id: 'closed-session',
+      taskId: 'task-1',
+      startedAt: sessionStartedAt,
+      endedAt: localTime(2026, 8, 15, 10),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'open-session',
+      taskId: 'task-1',
+      startedAt: localTime(2026, 8, 15, 11),
+      endedAt: null,
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    context.sqlite
+      .prepare(
+        'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ? where id = 1',
+      )
+      .run('running', 'task-1', sessionStartedAt, 100);
+    const stateBefore = appState.get();
+    const openBefore = intervals.findOpen();
+
+    expect(service.delete({ intervalId: 'closed-session' })).toEqual({
+      ok: true,
+      value: { intervalId: 'closed-session' },
+    });
+    expect(appState.get()).toEqual(stateBefore);
+    expect(intervals.findOpen()).toEqual(openBefore);
+    expect(reader.getState()).toMatchObject({
+      status: 'running',
+      sessionDurationMs: minutes(60),
+      taskTodayDurationMs: minutes(60),
+      taskLifetimeDurationMs: minutes(60),
+      activeIntervalStartedAt: localTime(2026, 8, 15, 11),
+    });
+  });
 });
 
 const minutes = (value: number): number => value * 60_000;

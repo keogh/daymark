@@ -81,6 +81,34 @@ describe('TimeIntervalRepository', () => {
     expect(repository.findById(open.id)).toEqual(open);
   });
 
+  it('deletes exactly one closed interval without deleting its task or other intervals', () => {
+    const target = createInterval();
+    const other = createInterval({
+      id: 'interval-2',
+      taskId: 'task-2',
+      startedAt: 2_000,
+      endedAt: 2_200,
+    });
+    repository.insert(target);
+    repository.insert(other);
+
+    expect(repository.deleteClosed(target.id)).toEqual(target);
+    expect(repository.findById(target.id)).toBeUndefined();
+    expect(repository.findById(other.id)).toEqual(other);
+    expect(
+      context.sqlite.prepare('select id from tasks where id = ?').get('task-1'),
+    ).toEqual({ id: 'task-1' });
+  });
+
+  it('does not delete a missing or open interval through closed correction', () => {
+    const open = createInterval({ endedAt: null });
+    repository.insert(open);
+
+    expect(repository.deleteClosed('missing')).toBeUndefined();
+    expect(repository.deleteClosed(open.id)).toBeUndefined();
+    expect(repository.findById(open.id)).toEqual(open);
+  });
+
   it('preserves the closed timestamp-order database constraint during update', () => {
     repository.insert(createInterval());
 

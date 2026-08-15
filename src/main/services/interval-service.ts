@@ -9,10 +9,14 @@ import {
 } from '@/main/services/timer-state-reader';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type {
+  DeleteIntervalInput,
   IntervalMutationResult,
   UpdateIntervalInput,
 } from '@/shared/contracts/intervals';
-import { validateUpdateIntervalInput } from '@/shared/validation/interval-correction-input';
+import {
+  validateDeleteIntervalInput,
+  validateUpdateIntervalInput,
+} from '@/shared/validation/interval-correction-input';
 
 export interface IntervalServiceDependencies {
   readonly appState: AppStateRepository;
@@ -49,6 +53,61 @@ export class IntervalService {
       console.error('Interval update failed.', error);
       return internalError();
     }
+  }
+
+  delete(input: DeleteIntervalInput): AppResult<IntervalMutationResult> {
+    const validation = validateDeleteIntervalInput(input);
+    if (!validation.ok) {
+      return validation;
+    }
+
+    try {
+      return this.#transactions.run(() => this.#deleteInTransaction(input));
+    } catch (error: unknown) {
+      console.error('Interval deletion failed.', error);
+      return internalError();
+    }
+  }
+
+  #deleteInTransaction(
+    input: DeleteIntervalInput,
+  ): AppResult<IntervalMutationResult> {
+    const validation = validateDeleteIntervalInput(input);
+    if (!validation.ok) {
+      return validation;
+    }
+
+    const target = this.#intervals.findById(validation.value.intervalId);
+    if (target === undefined) {
+      return intervalNotFound();
+    }
+    if (target.endedAt === null) {
+      return openIntervalNotEditable();
+    }
+
+    const stateBefore = this.#appState.get();
+    const openBefore = this.#intervals.findOpen();
+    this.#stateReader.getStateAt(this.#clock.now());
+
+    const deleted = this.#intervals.deleteClosed(target.id);
+    if (deleted === undefined || deleted.taskId !== target.taskId) {
+      throw new InvalidPersistedTimerStateError(
+        'Closed interval changed before its deletion completed.',
+      );
+    }
+
+    const stateAfter = this.#appState.get();
+    const openAfter = this.#intervals.findOpen();
+    if (
+      !sameAppState(stateBefore, stateAfter) ||
+      !sameOptionalInterval(openBefore, openAfter)
+    ) {
+      throw new InvalidPersistedTimerStateError(
+        'Interval deletion mutated authoritative timer state.',
+      );
+    }
+
+    return { ok: true, value: { intervalId: deleted.id } };
   }
 
   #updateInTransaction(

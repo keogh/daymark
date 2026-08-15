@@ -18,7 +18,7 @@ import { FakeClock } from '../domain/support/fake-clock';
 
 const originalTimezone = process.env.TZ;
 
-describe('IntervalService update', () => {
+describe('IntervalService', () => {
   let fixture: DisposableDatabase;
   let context: DatabaseContext;
   let clock: FakeClock;
@@ -261,6 +261,71 @@ describe('IntervalService update', () => {
         endTime: '11:00',
       }),
     ).toMatchObject({ ok: false, error: { code: 'INTERNAL_ERROR' } });
+    expect(intervals.findById(target.id)).toEqual(target);
+    expect(consoleError).toHaveBeenCalledOnce();
+  });
+
+  it('deletes exactly one closed interval while preserving its task, other intervals, and AppState', () => {
+    const target = seedInterval();
+    const other = seedInterval({
+      id: 'other-interval',
+      taskId: 'task-2',
+      startedAt: localTime(2026, 8, 13, 11),
+      endedAt: localTime(2026, 8, 13, 12),
+    });
+    const stateBefore = appState.get();
+
+    expect(service.delete({ intervalId: target.id })).toEqual({
+      ok: true,
+      value: { intervalId: target.id },
+    });
+    expect(intervals.findById(target.id)).toBeUndefined();
+    expect(intervals.findById(other.id)).toEqual(other);
+    expect(tasks.findById(target.taskId)).toBeDefined();
+    expect(appState.get()).toEqual(stateBefore);
+  });
+
+  it('returns controlled invalid, missing, and open-target delete failures without mutation', () => {
+    const invalidResult = service.delete({ intervalId: ' invalid' });
+    expect(invalidResult).toMatchObject({
+      ok: false,
+      error: { code: 'INVALID_INTERVAL_DELETE' },
+    });
+
+    expect(service.delete({ intervalId: 'missing' })).toMatchObject({
+      ok: false,
+      error: { code: 'TIME_INTERVAL_NOT_FOUND' },
+    });
+
+    seedRunningState(localTime(2026, 8, 14, 11, 30));
+    const stateBefore = appState.get();
+    const openBefore = intervals.findOpen();
+    expect(service.delete({ intervalId: 'open-interval' })).toMatchObject({
+      ok: false,
+      error: { code: 'OPEN_INTERVAL_NOT_EDITABLE' },
+    });
+    expect(intervals.findOpen()).toEqual(openBefore);
+    expect(appState.get()).toEqual(stateBefore);
+  });
+
+  it('rolls back deletion and maps persistence failure to a logged INTERNAL_ERROR', () => {
+    const target = seedInterval();
+    context.sqlite
+      .prepare(
+        "create trigger reject_interval_delete before delete on time_intervals begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    expect(service.delete({ intervalId: target.id })).toEqual({
+      ok: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An unexpected error occurred.',
+      },
+    });
     expect(intervals.findById(target.id)).toEqual(target);
     expect(consoleError).toHaveBeenCalledOnce();
   });
