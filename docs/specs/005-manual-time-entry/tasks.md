@@ -32,7 +32,7 @@ breakdown to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-005-001 | Define manual-entry contracts and validation | Complete | None | AC-005-009 |
-| TASK-005-002 | Implement transactional manual interval creation | Pending | TASK-005-001 | AC-005-003–008 |
+| TASK-005-002 | Implement transactional manual interval creation | Complete | TASK-005-001 | AC-005-003–008 |
 | TASK-005-003 | Expose the validated manual-entry boundary | Pending | TASK-005-002 | AC-005-009 |
 | TASK-005-004 | Add accessible manual-entry UI and refresh flows | Pending | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
 | TASK-005-005 | Verify Manual Time Entry and update documentation | Pending | TASK-005-004 | AC-005-001–012 |
@@ -110,7 +110,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -159,8 +159,28 @@ TASK-005-001.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when
-complete.
+- Added `ManualTimeService` in `src/main/services/manual-time-service.ts` to
+  validate manual-entry input, validate persisted timer state transactionally,
+  resolve explicit tasks, reuse normalized typed descriptions, defer new task
+  creation until after overlap checks, and create exactly one closed interval
+  without mutating `AppState`.
+- Extended `TimeIntervalRepository` with
+  `findOverlappingClosedRange(...)` in
+  `src/main/database/repositories/time-interval-repository.ts` so global
+  closed-interval conflicts are detected without conflating them with the
+  running open interval's elapsed-range check.
+- Added focused disposable-SQLite coverage in
+  `test/main/database/repositories/time-interval-repository.test.ts`,
+  `test/main/services/manual-time-service.test.ts`, and
+  `test/main/services/manual-time-service.integration.test.ts` for existing-task
+  reuse, typed-task reuse/creation, no-mutation validation and overlap
+  failures, running-timer overlap preservation, rollback on interval insert
+  failure, and controlled invalid-persisted-state mapping.
+- Verification commands run on 2026-08-15:
+  - `npm test -- manual-time-service` ✅
+  - `npm test -- time-interval-repository` ✅
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅
 
 ---
 

@@ -6,15 +6,16 @@ Manual Time Entry in progress
 
 ## Current Specification
 
-SPEC-005 — Manual Time Entry (Task TASK-005-001 complete)
+SPEC-005 — Manual Time Entry (Tasks TASK-005-001 and TASK-005-002 complete)
 
 ## Current Status
 
-SPEC-005 implementation has started with `TASK-005-001` complete. The shared
-manual-entry boundary now defines explicit IPC/preload contracts, renderer-safe
-error typing, and runtime validation for exact object shape, task-source
-exclusivity, trimmed fields, local date/time syntax, and same-day end-after-start
-rejection before service or persistence work.
+SPEC-005 implementation has completed `TASK-005-001` and `TASK-005-002`. The
+manual-entry boundary defines explicit contracts, renderer-safe error typing,
+and runtime validation, and the main-process service layer now creates manual
+intervals transactionally with exact task reuse/creation semantics, local-time
+conversion, overlap rejection against closed intervals and the running open
+interval's elapsed range, rollback-safe persistence, and unchanged `AppState`.
 
 ---
 
@@ -134,25 +135,28 @@ None.
 
 # Active Work
 
-SPEC-005 — Manual Time Entry is active. `TASK-005-001` is complete and the next
-planned task is `TASK-005-002` to implement transactional manual interval
-creation, task reuse/creation, local-time conversion, and overlap rejection.
+SPEC-005 — Manual Time Entry is active. `TASK-005-001` and `TASK-005-002` are
+complete. The next planned task is `TASK-005-003` to expose the validated
+manual-entry IPC and preload boundary.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. `TASK-005-001` remains within the established typed
-preload API, main-process SQLite ownership, timestamp-based interval source of
-truth, injected Clock, and npm decisions. No schema migration, dependency,
-decision, or architectural deviation was required for the shared manual-entry
-contracts and validation layer.
+See `docs/decisions.md`. `TASK-005-001` and `TASK-005-002` remain within the
+established typed preload API, main-process SQLite ownership, timestamp-based
+interval source of truth, injected Clock, and npm decisions. No schema
+migration, dependency, decision, or architectural deviation was required for
+the shared manual-entry contracts, transactional service flow, or overlap
+detection.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Completed `TASK-005-001` for SPEC-005. Added the shared
-`manual-time:create-interval` contract, manual-entry runtime validation, new
-renderer-safe error coverage, and typed preload API surface updates.
-`npm test -- manual-time`, `npm run typecheck`, and `npm run lint` passed.
+2026-08-15 — Completed `TASK-005-002` for SPEC-005. Added
+`ManualTimeService`, global closed-interval overlap detection, transactional
+manual interval creation with deferred task insertion on overlap failures, and
+focused SQLite-backed service/integration coverage. `npm test --
+manual-time-service`, `npm test -- time-interval-repository`, `npm run
+typecheck`, and `npm run lint` passed.

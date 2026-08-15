@@ -1,4 +1,15 @@
-import { and, asc, eq, gt, gte, isNull, lt, lte, or } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  eq,
+  gt,
+  gte,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  or,
+} from 'drizzle-orm';
 
 import type { ApplicationDatabase } from '@/main/database/database';
 import { timeIntervals } from '@/main/database/schema';
@@ -80,6 +91,24 @@ export class TimeIntervalRepository {
             isNull(timeIntervals.endedAt),
             gt(timeIntervals.endedAt, rangeStartedAt),
           ),
+        ),
+      )
+      .orderBy(asc(timeIntervals.startedAt))
+      .all();
+  }
+
+  findOverlappingClosedRange(
+    rangeStartedAt: number,
+    rangeEndedAt: number,
+  ): TimeInterval[] {
+    return this.#db
+      .select()
+      .from(timeIntervals)
+      .where(
+        and(
+          isNotNull(timeIntervals.endedAt),
+          lt(timeIntervals.startedAt, rangeEndedAt),
+          gt(timeIntervals.endedAt, rangeStartedAt),
         ),
       )
       .orderBy(asc(timeIntervals.startedAt))

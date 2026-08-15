@@ -124,6 +124,41 @@ describe('TimeIntervalRepository', () => {
     );
   });
 
+  it('returns closed intervals overlapping a half-open global range', () => {
+    const taskOneOverlap = createInterval({
+      id: 'task-one-overlap',
+      startedAt: 800,
+      endedAt: 1_050,
+    });
+    const taskTwoOverlap = createInterval({
+      id: 'task-two-overlap',
+      taskId: 'task-2',
+      startedAt: 1_250,
+      endedAt: 1_550,
+    });
+    repository.insert(
+      createInterval({
+        id: 'ends-at-start',
+        startedAt: 700,
+        endedAt: 1_000,
+      }),
+    );
+    repository.insert(taskOneOverlap);
+    repository.insert(taskTwoOverlap);
+    repository.insert(
+      createInterval({
+        id: 'open',
+        startedAt: 1_300,
+        endedAt: null,
+      }),
+    );
+
+    expect(repository.findOverlappingClosedRange(1_000, 1_500)).toEqual([
+      taskOneOverlap,
+      taskTwoOverlap,
+    ]);
+  });
+
   it('lists all intervals for a task and preserves task deletion cascade', () => {
     const first = createInterval({ id: 'first', startedAt: 100, endedAt: 200 });
     const second = createInterval({
