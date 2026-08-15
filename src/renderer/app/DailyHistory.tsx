@@ -320,15 +320,15 @@ const HistoryTaskRow = ({
   const isPending = pendingRows[rowId] === true;
   const isSameTask = timer?.currentTask?.id === task.task.id;
   const isAlreadyRunning =
-    timer?.status === 'running' && isSameTask === true;
+    timer?.status === 'running' && isSameTask;
   const actionLabel =
     isAlreadyRunning
       ? 'Already running'
       : isPending
-        ? timer?.status === 'paused' && isSameTask === true
+        ? timer?.status === 'paused' && isSameTask
           ? 'Resuming…'
           : 'Starting…'
-        : timer?.status === 'paused' && isSameTask === true
+        : timer?.status === 'paused' && isSameTask
           ? 'Resume'
           : 'Play';
 
