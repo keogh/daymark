@@ -15,12 +15,14 @@ import {
 } from '@/main/database/path';
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
 import { registerHistoryHandler } from '@/main/ipc/history';
+import { registerIntervalsHandlers } from '@/main/ipc/intervals';
 import { registerManualTimeHandler } from '@/main/ipc/manual-time';
 import { registerTimerHandlers } from '@/main/ipc/timer';
 import { registerTasksHandler } from '@/main/ipc/tasks';
 import { DurationProjector } from '@/main/services/duration-projections';
 import { SystemHealthService } from '@/main/services/system-health';
 import { HistoryService } from '@/main/services/history-service';
+import { IntervalService } from '@/main/services/interval-service';
 import { ManualTimeService } from '@/main/services/manual-time-service';
 import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
@@ -67,6 +69,13 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const historyService = new HistoryService({ clock, historyQueries });
+        const intervalService = new IntervalService({
+          appState,
+          intervals,
+          transactions: new TransactionRunner(context.sqlite),
+          stateReader,
+          clock,
+        });
         const manualTimeService = new ManualTimeService({
           appState,
           tasks,
@@ -91,6 +100,11 @@ export const registerApplicationLifecycle = (): void => {
           console,
         );
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
+        registerIntervalsHandlers(
+          ipcMain,
+          { commands: intervalService },
+          console,
+        );
         registerManualTimeHandler(
           ipcMain,
           { createInterval: manualTimeService },

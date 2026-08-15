@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SYSTEM_HEALTH_CHECK_CHANNEL } from '@/shared/contracts/system-health';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
+import {
+  INTERVALS_DELETE_CHANNEL,
+  INTERVALS_UPDATE_CHANNEL,
+} from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
 import {
@@ -60,6 +64,7 @@ describe('preload API', () => {
       'system',
       'timer',
       'history',
+      'intervals',
       'manualTime',
       'tasks',
     ]);
@@ -72,6 +77,7 @@ describe('preload API', () => {
       'stop',
     ]);
     expect(Object.keys(api.history)).toEqual(['getPage']);
+    expect(Object.keys(api.intervals)).toEqual(['update', 'delete']);
     expect(Object.keys(api.manualTime)).toEqual(['createInterval']);
     expect(Object.keys(api.tasks)).toEqual(['getSuggestions']);
     await expect(api.system.healthCheck()).resolves.toEqual(response);
@@ -83,6 +89,14 @@ describe('preload API', () => {
     await api.timer.resume();
     await api.timer.stop();
     await api.history.getPage({ beforeDayStartedAt: 0 });
+    await api.intervals.update({
+      intervalId: 'interval-1',
+      startDate: '2026-08-14',
+      startTime: '09:00',
+      endDate: '2026-08-14',
+      endTime: '10:00',
+    });
+    await api.intervals.delete({ intervalId: 'interval-2' });
     await api.manualTime.createInterval({
       taskDescription: 'Focus',
       date: '2026-08-14',
@@ -100,6 +114,17 @@ describe('preload API', () => {
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],
       [HISTORY_GET_PAGE_CHANNEL, { beforeDayStartedAt: 0 }],
+      [
+        INTERVALS_UPDATE_CHANNEL,
+        {
+          intervalId: 'interval-1',
+          startDate: '2026-08-14',
+          startTime: '09:00',
+          endDate: '2026-08-14',
+          endTime: '10:00',
+        },
+      ],
+      [INTERVALS_DELETE_CHANNEL, { intervalId: 'interval-2' }],
       [
         MANUAL_TIME_CREATE_INTERVAL_CHANNEL,
         {

@@ -1,6 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
+import {
+  INTERVALS_DELETE_CHANNEL,
+  INTERVALS_UPDATE_CHANNEL,
+} from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
 import {
@@ -31,6 +35,10 @@ const timeTrackerApi: TimeTrackerAPI = {
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),
+  },
+  intervals: {
+    update: (input) => ipcRenderer.invoke(INTERVALS_UPDATE_CHANNEL, input),
+    delete: (input) => ipcRenderer.invoke(INTERVALS_DELETE_CHANNEL, input),
   },
   manualTime: {
     createInterval: (input) =>

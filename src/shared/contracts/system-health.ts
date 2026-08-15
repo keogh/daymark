@@ -1,5 +1,6 @@
 import type { TimerAPI } from './timer';
 import type { HistoryAPI } from './history';
+import type { IntervalsAPI } from './intervals';
 import type { ManualTimeAPI } from './manual-time';
 import type { TasksAPI } from './tasks';
 
@@ -21,6 +22,7 @@ export interface TimeTrackerAPI {
   };
   readonly timer: TimerAPI;
   readonly history: HistoryAPI;
+  readonly intervals: IntervalsAPI;
   readonly manualTime: ManualTimeAPI;
   readonly tasks: TasksAPI;
 }

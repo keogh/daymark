@@ -938,6 +938,16 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
           },
         }),
     },
+    intervals: {
+      update: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { intervalId: 'interval-1' },
+      }),
+      delete: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { intervalId: 'interval-1' },
+      }),
+    },
     manualTime: {
       createInterval:
         overrides.createManualInterval ??

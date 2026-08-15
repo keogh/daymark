@@ -155,14 +155,16 @@ None.
 
 # Active Work
 
-SPEC-005 — Manual Time Entry is verified. The next planned specification is
-SPEC-006 — Edit and Delete Intervals.
+SPEC-006 — Edit and Delete Intervals is active. `TASK-006-001` through
+`TASK-006-004` are complete: correction contracts, transactional edit/delete,
+and the runtime-validated IPC/preload boundary are implemented. The next task is
+`TASK-006-005` — Add interval actions and edit workflow.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-005 remains within the established typed preload
+See `docs/decisions.md`. SPEC-006 remains within the established typed preload
 API, main-process SQLite ownership, timestamp-based interval source of truth,
 injected Clock, local-calendar projection, and npm decisions. No schema
 migration, dependency, decision, or architectural deviation was required.
@@ -171,8 +173,7 @@ migration, dependency, decision, or architectural deviation was required.
 
 # Last Updated
 
-2026-08-15 — Verified SPEC-005 and completed `TASK-005-005`. AC-005-001 through
-AC-005-012, the Definition of Done, formatting, typecheck, lint, all 312 tests,
-macOS arm64 packaging, and an isolated packaged manual-entry flow passed. The
-packaged flow verified authoritative refresh, controlled overlap preservation,
-clean console output, and exactly one closed interval with unchanged timer state.
+2026-08-15 — Completed `TASK-006-004`. Explicit interval update/delete preload
+and IPC APIs now runtime-validate commands before service execution and safely
+map unexpected failures. Focused boundary tests, typecheck, lint, and all 380
+tests in 48 files passed.

@@ -33,7 +33,7 @@ breakdown to match the specification.
 | TASK-006-001 | Define correction contracts and validation | Complete | None | AC-006-005, AC-006-010, AC-006-011, AC-006-013 |
 | TASK-006-002 | Implement transactional interval editing | Complete | TASK-006-001 | AC-006-003–007, AC-006-010–012 |
 | TASK-006-003 | Implement transactional interval deletion | Complete | TASK-006-001 | AC-006-008–012 |
-| TASK-006-004 | Expose validated interval mutation APIs | Pending | TASK-006-002, TASK-006-003 | AC-006-010, AC-006-011, AC-006-013 |
+| TASK-006-004 | Expose validated interval mutation APIs | Complete | TASK-006-002, TASK-006-003 | AC-006-010, AC-006-011, AC-006-013 |
 | TASK-006-005 | Add interval actions and edit workflow | Pending | TASK-006-004 | AC-006-001–007, AC-006-010–014 |
 | TASK-006-006 | Add confirmed deletion workflow | Pending | TASK-006-004 | AC-006-001, AC-006-008–014 |
 | TASK-006-007 | Verify interval correction and update documentation | Pending | TASK-006-005, TASK-006-006 | AC-006-001–014 |
@@ -224,7 +224,7 @@ TASK-006-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -265,7 +265,15 @@ operations without widening renderer privileges.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- --run test/main/ipc/intervals.test.ts test/preload/index.test.ts test/shared/validation/interval-correction-input.test.ts test/shared/contracts/intervals.test.ts` — passed, 4 files and 43 tests.
+- `npm test` — passed, 48 files and 380 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- Added explicit update/delete IPC handlers that reject malformed exact-shape
+  commands before service execution, preserve controlled service failures, and
+  sanitize/log unexpected boundary failures without logging command contents.
+- Exposed only typed `intervals.update` and `intervals.delete` preload methods and
+  composed `IntervalService` plus both handlers during application startup.
 
 ---
 
