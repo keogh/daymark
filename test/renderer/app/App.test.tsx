@@ -699,6 +699,7 @@ describe('App', () => {
 interface TimerApiOverrides {
   readonly getState?: TimeTrackerAPI['timer']['getState'];
   readonly start?: TimeTrackerAPI['timer']['start'];
+  readonly switchToTask?: TimeTrackerAPI['timer']['switchToTask'];
   readonly pause?: TimeTrackerAPI['timer']['pause'];
   readonly resume?: TimeTrackerAPI['timer']['resume'];
   readonly stop?: TimeTrackerAPI['timer']['stop'];
@@ -714,6 +715,9 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
         vi.fn().mockResolvedValue({ ok: true, value: idleState }),
       start:
         overrides.start ??
+        vi.fn().mockResolvedValue({ ok: true, value: runningState }),
+      switchToTask:
+        overrides.switchToTask ??
         vi.fn().mockResolvedValue({ ok: true, value: runningState }),
       pause: overrides.pause ?? vi.fn(),
       resume: overrides.resume ?? vi.fn(),

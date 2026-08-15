@@ -42,6 +42,10 @@ export interface SwitchToTaskInput {
 export interface TimerAPI {
   getState(this: void): Promise<AppResult<TimerState>>;
   start(this: void, input: StartTaskInput): Promise<AppResult<TimerState>>;
+  switchToTask(
+    this: void,
+    input: SwitchToTaskInput,
+  ): Promise<AppResult<TimerState>>;
   pause(this: void): Promise<AppResult<TimerState>>;
   resume(this: void): Promise<AppResult<TimerState>>;
   stop(this: void): Promise<AppResult<TimerState>>;

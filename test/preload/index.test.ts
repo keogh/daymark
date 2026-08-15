@@ -10,6 +10,7 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_SWITCH_TO_TASK_CHANNEL,
 } from '@/shared/contracts/timer';
 
 const electronMocks = vi.hoisted(() => ({
@@ -58,6 +59,7 @@ describe('preload API', () => {
     expect(Object.keys(api.timer)).toEqual([
       'getState',
       'start',
+      'switchToTask',
       'pause',
       'resume',
       'stop',
@@ -68,6 +70,7 @@ describe('preload API', () => {
     await api.timer.getState();
     await api.timer.start({ source: 'description', description: 'Focus' });
     await api.timer.start({ source: 'existing-task', taskId: 'task-1' });
+    await api.timer.switchToTask({ taskId: 'task-2' });
     await api.timer.pause();
     await api.timer.resume();
     await api.timer.stop();
@@ -78,6 +81,7 @@ describe('preload API', () => {
       [TIMER_GET_STATE_CHANNEL],
       [TIMER_START_CHANNEL, { source: 'description', description: 'Focus' }],
       [TIMER_START_CHANNEL, { source: 'existing-task', taskId: 'task-1' }],
+      [TIMER_SWITCH_TO_TASK_CHANNEL, { taskId: 'task-2' }],
       [TIMER_PAUSE_CHANNEL],
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],

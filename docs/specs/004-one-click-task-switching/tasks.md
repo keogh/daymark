@@ -32,7 +32,7 @@ to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-004-001 | Define switch command contracts and validation | Pending | None | AC-004-007 |
 | TASK-004-002 | Implement atomic timer switch branches | Complete | TASK-004-001 | AC-004-001–006 |
-| TASK-004-003 | Expose the validated switch boundary | Pending | TASK-004-002 | AC-004-001–007 |
+| TASK-004-003 | Expose the validated switch boundary | Complete | TASK-004-002 | AC-004-001–007 |
 | TASK-004-004 | Add accessible history-row Play controls | Pending | TASK-004-003 | AC-004-001, AC-004-004–010 |
 | TASK-004-005 | Verify One-Click Task Switching and update documentation | Pending | TASK-004-004 | AC-004-001–010 |
 
@@ -164,7 +164,7 @@ TASK-004-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -204,7 +204,18 @@ TASK-004-002.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when complete.
+- Added `window.timeTracker.timer.switchToTask(...)` to the shared timer/preload
+  boundary and routed it over the explicit `timer:switch-to-task` channel.
+- Registered validated timer-switch IPC handling that rejects malformed input
+  before service execution and preserves existing renderer-safe expected and
+  unexpected error mapping.
+- Added focused preload and timer IPC tests covering the exposed method,
+  explicit channel registration, successful delegation, and malformed-input
+  rejection without calling the service.
+- Verification completed on 2026-08-15:
+  - `npm test -- preload/index.test.ts main/ipc/timer.test.ts renderer/app/App.test.tsx` — passed
+  - `npm run typecheck` — passed
+  - `npm run lint` — passed
 
 ---
 

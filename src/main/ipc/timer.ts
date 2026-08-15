@@ -10,8 +10,10 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_SWITCH_TO_TASK_CHANNEL,
   type TimerState,
 } from '@/shared/contracts/timer';
+import { validateSwitchToTaskInput } from '@/shared/validation/switch-to-task';
 import { validateStartTaskInput } from '@/shared/validation/task-description';
 
 type TimerHandler = (event: unknown, input?: unknown) => AppResult<TimerState>;
@@ -26,7 +28,10 @@ export interface TimerIpcLogger {
 
 export interface TimerIpcOperations {
   readonly getState: Pick<TimerStateReader, 'getState'>;
-  readonly commands: Pick<TimerService, 'start' | 'pause' | 'resume' | 'stop'>;
+  readonly commands: Pick<
+    TimerService,
+    'start' | 'switchToTask' | 'pause' | 'resume' | 'stop'
+  >;
 }
 
 export const registerTimerHandlers = (
@@ -59,6 +64,17 @@ export const registerTimerHandlers = (
               taskId: validation.value.taskId,
             },
       );
+    }),
+  );
+  ipc.handle(
+    TIMER_SWITCH_TO_TASK_CHANNEL,
+    safeHandler(logger, (_event, input) => {
+      const validation = validateSwitchToTaskInput(input);
+      if (!validation.ok) {
+        return validation;
+      }
+
+      return operations.commands.switchToTask(validation.value);
     }),
   );
   ipc.handle(

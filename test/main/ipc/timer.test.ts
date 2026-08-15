@@ -10,6 +10,7 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_SWITCH_TO_TASK_CHANNEL,
   type TimerState,
 } from '@/shared/contracts/timer';
 
@@ -25,7 +26,7 @@ const idleState: TimerState = {
 };
 
 describe('timer IPC handlers', () => {
-  it('registers five explicit channels and delegates successful operations', () => {
+  it('registers six explicit channels and delegates successful operations', () => {
     const handlers = new Map<
       string,
       (event: unknown, input?: unknown) => unknown
@@ -45,6 +46,7 @@ describe('timer IPC handlers', () => {
     expect([...handlers.keys()]).toEqual([
       TIMER_GET_STATE_CHANNEL,
       TIMER_START_CHANNEL,
+      TIMER_SWITCH_TO_TASK_CHANNEL,
       TIMER_PAUSE_CHANNEL,
       TIMER_RESUME_CHANNEL,
       TIMER_STOP_CHANNEL,
@@ -78,6 +80,15 @@ describe('timer IPC handlers', () => {
     expect(operations.commands.start).toHaveBeenLastCalledWith({
       source: 'existing-task',
       taskId: 'task-1',
+    });
+    expect(
+      handlers.get(TIMER_SWITCH_TO_TASK_CHANNEL)?.({}, { taskId: 'task-2' }),
+    ).toEqual({
+      ok: true,
+      value: idleState,
+    });
+    expect(operations.commands.switchToTask).toHaveBeenCalledWith({
+      taskId: 'task-2',
     });
     expect(handlers.get(TIMER_PAUSE_CHANNEL)?.({})).toEqual({
       ok: true,
@@ -118,6 +129,30 @@ describe('timer IPC handlers', () => {
       },
     });
     expect(operations.commands.start).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid switch input at the boundary without calling the service', () => {
+    const handlers = new Map<
+      string,
+      (event: unknown, input?: unknown) => unknown
+    >();
+    const operations = createOperations();
+    registerTimerHandlers(
+      { handle: (channel, listener) => handlers.set(channel, listener) },
+      operations,
+      { error: vi.fn() },
+    );
+
+    expect(
+      handlers.get(TIMER_SWITCH_TO_TASK_CHANNEL)?.({}, { taskId: '   ' }),
+    ).toEqual({
+      ok: false,
+      error: {
+        code: 'INVALID_SWITCH_TASK',
+        message: 'Switch task input is invalid.',
+      },
+    });
+    expect(operations.commands.switchToTask).not.toHaveBeenCalled();
   });
 
   it('returns expected failures as sanitized values', () => {
@@ -185,6 +220,7 @@ const createOperations = (): TimerIpcOperations => ({
   getState: { getState: vi.fn(() => idleState) },
   commands: {
     start: vi.fn(() => ({ ok: true as const, value: idleState })),
+    switchToTask: vi.fn(() => ({ ok: true as const, value: idleState })),
     pause: vi.fn(() => ({ ok: true as const, value: idleState })),
     resume: vi.fn(() => ({ ok: true as const, value: idleState })),
     stop: vi.fn(() => ({ ok: true as const, value: idleState })),

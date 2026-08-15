@@ -12,6 +12,7 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_SWITCH_TO_TASK_CHANNEL,
 } from '@/shared/contracts/timer';
 
 const timeTrackerApi: TimeTrackerAPI = {
@@ -21,6 +22,8 @@ const timeTrackerApi: TimeTrackerAPI = {
   timer: {
     getState: () => ipcRenderer.invoke(TIMER_GET_STATE_CHANNEL),
     start: (input) => ipcRenderer.invoke(TIMER_START_CHANNEL, input),
+    switchToTask: (input) =>
+      ipcRenderer.invoke(TIMER_SWITCH_TO_TASK_CHANNEL, input),
     pause: () => ipcRenderer.invoke(TIMER_PAUSE_CHANNEL),
     resume: () => ipcRenderer.invoke(TIMER_RESUME_CHANNEL),
     stop: () => ipcRenderer.invoke(TIMER_STOP_CHANNEL),
