@@ -32,7 +32,7 @@ to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-003-001 | Define suggestion and explicit-start contracts | Complete | None | AC-003-007, AC-003-012–014 |
 | TASK-003-002 | Implement bounded suggestion queries and projections | Complete | TASK-003-001 | AC-003-001–004, AC-003-015 |
-| TASK-003-003 | Implement task suggestion and explicit-reuse services | Pending | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
+| TASK-003-003 | Implement task suggestion and explicit-reuse services | Complete | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
 | TASK-003-004 | Expose the validated task suggestion boundary | Pending | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
 | TASK-003-005 | Build the accessible idle-task combobox | Pending | TASK-003-004 | AC-003-001–011, AC-003-016 |
 | TASK-003-006 | Verify Task Search and Reuse and update documentation | Pending | TASK-003-005 | AC-003-001–017 |
@@ -179,7 +179,7 @@ TASK-003-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -223,8 +223,30 @@ TASK-003-002.
 
 ### Completion Evidence
 
-Record commands run, results, transaction evidence, and implementation notes when
-complete.
+- Added TaskService orchestration that validates complete inputs before work,
+  normalizes through the shared validator, obtains exactly one Clock snapshot, and
+  passes that same snapshot to the bounded suggestion query and response.
+- Extended TimerService Start to resolve `existing-task` IDs only after the
+  idle-state check and inside the existing SQLite transaction. Exact reuse creates
+  one open interval without duplicating the Task; a missing ID returns
+  `TASK_NOT_FOUND` with no persistence changes.
+- Preserved description-based normalized reuse/creation and `TIMER_NOT_IDLE` for
+  both Start variants. Tests demonstrate active-state rejection occurs before task
+  lookup and transaction rollback coverage remains green.
+- Added deterministic TaskService unit tests plus disposable-SQLite service
+  integration for projected suggestions followed by exact-ID reuse.
+- `npm test -- test/main/services/task-service.test.ts
+  test/main/services/timer-service.test.ts
+  test/main/services/timer-service.integration.test.ts
+  test/main/database/repositories/task-suggestion-query-repository.test.ts
+  test/main/database/repositories/task-repository.test.ts
+  test/main/database/repositories/time-interval-repository.test.ts` — passed, 57
+  tests.
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 214 tests.
+- `git diff --check` — passed.
 
 ---
 

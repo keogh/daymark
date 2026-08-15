@@ -3,9 +3,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DatabaseContext } from '@/main/database/database';
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
 import { TaskRepository } from '@/main/database/repositories/task-repository';
+import { TaskSuggestionQueryRepository } from '@/main/database/repositories/task-suggestion-query-repository';
 import { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
 import { TransactionRunner } from '@/main/database/transaction-runner';
 import { DurationProjector } from '@/main/services/duration-projections';
+import { TaskService } from '@/main/services/task-service';
 import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 import type { AppResult } from '@/shared/contracts/app-result';
@@ -56,8 +58,21 @@ describe('TimerService SQLite integration', () => {
       clock,
       generateId: () => `integration-${nextId++}`,
     });
+    const taskService = new TaskService({
+      clock,
+      suggestionQueries: new TaskSuggestionQueryRepository(context.db),
+    });
 
-    return { context, tasks, intervals, appState, durations, reader, service };
+    return {
+      context,
+      tasks,
+      intervals,
+      appState,
+      durations,
+      reader,
+      service,
+      taskService,
+    };
   };
 
   const restartApplication = (): TestApplication => {
@@ -214,6 +229,58 @@ describe('TimerService SQLite integration', () => {
     expect(application.intervals.findOpen()).toBeUndefined();
   });
 
+  it('suggests persisted totals and atomically starts that exact task by ID', () => {
+    const now = clock.now();
+    application.tasks.insert({
+      id: 'reusable-task',
+      description: 'Reusable Task',
+      normalizedDescription: 'reusable task',
+      createdAt: now - minutes(60),
+      updatedAt: now - minutes(60),
+    });
+    application.intervals.insert({
+      id: 'closed-interval',
+      taskId: 'reusable-task',
+      startedAt: now - minutes(45),
+      endedAt: now - minutes(15),
+      createdAt: now - minutes(45),
+      updatedAt: now - minutes(15),
+    });
+
+    expect(application.taskService.getSuggestions({ query: 'usable' })).toEqual(
+      {
+        ok: true,
+        value: {
+          suggestions: [
+            {
+              task: { id: 'reusable-task', description: 'Reusable Task' },
+              todayDurationMs: minutes(30),
+              lifetimeDurationMs: minutes(30),
+              mostRecentActivityAt: now - minutes(45),
+            },
+          ],
+          now,
+        },
+      },
+    );
+
+    const started = valueOf(
+      application.service.start({
+        source: 'existing-task',
+        taskId: 'reusable-task',
+      }),
+    );
+    expect(started).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'reusable-task', description: 'Reusable Task' },
+      taskTodayDurationMs: minutes(30),
+      taskLifetimeDurationMs: minutes(30),
+    });
+    expect(countRows(application.context, 'tasks')).toBe(1);
+    expect(application.intervals.findByTask('reusable-task')).toHaveLength(2);
+    expect(application.intervals.findOpen()?.taskId).toBe('reusable-task');
+  });
+
   it('independently prevents a second open interval in SQLite', () => {
     const state = valueOf(
       application.service.start({
@@ -279,6 +346,7 @@ interface TestApplication {
   readonly durations: DurationProjector;
   readonly reader: TimerStateReader;
   readonly service: TimerService;
+  readonly taskService: TaskService;
 }
 
 const valueOf = (result: AppResult<TimerState>): TimerState => {

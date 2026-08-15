@@ -45,16 +45,7 @@ export class TimerService {
     if (!validation.ok) {
       return validation;
     }
-    if (validation.value.source !== 'description') {
-      return {
-        ok: false,
-        error: {
-          code: 'INVALID_START_TASK',
-          message: 'Starting an existing task is not available yet.',
-        },
-      };
-    }
-    const description = validation.value;
+    const startInput = validation.value;
 
     const now = this.#clock.now();
     const transition = this.#transactions.run<AppResult<true>>(() => {
@@ -64,16 +55,22 @@ export class TimerService {
       }
 
       const task =
-        this.#tasks.findByNormalizedDescription(
-          description.normalizedDescription,
-        ) ??
-        this.#tasks.insert({
-          id: this.#generateId(),
-          description: description.description,
-          normalizedDescription: description.normalizedDescription,
-          createdAt: now,
-          updatedAt: now,
-        });
+        startInput.source === 'existing-task'
+          ? this.#tasks.findById(startInput.taskId)
+          : (this.#tasks.findByNormalizedDescription(
+              startInput.normalizedDescription,
+            ) ??
+            this.#tasks.insert({
+              id: this.#generateId(),
+              description: startInput.description,
+              normalizedDescription: startInput.normalizedDescription,
+              createdAt: now,
+              updatedAt: now,
+            }));
+
+      if (task === undefined) {
+        return taskNotFound();
+      }
 
       this.#intervals.insert({
         id: this.#generateId(),
@@ -228,6 +225,14 @@ const timerNotIdle = (): AppResult<never> => ({
   error: {
     code: 'TIMER_NOT_IDLE',
     message: 'The timer must be idle before starting a task.',
+  },
+});
+
+const taskNotFound = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'TASK_NOT_FOUND',
+    message: 'The selected task no longer exists.',
   },
 });
 

@@ -132,6 +132,53 @@ describe('TimerService', () => {
     expect(countRows(context, 'tasks')).toBe(1);
   });
 
+  it('starts an explicitly selected existing task without creating a duplicate', () => {
+    const now = clock.now();
+    tasks.insert({
+      id: 'selected-task',
+      description: 'Selected Task',
+      normalizedDescription: 'selected task',
+      createdAt: 100,
+      updatedAt: 100,
+    });
+
+    const result = service.start({
+      source: 'existing-task',
+      taskId: 'selected-task',
+    });
+
+    expect(result.ok && result.value.currentTask).toEqual({
+      id: 'selected-task',
+      description: 'Selected Task',
+    });
+    expect(intervals.findOpen()).toMatchObject({
+      taskId: 'selected-task',
+      startedAt: now,
+    });
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'selected-task',
+    });
+    expect(countRows(context, 'tasks')).toBe(1);
+  });
+
+  it('returns TASK_NOT_FOUND for a missing selected task without persistence', () => {
+    const changesBefore = totalChanges(context);
+
+    expect(
+      service.start({ source: 'existing-task', taskId: 'deleted-task' }),
+    ).toEqual({
+      ok: false,
+      error: {
+        code: 'TASK_NOT_FOUND',
+        message: 'The selected task no longer exists.',
+      },
+    });
+    expect(totalChanges(context)).toBe(changesBefore);
+    expect(intervals.findOpen()).toBeUndefined();
+    expect(appState.get().timerStatus).toBe('idle');
+  });
+
   it.each([undefined, null, {}])(
     'rejects malformed input without persistence: %j',
     (input) => {
@@ -176,6 +223,24 @@ describe('TimerService', () => {
       expect(countRows(context, 'time_intervals')).toBe(
         status === 'running' ? 1 : 0,
       );
+    },
+  );
+
+  it.each(['running', 'paused'] as const)(
+    'rejects explicit Start while the timer is %s before resolving the task',
+    (status) => {
+      seedActiveState(context, status, clock.now());
+      const findById = vi.spyOn(tasks, 'findById');
+      const changesBefore = totalChanges(context);
+
+      expect(
+        service.start({ source: 'existing-task', taskId: 'missing-task' }),
+      ).toMatchObject({
+        ok: false,
+        error: { code: 'TIMER_NOT_IDLE' },
+      });
+      expect(findById).not.toHaveBeenCalled();
+      expect(totalChanges(context)).toBe(changesBefore);
     },
   );
 
