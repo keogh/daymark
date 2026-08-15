@@ -34,7 +34,7 @@ breakdown to match the specification.
 | TASK-006-002 | Implement transactional interval editing | Complete | TASK-006-001 | AC-006-003–007, AC-006-010–012 |
 | TASK-006-003 | Implement transactional interval deletion | Complete | TASK-006-001 | AC-006-008–012 |
 | TASK-006-004 | Expose validated interval mutation APIs | Complete | TASK-006-002, TASK-006-003 | AC-006-010, AC-006-011, AC-006-013 |
-| TASK-006-005 | Add interval actions and edit workflow | Pending | TASK-006-004 | AC-006-001–007, AC-006-010–014 |
+| TASK-006-005 | Add interval actions and edit workflow | Complete | TASK-006-004 | AC-006-001–007, AC-006-010–014 |
 | TASK-006-006 | Add confirmed deletion workflow | Pending | TASK-006-004 | AC-006-001, AC-006-008–014 |
 | TASK-006-007 | Verify interval correction and update documentation | Pending | TASK-006-005, TASK-006-006 | AC-006-001–014 |
 
@@ -281,7 +281,7 @@ operations without widening renderer privileges.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -327,7 +327,22 @@ TASK-006-004.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- --run test/renderer/app/DailyHistory.test.tsx test/renderer/app/EditIntervalDialog.test.tsx test/renderer/app/local-date-format.test.ts test/renderer/app/App.test.tsx test/main/services/history-projections.test.ts` — passed, 5 files and 60 tests.
+- `npm test -- --run test/renderer test/main/services/history-service.test.ts test/main/services/history-service.integration.test.ts test/main/services/timer-service.test.ts test/main/services/timer-service.integration.test.ts` — passed, 11 files and 122 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 50 files and 389 tests.
+- Extended each bounded history interval projection with authoritative complete
+  timestamps while retaining clipped selected-day display bounds.
+- Added separate labeled Edit/Delete actions for closed intervals and a textual
+  non-editable running state without changing row expansion or Play/Resume behavior.
+- Added a compact edit dialog with read-only Task context, independent local
+  start/end fields, shared validation, pending and controlled-error states,
+  duplicate prevention, successful timer/history refresh wiring, and explicit
+  focus return to the invoking action.
+- Browser plugin and Playwright were unavailable; renderer behavior was verified
+  through the existing React Testing Library rendered-DOM harness without adding
+  a dependency.
 
 ---
 

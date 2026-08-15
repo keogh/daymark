@@ -26,6 +26,7 @@ import {
 } from './use-history-controller';
 import { useLiveHistoryPage } from './use-live-history-page';
 import { formatLocalDateInput } from './local-date-format';
+import { EditIntervalDialog } from './EditIntervalDialog';
 
 export const DailyHistory = ({
   onAddTime = () => undefined,
@@ -39,11 +40,13 @@ export const DailyHistory = ({
     }),
   refreshRevision = 0,
   timer = null,
+  onIntervalSaved = () => Promise.resolve(),
 }: {
   readonly onAddTime?: (date: string) => void;
   readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly refreshRevision?: number;
   readonly timer?: TimerState | null;
+  readonly onIntervalSaved?: () => Promise<void>;
 }) => {
   const controller = useHistoryController(refreshRevision);
   const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
@@ -89,6 +92,7 @@ export const DailyHistory = ({
         onAddTime={onAddTime}
         pendingRows={pendingRows}
         timer={timer}
+        onIntervalSaved={onIntervalSaved}
       />
     </section>
   );
@@ -101,6 +105,7 @@ const HistoryContent = ({
   onAddTime,
   pendingRows,
   timer,
+  onIntervalSaved,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -108,6 +113,7 @@ const HistoryContent = ({
   onAddTime: (date: string) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
+  onIntervalSaved: () => Promise<void>;
 }) => {
   if (controller.loadState.status === 'loading') {
     return (
@@ -139,6 +145,7 @@ const HistoryContent = ({
       pendingRows={pendingRows}
       state={controller.loadState}
       timer={timer}
+      onIntervalSaved={onIntervalSaved}
     />
   );
 };
@@ -151,6 +158,7 @@ const HistoryDays = ({
   pendingRows,
   state,
   timer,
+  onIntervalSaved,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -159,6 +167,7 @@ const HistoryDays = ({
   pendingRows: Record<string, boolean>;
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
   timer: TimerState | null;
+  onIntervalSaved: () => Promise<void>;
 }) => {
   const page = useLiveHistoryPage(state.page);
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
@@ -179,6 +188,7 @@ const HistoryDays = ({
           onAddTime={onAddTime}
           pendingRows={pendingRows}
           timer={timer}
+          onIntervalSaved={onIntervalSaved}
         />
       ))}
       {!hasTrackedTime && (
@@ -278,6 +288,7 @@ const HistoryDaySection = ({
   onAddTime,
   pendingRows,
   timer,
+  onIntervalSaved,
 }: {
   day: HistoryDay;
   now: number;
@@ -285,6 +296,7 @@ const HistoryDaySection = ({
   onAddTime: (date: string) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
+  onIntervalSaved: () => Promise<void>;
 }) => (
   <section
     aria-labelledby={`history-day-${day.dayStartedAt}`}
@@ -315,6 +327,7 @@ const HistoryDaySection = ({
         pendingRows={pendingRows}
         task={task}
         timer={timer}
+        onIntervalSaved={onIntervalSaved}
       />
     ))}
   </section>
@@ -326,14 +339,20 @@ const HistoryTaskRow = ({
   pendingRows,
   task,
   timer,
+  onIntervalSaved,
 }: {
   day: HistoryDay;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
   pendingRows: Record<string, boolean>;
   task: HistoryTask;
   timer: TimerState | null;
+  onIntervalSaved: () => Promise<void>;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [editInterval, setEditInterval] = useState<HistoryInterval | null>(
+    null,
+  );
+  const editReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const intervalListId = `history-intervals-${day.dayStartedAt}-${task.task.id}`;
   const rowId = `${day.dayStartedAt}:${task.task.id}`;
   const isPending = pendingRows[rowId] === true;
@@ -390,9 +409,28 @@ const HistoryTaskRow = ({
               day={day}
               interval={interval}
               key={interval.id}
+              onEdit={(trigger) => {
+                editReturnFocusRef.current = trigger;
+                setEditInterval(interval);
+              }}
+              taskDescription={task.task.description}
             />
           ))}
         </ul>
+      )}
+      {editInterval !== null && (
+        <EditIntervalDialog
+          interval={editInterval}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditInterval(null);
+              window.setTimeout(() => editReturnFocusRef.current?.focus(), 0);
+            }
+          }}
+          onSaved={onIntervalSaved}
+          open
+          taskDescription={task.task.description}
+        />
       )}
     </div>
   );
@@ -401,9 +439,13 @@ const HistoryTaskRow = ({
 const HistoryIntervalRow = ({
   day,
   interval,
+  onEdit,
+  taskDescription,
 }: {
   day: HistoryDay;
   interval: HistoryInterval;
+  onEdit: (trigger: HTMLButtonElement) => void;
+  taskDescription: string;
 }) => {
   const start = formatIntervalTime(interval.projectedStartedAt, false);
   const end = formatIntervalTime(
@@ -421,6 +463,35 @@ const HistoryIntervalRow = ({
         {start} – {end}
       </span>
       <span>{duration}</span>
+      {interval.isRunning ? (
+        <span className="history-interval__status">
+          Running · actions unavailable
+        </span>
+      ) : (
+        <span
+          aria-label={`Actions for ${start} to ${end}`}
+          className="history-interval__actions"
+          role="group"
+        >
+          <Button
+            aria-label={`Edit ${taskDescription}, ${start} to ${end}`}
+            onClick={(event) => onEdit(event.currentTarget)}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            Edit
+          </Button>
+          <Button
+            aria-label={`Delete ${taskDescription}, ${start} to ${end}`}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            Delete
+          </Button>
+        </span>
+      )}
     </li>
   );
 };

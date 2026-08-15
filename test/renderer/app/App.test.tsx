@@ -62,6 +62,8 @@ const historyPageWithTask = (
           intervals: [
             {
               id: 'interval-1',
+              startedAt: 1_000,
+              endedAt: 1_800_000,
               projectedStartedAt: 1_000,
               projectedEndedAt: 1_800_000,
               durationMs: 1_799_000,

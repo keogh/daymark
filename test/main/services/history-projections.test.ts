@@ -45,6 +45,8 @@ describe('history interval projection', () => {
     expect(projectIntervalToDay(interval, firstDay, interval.endedAt!)).toEqual(
       {
         id: interval.id,
+        startedAt: interval.startedAt,
+        endedAt: interval.endedAt,
         projectedStartedAt: interval.startedAt,
         projectedEndedAt: firstDay.dayEndedAt,
         durationMs: minutes(30),
@@ -55,6 +57,8 @@ describe('history interval projection', () => {
       projectIntervalToDay(interval, secondDay, interval.endedAt!),
     ).toEqual({
       id: interval.id,
+      startedAt: interval.startedAt,
+      endedAt: interval.endedAt,
       projectedStartedAt: secondDay.dayStartedAt,
       projectedEndedAt: interval.endedAt,
       durationMs: minutes(30),

@@ -64,6 +64,8 @@ export const projectIntervalToDay = (
 
   return {
     id: interval.id,
+    startedAt: interval.startedAt,
+    endedAt: interval.endedAt,
     projectedStartedAt,
     projectedEndedAt,
     durationMs,

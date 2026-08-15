@@ -63,6 +63,7 @@ export const App = () => {
       </div>
       <DailyHistory
         onAddTime={(date) => setManualEntryDate(date)}
+        onIntervalSaved={controller.refresh}
         onPlayTask={controller.switchToTask}
         refreshRevision={controller.authoritativeRevision}
         timer={

@@ -440,10 +440,38 @@ input {
 }
 
 .history-interval {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) auto auto;
+  align-items: center;
   gap: 1rem;
   font-size: 0.875rem;
+}
+
+.history-interval__actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.history-interval__status {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+.edit-interval-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.edit-interval-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.edit-interval-form__task {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 620;
 }
 
 .history-empty {
@@ -495,6 +523,15 @@ input {
 
   .manual-entry-form__times {
     grid-template-columns: 1fr;
+  }
+
+  .edit-interval-form__row,
+  .history-interval {
+    grid-template-columns: 1fr;
+  }
+
+  .history-interval__actions {
+    justify-content: flex-start;
   }
 
   .start-form {

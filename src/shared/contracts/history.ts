@@ -35,6 +35,8 @@ export interface HistoryTaskSummary {
 
 export interface HistoryInterval {
   readonly id: string;
+  readonly startedAt: number;
+  readonly endedAt: number | null;
   readonly projectedStartedAt: number;
   readonly projectedEndedAt: number;
   readonly durationMs: number;

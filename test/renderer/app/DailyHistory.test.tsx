@@ -46,6 +46,8 @@ const loadedPage: HistoryPage = {
           intervals: [
             {
               id: 'interval-1',
+              startedAt: new Date(2026, 7, 14, 9, 15).getTime(),
+              endedAt: new Date(2026, 7, 14, 10, 45).getTime(),
               projectedStartedAt: new Date(2026, 7, 14, 9, 15).getTime(),
               projectedEndedAt: new Date(2026, 7, 14, 10, 45).getTime(),
               durationMs: 5_400_000,
@@ -61,6 +63,8 @@ const loadedPage: HistoryPage = {
           intervals: [
             {
               id: 'interval-short',
+              startedAt: new Date(2026, 7, 14, 8).getTime(),
+              endedAt: new Date(2026, 7, 14, 8, 0, 30).getTime(),
               projectedStartedAt: new Date(2026, 7, 14, 8).getTime(),
               projectedEndedAt: new Date(2026, 7, 14, 8, 0, 30).getTime(),
               durationMs: 30_000,
@@ -83,6 +87,8 @@ const loadedPage: HistoryPage = {
           intervals: [
             {
               id: 'cross-midnight',
+              startedAt: new Date(2026, 7, 13, 23, 30).getTime(),
+              endedAt: new Date(2026, 7, 14, 0, 30).getTime(),
               projectedStartedAt: new Date(2026, 7, 13, 23, 30).getTime(),
               projectedEndedAt: today,
               durationMs: 1_800_000,
@@ -114,6 +120,8 @@ const olderPage: HistoryPage = {
           intervals: [
             {
               id: 'interval-older',
+              startedAt: new Date(2026, 7, 12, 9).getTime(),
+              endedAt: new Date(2026, 7, 12, 10).getTime(),
               projectedStartedAt: new Date(2026, 7, 12, 9).getTime(),
               projectedEndedAt: new Date(2026, 7, 12, 10).getTime(),
               durationMs: 3_600_000,
@@ -143,6 +151,8 @@ const runningPage: HistoryPage = {
           intervals: [
             {
               id: 'interval-live',
+              startedAt: snapshotNow - 60_000,
+              endedAt: null,
               projectedStartedAt: snapshotNow - 60_000,
               projectedEndedAt: snapshotNow,
               durationMs: 60_000,
@@ -214,6 +224,72 @@ describe('DailyHistory', () => {
     expect(taskButtons[1]!).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getAllByRole('list')).toHaveLength(2);
     expect(screen.getByLabelText(/to midnight, 30m/)).toBeVisible();
+  });
+
+  it('shows labeled correction actions only for closed intervals without changing expansion from Play', async () => {
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+
+    render(<DailyHistory />);
+
+    const taskToggle = (
+      await screen.findAllByRole('button', {
+        name: 'Implement authentication',
+      })
+    )[0]!;
+    const play = screen.getAllByRole('button', {
+      name: 'Play Implement authentication',
+    })[0]!;
+    fireEvent.click(play);
+    expect(taskToggle).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(taskToggle);
+    expect(
+      screen.getByRole('button', {
+        name: /Edit Implement authentication, .* to/,
+      }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole('button', {
+        name: /Delete Implement authentication, .* to/,
+      }),
+    ).toBeEnabled();
+  });
+
+  it('keeps a running interval inspectable without correction actions', async () => {
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: runningPage }));
+    render(<DailyHistory />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Live task' }));
+
+    expect(screen.getByText('Running · actions unavailable')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: /Edit Live task/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Delete Live task/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps Edit keyboard-focusable and returns focus to it after Escape', async () => {
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+    render(<DailyHistory />);
+    fireEvent.click(
+      (
+        await screen.findAllByRole('button', {
+          name: 'Implement authentication',
+        })
+      )[0]!,
+    );
+    const edit = screen.getByRole('button', {
+      name: /Edit Implement authentication, .* to/,
+    });
+    edit.focus();
+
+    fireEvent.click(edit);
+
+    expect(screen.getByRole('dialog', { name: 'Edit time' })).toBeVisible();
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    await waitFor(() => expect(edit).toHaveFocus());
   });
 
   it('renders state-aware history-row play labels for idle, paused, and running states', async () => {
