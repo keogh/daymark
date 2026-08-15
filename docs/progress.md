@@ -2,16 +2,18 @@
 
 ## Current Phase
 
-Daily History complete
+Task Search and Reuse specification ready
 
 ## Current Specification
 
-SPEC-002 — Daily History (Verified)
+SPEC-003 — Task Search and Reuse (Ready for Implementation)
 
 ## Current Status
 
-SPEC-002 is verified. Daily History is an accurate, accessible, read-only projection
-on the main Timer view with bounded older-history pagination and live running values.
+SPEC-003 is implementation-ready with a companion task breakdown. It defines
+bounded recent and substring-matched task suggestions, deterministic ordering,
+authoritative daily and lifetime totals, accessible keyboard and pointer reuse, and
+explicit existing-task Start by stable ID.
 
 ---
 
@@ -85,9 +87,10 @@ None.
 
 # Active Work
 
-SPEC-002 is complete. The next planned specification is SPEC-003 — Task Search and
-Reuse; it must be implementation-ready with a companion task breakdown before work
-begins.
+SPEC-003 is ready for implementation. The first unblocked task is TASK-003-001 —
+Define suggestion and explicit-start contracts. SPEC-004 remains the next planned
+specification and will define history-row Play and one-click switching while a task
+is running or paused.
 
 ---
 
@@ -103,6 +106,8 @@ No schema migration or architectural deviation was required.
 
 # Last Updated
 
-2026-08-15 — Verified SPEC-002. AC-002-001 through AC-002-018, 179 automated tests,
-full static validation, macOS arm64 packaging, and isolated development/packaged
-runtime workflows passed, including offline rendering and restart recovery.
+2026-08-15 — Made SPEC-003 ready for implementation with six ordered tasks and
+AC-003-001 through AC-003-017. Product decisions establish five visible results,
+empty-input recents, normalized case-insensitive substring search, prefix-first then
+recent ordering, first-result keyboard highlighting, and authoritative daily and
+lifetime suggestion totals.
