@@ -6,7 +6,7 @@ SPEC-004 — One-Click Task Switching
 
 ## Active Task
 
-TASK-004-004 — Add accessible history-row Play controls
+TASK-004-005 — Verify One-Click Task Switching and Update Documentation
 
 ## Status
 
@@ -16,30 +16,27 @@ Complete
 
 # Immediate Plan
 
-1. Add state-aware Daily History row actions that map idle, paused-same-task,
-   running-same-task, and different-task cases onto the existing timer switch
-   boundary without disabling unrelated timer controls.
-2. Keep row-scoped pending and compact stale-task feedback in the history UI,
-   and trigger authoritative timer/history refresh after success or
-   `TASK_NOT_FOUND`.
-3. Add focused renderer tests for labels, keyboard activation, pending, refresh,
-   and controlled error behavior, then run the task verification commands plus
-   `npm run typecheck` and `npm run lint`.
+1. Trace every SPEC-004 acceptance criterion to existing service, IPC, preload,
+   integration, and renderer coverage, and patch only if verification exposes a
+   gap.
+2. Run the required validation set for final SPEC-004 closeout:
+   `npm run typecheck`, `npm run lint`, `npm test`, and `npm run package`.
+3. Update SPEC-004 documentation artifacts (`tasks.md`, `spec.md` status if
+   warranted, and `docs/progress.md`) with verification evidence and final
+   completion state.
 
 ---
 
 # Scope Guard
 
-Do not add suggestion-list active switching, interval-row actions, tray
-switching, analytics, or settings behavior in this task.
+Do not add new product behavior beyond SPEC-004 or broaden scope into later
+switching entry points, interval actions, tray controls, or unrelated refactors.
 
 ---
 
 # Completion
 
-TASK-004-004 is complete. Daily History now exposes state-aware accessible row
-actions backed by the validated `switchToTask(...)` timer boundary, keeps
-pending duplicate prevention scoped to the activated row, preserves unrelated
-timer controls during history-triggered switching, and shows compact
-non-blocking stale-task feedback while still forcing authoritative history
-refresh on success and `TASK_NOT_FOUND`.
+TASK-004-005 is complete. SPEC-004 is verified against AC-004-001 through
+AC-004-010, the required validation suite and macOS arm64 packaging passed, and
+completion evidence is recorded in the specification task breakdown and project
+progress log.

@@ -2,19 +2,20 @@
 
 ## Current Phase
 
-One-Click Task Switching specified
+One-Click Task Switching verified
 
 ## Current Specification
 
-SPEC-004 — One-Click Task Switching (Ready for Implementation)
+SPEC-004 — One-Click Task Switching (Verified)
 
 ## Current Status
 
-SPEC-004 implementation is in progress. The service layer now supports atomic
-history-task switching by stable task ID across idle, running, and paused timer
-states, including same-task no-op/resume behavior and controlled stale-target
-failures. The next work is exposing that validated boundary through preload and
-IPC, then wiring the Daily History Play controls and refresh behavior.
+SPEC-004 is complete and verified. Daily History now exposes one-click,
+state-aware task restart and switching by stable task ID across idle, running,
+and paused timer states; the renderer refreshes authoritatively after successful
+history-row starts/switches and controlled stale-task failures; and the narrow
+typed preload/IPC boundary preserves transactional timer semantics and runtime
+input validation.
 
 ---
 
@@ -24,6 +25,7 @@ IPC, then wiring the Daily History Play controls and refresh behavior.
 - SPEC-001 — Core Time Tracking (Verified 2026-08-14)
 - SPEC-002 — Daily History (Verified 2026-08-15)
 - SPEC-003 — Task Search and Reuse (Verified 2026-08-15)
+- SPEC-004 — One-Click Task Switching (Verified 2026-08-15)
 
 SPEC-001 delivered:
 
@@ -88,18 +90,40 @@ typed reuse, accessibility state, restart reconstruction, scope exclusions, and
 renderer security. The packaged app loaded without HTTP(S) resources or console
 warnings/errors.
 
+SPEC-004 delivered:
+
+- one-click Daily History row actions that start or switch to an existing task by
+  stable ID from idle, running, and paused timer states;
+- atomic running-task and paused-task switch semantics that preserve or reset
+  `sessionStartedAt` exactly as specified, including same-task running no-op and
+  paused same-task resume behavior;
+- compact non-blocking stale-task feedback with authoritative history refresh and
+  unchanged active timer state on `TASK_NOT_FOUND`;
+- runtime-validated switch input and a narrow typed preload/IPC boundary that
+  reuses the existing timer-state contract without exposing raw Electron
+  capabilities;
+- service, integration, IPC, preload, shared-validation, renderer, and packaged
+  acceptance coverage for the new switching flows.
+
+Final acceptance covered AC-004-001 through AC-004-010 and the project Definition
+of Done. Typecheck, lint, all 267 tests in 38 files, and macOS arm64 packaging
+passed on 2026-08-15. An isolated packaged acceptance run using
+`--user-data-dir=/tmp/timetracker-spec004-user-data` passed idle history Play,
+running switch, paused switch, paused same-task resume, running same-task
+disabled state, and stale-task inline feedback without touching the real
+application profile.
+
 ---
 
 # Upcoming Specifications
 
-1. SPEC-004 — One-Click Task Switching
-2. SPEC-005 — Manual Time Entry
-3. SPEC-006 — Edit and Delete Intervals
-4. SPEC-007 — Task Management
-5. SPEC-008 — System Tray
-6. SPEC-009 — Analytics
-7. SPEC-010 — Settings
-8. SPEC-011 — Packaging and Release
+1. SPEC-005 — Manual Time Entry
+2. SPEC-006 — Edit and Delete Intervals
+3. SPEC-007 — Task Management
+4. SPEC-008 — System Tray
+5. SPEC-009 — Analytics
+6. SPEC-010 — Settings
+7. SPEC-011 — Packaging and Release
 
 ---
 
@@ -111,27 +135,26 @@ None.
 
 # Active Work
 
-SPEC-004 is active. TASK-004-002 is complete and TASK-004-003 is next. Current
-scope remains history-row Play and atomic one-click switching semantics across
-idle, running, and paused timer states without adding tray switching, interval
-actions, or task management behavior.
+No active specification is currently in progress. The next planned work is
+SPEC-005 — Manual Time Entry.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-004 is designed to remain within the established
-typed preload API, main-process SQLite, timestamp-based interval, injected Clock,
-and npm decisions. It reuses SPEC-002 local-calendar projections and SPEC-003
-stable task-ID reuse semantics. No schema migration, dependency, decision, or
-architectural deviation is required by the specification as written.
+See `docs/decisions.md`. SPEC-004 remained within the established typed preload
+API, main-process SQLite, timestamp-based interval, injected Clock, and npm
+decisions. It reused SPEC-002 local-calendar projections and SPEC-003 stable
+task-ID reuse semantics. No schema migration, dependency, decision, or
+architectural deviation was required.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Completed TASK-004-002 for SPEC-004 by adding atomic
-`TimerService.switchToTask(...)` branches for idle start, running switch,
-paused switch, running same-task no-op, paused same-task resume, and controlled
-stale-target failures. Focused timer service/integration tests, typecheck, and
-lint passed. The next slice is TASK-004-003 for preload and IPC exposure.
+2026-08-15 — Verified SPEC-004 and completed TASK-004-005. Final acceptance
+confirmed one-click Daily History switching across idle, running, paused,
+same-task resume/no-op, and stale-task handling. `npm run typecheck`,
+`npm run lint`, `npm test`, and `npm run package` passed, and the packaged
+macOS arm64 app passed isolated CDP-driven history-row switching acceptance
+using `/tmp/timetracker-spec004-user-data`.

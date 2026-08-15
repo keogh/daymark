@@ -3,7 +3,7 @@
 ## Source
 
 - Specification: `docs/specs/004-one-click-task-switching/spec.md`
-- Specification status: Ready for Implementation
+- Specification status: Verified
 - Last reviewed against specification: 2026-08-15
 
 The specification is the source of truth for behavior. This file only decomposes
@@ -30,11 +30,11 @@ to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-004-001 | Define switch command contracts and validation | Pending | None | AC-004-007 |
+| TASK-004-001 | Define switch command contracts and validation | Complete | None | AC-004-007 |
 | TASK-004-002 | Implement atomic timer switch branches | Complete | TASK-004-001 | AC-004-001–006 |
 | TASK-004-003 | Expose the validated switch boundary | Complete | TASK-004-002 | AC-004-001–007 |
 | TASK-004-004 | Add accessible history-row Play controls | Complete | TASK-004-003 | AC-004-001, AC-004-004–010 |
-| TASK-004-005 | Verify One-Click Task Switching and update documentation | Pending | TASK-004-004 | AC-004-001–010 |
+| TASK-004-005 | Verify One-Click Task Switching and update documentation | Complete | TASK-004-004 | AC-004-001–010 |
 
 ---
 
@@ -289,7 +289,7 @@ TASK-004-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -336,4 +336,20 @@ TASK-004-004.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when complete.
+- Final acceptance matrix:
+
+  | Acceptance criteria | Evidence | Result |
+  | --- | --- | --- |
+  | AC-004-001, AC-004-002, AC-004-003, AC-004-005, AC-004-009 | Timer service unit/integration coverage and renderer/App tests verify idle history start, running different-task switch, paused different-task switch, paused same-task resume, and authoritative timer/history refresh wiring. The isolated packaged macOS arm64 acceptance run repeated idle Play, running switch, paused switch, paused same-task resume, and confirmed the timer returned to the correct running or idle view after each flow. | Passed |
+  | AC-004-004, AC-004-008, AC-004-010 | Renderer tests cover state-aware `Play`/`Resume`/`Already running` labels, keyboard-reachable controls, disabled same-task running state, and duplicate row-activation prevention. The isolated packaged acceptance run confirmed the same-task running row exposed a disabled `Already running` control while the timer stayed in the running presentation. | Passed |
+  | AC-004-006 | Timer service unit/integration coverage proves `TASK_NOT_FOUND` leaves AppState and intervals unchanged. Renderer tests verify the compact non-blocking history-area message and preserved controls. The isolated packaged acceptance run deleted a stale task from the disposable SQLite profile, triggered history-row Play, observed `The selected task no longer exists.`, and confirmed the final timer state remained idle on August 15, 2026. | Passed |
+  | AC-004-007 | Shared validation, IPC, preload, and service tests reject malformed exact-shape switch input as `INVALID_SWITCH_TASK` before service mutation. | Passed |
+
+- `npm run typecheck` — passed on 2026-08-15.
+- `npm run lint` — passed on 2026-08-15.
+- `npm test` — passed on 2026-08-15, 267 tests in 38 files.
+- `npm run package` — passed on 2026-08-15 for macOS arm64. Electron Forge emitted only its existing Vite `inlineDynamicImports` deprecation warning.
+- 2026-08-15: Launched the packaged macOS arm64 app with isolated user data via `--user-data-dir=/tmp/timetracker-spec004-user-data` and exercised SPEC-004 history-row flows over Electron CDP. Idle Play, running different-task switch, paused different-task switch, paused same-task resume, running same-task disabled state, and stale-task inline feedback all passed.
+- 2026-08-15: The isolated packaged acceptance mutated only `/tmp/timetracker-spec004-user-data/time-tracker.sqlite` to create the stale-task condition, leaving the real application profile untouched.
+- No schema, migration, architectural decision, or additional product-documentation changes were required beyond verification status and progress updates.
+- Deviations: none.
