@@ -1,0 +1,295 @@
+# SPEC-004 — Task Breakdown
+
+## Source
+
+- Specification: `docs/specs/004-one-click-task-switching/spec.md`
+- Specification status: Ready for Implementation
+- Last reviewed against specification: 2026-08-15
+
+The specification is the source of truth for behavior. This file only decomposes
+that behavior into implementation work. If the two conflict, update this breakdown
+to match the specification.
+
+---
+
+# Execution Rules
+
+- Complete tasks in dependency order and keep only one task `In Progress`.
+- Before implementation, copy the active task's immediate steps into
+  `docs/plan.md`.
+- Record focused verification evidence before marking a task `Complete`.
+- Reuse SPEC-001 timer-state contracts, SPEC-002 history refresh behavior, and
+  SPEC-003 stable task-ID start semantics where their semantics match.
+- Do not add task management, manual interval editing, tray switching, analytics,
+  settings, or new timer states.
+- Task completion does not replace final acceptance and Definition of Done checks.
+
+---
+
+# Task Index
+
+| ID | Task | Status | Depends on | Acceptance criteria |
+| --- | --- | --- | --- | --- |
+| TASK-004-001 | Define switch command contracts and validation | Pending | None | AC-004-007 |
+| TASK-004-002 | Implement atomic timer switch branches | Pending | TASK-004-001 | AC-004-001–006 |
+| TASK-004-003 | Expose the validated switch boundary | Pending | TASK-004-002 | AC-004-001–007 |
+| TASK-004-004 | Add accessible history-row Play controls | Pending | TASK-004-003 | AC-004-001, AC-004-004–010 |
+| TASK-004-005 | Verify One-Click Task Switching and update documentation | Pending | TASK-004-004 | AC-004-001–010 |
+
+---
+
+# Tasks
+
+## TASK-004-001 — Define Switch Command Contracts and Validation
+
+### Status
+
+Pending
+
+### Outcome
+
+Shared types and runtime validators define the history Play input and controlled
+feature-specific error handling without changing timer behavior yet.
+
+### Dependencies
+
+None.
+
+### Included
+
+- Define `SwitchToTaskInput` and preload/main shared contracts.
+- Add exact-shape runtime validation for non-null object input, `taskId` string
+  requirements, and unknown-property rejection.
+- Introduce or extend controlled error-code typing for `INVALID_SWITCH_TASK`.
+- Add focused unit and boundary tests under mirrored `test/` paths.
+
+### Excluded
+
+- Timer transition logic, IPC registration, and renderer controls.
+
+### Deliverables
+
+- Shared contracts, validation modules, error mappings, and focused tests.
+
+### Verification
+
+- Run focused contract and boundary tests, `npm run typecheck`, and `npm run
+  lint`.
+
+### Traceability
+
+- Acceptance criteria: AC-004-007
+- Specification sections: 7, 12, 14, 15, 23
+
+### Completion Evidence
+
+Record commands run, results, and any relevant implementation notes when complete.
+
+---
+
+## TASK-004-002 — Implement Atomic Timer Switch Branches
+
+### Status
+
+Pending
+
+### Outcome
+
+Application services and disposable SQLite repositories support atomic idle start,
+running switch, paused switch, same-task no-op, and same-task resume behavior by
+stable task ID.
+
+### Dependencies
+
+TASK-004-001.
+
+### Included
+
+- Extend TimerService with the switch operation and branch semantics.
+- Resolve task IDs inside the transaction.
+- Preserve session continuity for running different-task switches.
+- Reset `sessionStartedAt` for paused different-task switches.
+- Reuse resume semantics for paused same-task activation.
+- Return `TASK_NOT_FOUND` without persistence mutation for stale IDs.
+- Add deterministic unit, repository, and integration tests with disposable SQLite
+  databases.
+
+### Excluded
+
+- IPC wiring and renderer UI changes.
+- Any schema change unless the specification and breakdown are updated first.
+
+### Deliverables
+
+- Timer service changes, repository helpers if needed, composition updates, and
+  focused tests.
+
+### Verification
+
+- Run focused timer service and SQLite integration tests, relevant core timer
+  regressions, `npm run typecheck`, and `npm run lint`.
+
+### Traceability
+
+- Acceptance criteria: AC-004-001–006
+- Specification sections: 8–11, 16, 17, 19, 20, 24
+
+### Completion Evidence
+
+Record commands run, results, and any relevant implementation notes when complete.
+
+---
+
+## TASK-004-003 — Expose the Validated Switch Boundary
+
+### Status
+
+Pending
+
+### Outcome
+
+The preload and IPC layers expose one narrow validated history Play operation
+without widening renderer privileges.
+
+### Dependencies
+
+TASK-004-002.
+
+### Included
+
+- Register the explicit `timer:switch-to-task` IPC handler.
+- Expose `window.timeTracker.timer.switchToTask(...)` through preload.
+- Validate switch input in the main-process boundary before service execution.
+- Map expected failures to controlled `AppResult` values and log unexpected
+  failures safely.
+- Add focused preload and IPC tests.
+
+### Excluded
+
+- Renderer interaction design and history-row visual changes.
+
+### Deliverables
+
+- IPC handler, preload API additions, composition wiring, and focused tests.
+
+### Verification
+
+- Run focused preload and IPC tests, timer boundary regressions, `npm run
+  typecheck`, and `npm run lint`.
+
+### Traceability
+
+- Acceptance criteria: AC-004-001–007
+- Specification sections: 11–15, 23
+
+### Completion Evidence
+
+Record commands run, results, and any relevant implementation notes when complete.
+
+---
+
+## TASK-004-004 — Add Accessible History-Row Play Controls
+
+### Status
+
+Pending
+
+### Outcome
+
+Daily History exposes accessible, state-aware row actions that start, resume, or
+switch tasks with correct pending, success, and controlled failure behavior.
+
+### Dependencies
+
+TASK-004-003.
+
+### Included
+
+- Render task-row Play/Resume/Already-running controls in collapsed and expanded
+  history presentations.
+- Wire pointer and keyboard activation to the new timer switch API.
+- Prevent duplicate row activation while pending.
+- Preserve usable timer controls and show compact non-blocking `TASK_NOT_FOUND`
+  feedback.
+- Trigger authoritative history refresh after successful switch and stale-task
+  failure.
+- Add focused renderer tests for labeling, focus, keyboard activation, pending,
+  success, and error behavior.
+
+### Excluded
+
+- Suggestion-list switching while active.
+- Interval-row actions, tray behavior, analytics, or settings UI.
+
+### Deliverables
+
+- Renderer components/hooks, state wiring, and focused UI tests.
+
+### Verification
+
+- Run focused history/timer renderer tests, `npm run typecheck`, and `npm run
+  lint`.
+
+### Traceability
+
+- Acceptance criteria: AC-004-001, AC-004-004–010
+- Specification sections: 13, 16, 17, 21, 25
+
+### Completion Evidence
+
+Record commands run, results, and any relevant implementation notes when complete.
+
+---
+
+## TASK-004-005 — Verify One-Click Task Switching and Update Documentation
+
+### Status
+
+Pending
+
+### Outcome
+
+SPEC-004 is verified end to end, supporting documentation reflects the completed
+behavior, and project-level validation demonstrates no regression against earlier
+specifications.
+
+### Dependencies
+
+TASK-004-004.
+
+### Included
+
+- Verify every SPEC-004 acceptance criterion directly.
+- Run full required project validation and packaging if required by the
+  implementation surface.
+- Perform required manual acceptance for idle start, running switch, paused
+  switch, same-task paused resume, same-task running state, and stale-task
+  handling.
+- Update `docs/progress.md` and any affected product or architecture docs if
+  implementation refined documented behavior.
+- Record completion evidence and set final statuses when Definition of Done is
+  satisfied.
+
+### Excluded
+
+- New product behavior beyond SPEC-004.
+
+### Deliverables
+
+- Verified specification/task statuses, updated progress documentation, and final
+  validation evidence.
+
+### Verification
+
+- Run `npm run typecheck`, `npm run lint`, `npm test`, and `npm run package` if
+  the completed implementation touches packaging-relevant behavior or the spec's
+  final verification requires it.
+
+### Traceability
+
+- Acceptance criteria: AC-004-001–010
+- Specification sections: 17–25
+
+### Completion Evidence
+
+Record commands run, results, and any relevant implementation notes when complete.

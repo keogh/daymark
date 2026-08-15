@@ -2,18 +2,19 @@
 
 ## Current Phase
 
-Task Search and Reuse complete
+One-Click Task Switching specified
 
 ## Current Specification
 
-SPEC-003 — Task Search and Reuse (Verified)
+SPEC-004 — One-Click Task Switching (Ready for Implementation)
 
 ## Current Status
 
-SPEC-003 is verified. The idle timer now provides bounded recent and normalized
-substring-matched task suggestions with deterministic prefix/recency ordering,
-authoritative daily and lifetime totals, accessible keyboard and pointer reuse,
-and explicit existing-task Start by stable ID.
+SPEC-004 is now defined and ready for implementation. The next work extends Daily
+History with one-click Play actions that can start a task from idle, switch from a
+running or paused task by stable ID, treat running same-task activation as a
+no-op, resume paused same-task activation, and refresh authoritative history after
+successful or stale-target outcomes.
 
 ---
 
@@ -110,24 +111,26 @@ None.
 
 # Active Work
 
-SPEC-003 is verified with no blockers or deviations. SPEC-004 is the next planned
-specification and will define history-row Play and one-click switching while a task
-is running or paused.
+SPEC-004 is ready for implementation with a companion task breakdown. It is scoped
+to history-row Play and atomic one-click switching semantics across idle, running,
+and paused timer states without adding tray switching, interval actions, or task
+management behavior.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-003 remained within the established typed preload API,
-main-process SQLite, timestamp-based interval, injected Clock, and npm decisions.
-It reused SPEC-002 local-calendar projections and source-owned UI primitives. No
-schema migration, dependency, decision, or architectural deviation was required.
+See `docs/decisions.md`. SPEC-004 is designed to remain within the established
+typed preload API, main-process SQLite, timestamp-based interval, injected Clock,
+and npm decisions. It reuses SPEC-002 local-calendar projections and SPEC-003
+stable task-ID reuse semantics. No schema migration, dependency, decision, or
+architectural deviation is required by the specification as written.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Verified SPEC-003 against AC-003-001 through AC-003-017 with 232
-automated tests, macOS arm64 packaging, and isolated development and packaged
-runtime acceptance covering search, keyboard/pointer/typed reuse, restart,
-security, offline packaged resources, accessibility state, and scope exclusions.
+2026-08-15 — Designed SPEC-004 — One-Click Task Switching and added its companion
+task breakdown. The next implementation slice is ready, covering history-row Play,
+idle start by stable ID, running/paused switching semantics, same-task handling,
+validated process-boundary input, and authoritative history refresh behavior.
