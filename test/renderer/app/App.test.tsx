@@ -440,6 +440,12 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
         },
       }),
     },
+    tasks: {
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { suggestions: [], now: 1_000 },
+      }),
+    },
   };
 
   Object.defineProperty(window, 'timeTracker', {

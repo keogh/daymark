@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
+import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
 import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
   type TimeTrackerAPI,
@@ -26,6 +27,10 @@ const timeTrackerApi: TimeTrackerAPI = {
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),
+  },
+  tasks: {
+    getSuggestions: (input) =>
+      ipcRenderer.invoke(TASKS_GET_SUGGESTIONS_CHANNEL, input),
   },
 };
 

@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
 import { HistoryQueryRepository } from '@/main/database/repositories/history-query-repository';
 import { TaskRepository } from '@/main/database/repositories/task-repository';
+import { TaskSuggestionQueryRepository } from '@/main/database/repositories/task-suggestion-query-repository';
 import { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
 import { TransactionRunner } from '@/main/database/transaction-runner';
 import { SystemClock } from '@/main/domain/clock';
@@ -15,11 +16,13 @@ import {
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
 import { registerHistoryHandler } from '@/main/ipc/history';
 import { registerTimerHandlers } from '@/main/ipc/timer';
+import { registerTasksHandler } from '@/main/ipc/tasks';
 import { DurationProjector } from '@/main/services/duration-projections';
 import { SystemHealthService } from '@/main/services/system-health';
 import { HistoryService } from '@/main/services/history-service';
 import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
+import { TaskService } from '@/main/services/task-service';
 import { createMainWindow } from './create-window';
 import { startApplication } from './startup';
 
@@ -41,6 +44,9 @@ export const registerApplicationLifecycle = (): void => {
         const tasks = new TaskRepository(context.db);
         const intervals = new TimeIntervalRepository(context.db);
         const historyQueries = new HistoryQueryRepository(context.db);
+        const taskSuggestionQueries = new TaskSuggestionQueryRepository(
+          context.db,
+        );
         const clock = new SystemClock();
         const stateReader = new TimerStateReader({
           appState,
@@ -59,6 +65,10 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const historyService = new HistoryService({ clock, historyQueries });
+        const taskService = new TaskService({
+          clock,
+          suggestionQueries: taskSuggestionQueries,
+        });
 
         registerSystemHealthHandler(
           ipcMain,
@@ -70,6 +80,7 @@ export const registerApplicationLifecycle = (): void => {
           console,
         );
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
+        registerTasksHandler(ipcMain, { getSuggestions: taskService }, console);
       },
       createNormalWindow: createMainWindow,
       logInitializationFailure: (error) => {

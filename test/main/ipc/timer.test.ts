@@ -66,6 +66,19 @@ describe('timer IPC handlers', () => {
       source: 'description',
       description: 'Focus',
     });
+    expect(
+      handlers.get(TIMER_START_CHANNEL)?.(
+        {},
+        { source: 'existing-task', taskId: 'task-1' },
+      ),
+    ).toEqual({
+      ok: true,
+      value: idleState,
+    });
+    expect(operations.commands.start).toHaveBeenLastCalledWith({
+      source: 'existing-task',
+      taskId: 'task-1',
+    });
     expect(handlers.get(TIMER_PAUSE_CHANNEL)?.({})).toEqual({
       ok: true,
       value: idleState,

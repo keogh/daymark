@@ -33,7 +33,7 @@ to match the specification.
 | TASK-003-001 | Define suggestion and explicit-start contracts | Complete | None | AC-003-007, AC-003-012–014 |
 | TASK-003-002 | Implement bounded suggestion queries and projections | Complete | TASK-003-001 | AC-003-001–004, AC-003-015 |
 | TASK-003-003 | Implement task suggestion and explicit-reuse services | Complete | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
-| TASK-003-004 | Expose the validated task suggestion boundary | Pending | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
+| TASK-003-004 | Expose the validated task suggestion boundary | Complete | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
 | TASK-003-005 | Build the accessible idle-task combobox | Pending | TASK-003-004 | AC-003-001–011, AC-003-016 |
 | TASK-003-006 | Verify Task Search and Reuse and update documentation | Pending | TASK-003-005 | AC-003-001–017 |
 
@@ -254,7 +254,7 @@ TASK-003-002.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -296,7 +296,29 @@ TASK-003-003.
 
 ### Completion Evidence
 
-Record commands run, results, and implementation notes when complete.
+- Added one explicit `tasks:get-suggestions` IPC handler that validates the exact
+  request shape before invoking TaskService, safely returns controlled failures,
+  and logs unexpected failures under a content-free technical message before
+  returning `INTERNAL_ERROR`.
+- Composed TaskSuggestionQueryRepository, TaskService, and the tasks handler in the
+  main-process lifecycle without exposing database or query primitives.
+- Added `tasks.getSuggestions` to the typed public API and contextBridge preload;
+  preload tests demonstrate only the narrow method and explicit channel are
+  exposed. The timer boundary and preload tests cover both description and
+  existing-task Start variants end to end through their typed channel.
+- Added focused IPC tests for successful delegation, malformed/oversized/unknown
+  input rejection before service work, controlled suggestion failures, sanitized
+  unexpected failures, and content-free logging.
+- Mechanically updated the full renderer API test fixture for the new required
+  public contract; no renderer suggestion behavior was introduced.
+- `npm test -- test/main/ipc/tasks.test.ts test/main/ipc/timer.test.ts
+  test/preload/index.test.ts test/main/services/task-service.test.ts
+  test/main/services/timer-service.test.ts` — passed, 42 tests.
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 222 tests.
+- `git diff --check` — passed.
 
 ---
 
