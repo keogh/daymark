@@ -10,6 +10,9 @@ import {
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { ManualIntervalCreateResult } from '@/shared/contracts/manual-time';
 import {
+  type CreateManualIntervalInput,
+} from '@/shared/contracts/manual-time';
+import {
   validateCreateManualIntervalInput,
   type ValidatedCreateManualIntervalInput,
 } from '@/shared/validation/manual-time-input';
@@ -44,7 +47,7 @@ export class ManualTimeService {
   }
 
   createInterval(
-    input: unknown,
+    input: CreateManualIntervalInput,
   ): AppResult<ManualIntervalCreateResult> {
     const validation = validateCreateManualIntervalInput(input);
     if (!validation.ok) {

@@ -33,7 +33,7 @@ breakdown to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-005-001 | Define manual-entry contracts and validation | Complete | None | AC-005-009 |
 | TASK-005-002 | Implement transactional manual interval creation | Complete | TASK-005-001 | AC-005-003–008 |
-| TASK-005-003 | Expose the validated manual-entry boundary | Pending | TASK-005-002 | AC-005-009 |
+| TASK-005-003 | Expose the validated manual-entry boundary | Complete | TASK-005-002 | AC-005-009 |
 | TASK-005-004 | Add accessible manual-entry UI and refresh flows | Pending | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
 | TASK-005-005 | Verify Manual Time Entry and update documentation | Pending | TASK-005-004 | AC-005-001–012 |
 
@@ -188,7 +188,7 @@ TASK-005-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -229,8 +229,27 @@ TASK-005-002.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when
-complete.
+- Added `registerManualTimeHandler(...)` in `src/main/ipc/manual-time.ts` to
+  register the explicit `manual-time:create-interval` channel, validate manual
+  entry input at the main-process boundary before service execution, and
+  sanitize unexpected failures without exposing technical details.
+- Wired the validated boundary into application startup in
+  `src/main/app/lifecycle.ts` by composing `ManualTimeService` and registering
+  the manual-time IPC handler alongside the existing timer/history/task
+  handlers.
+- Kept the preload surface narrow through the existing typed
+  `window.timeTracker.manualTime.createInterval(...)` API and aligned
+  `ManualTimeService.createInterval(...)` with the shared
+  `CreateManualIntervalInput` contract.
+- Added focused boundary coverage in `test/main/ipc/manual-time.test.ts` for
+  successful delegation, invalid-input rejection before service calls,
+  controlled overlap failures, and sanitized unexpected exceptions.
+- Verification commands run on 2026-08-15:
+  - `npm test -- manual-time` ✅
+  - `npm test -- preload` ✅
+  - `npm test -- ipc` ✅
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅
 
 ---
 

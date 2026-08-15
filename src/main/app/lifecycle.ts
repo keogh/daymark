@@ -15,11 +15,13 @@ import {
 } from '@/main/database/path';
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
 import { registerHistoryHandler } from '@/main/ipc/history';
+import { registerManualTimeHandler } from '@/main/ipc/manual-time';
 import { registerTimerHandlers } from '@/main/ipc/timer';
 import { registerTasksHandler } from '@/main/ipc/tasks';
 import { DurationProjector } from '@/main/services/duration-projections';
 import { SystemHealthService } from '@/main/services/system-health';
 import { HistoryService } from '@/main/services/history-service';
+import { ManualTimeService } from '@/main/services/manual-time-service';
 import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 import { TaskService } from '@/main/services/task-service';
@@ -65,6 +67,15 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const historyService = new HistoryService({ clock, historyQueries });
+        const manualTimeService = new ManualTimeService({
+          appState,
+          tasks,
+          intervals,
+          transactions: new TransactionRunner(context.sqlite),
+          stateReader,
+          clock,
+          generateId: randomUUID,
+        });
         const taskService = new TaskService({
           clock,
           suggestionQueries: taskSuggestionQueries,
@@ -80,6 +91,11 @@ export const registerApplicationLifecycle = (): void => {
           console,
         );
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
+        registerManualTimeHandler(
+          ipcMain,
+          { createInterval: manualTimeService },
+          console,
+        );
         registerTasksHandler(ipcMain, { getSuggestions: taskService }, console);
       },
       createNormalWindow: createMainWindow,
