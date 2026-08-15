@@ -6,7 +6,7 @@ SPEC-005 — Manual Time Entry
 
 ## Active Task
 
-TASK-005-004 — Add accessible manual-entry UI and refresh flows
+TASK-005-005 — Verify Manual Time Entry and update documentation
 
 ## Status
 
@@ -16,27 +16,24 @@ Complete
 
 # Immediate Plan
 
-1. Add a shared, accessible manual-entry surface with task selection, typed task
-   entry, date/time fields, pending protection, and controlled errors.
-2. Wire global Timer and day-scoped Daily History entry points with the required
-   local-day defaults.
-3. Refresh timer and history projections authoritatively after a successful save.
-4. Add focused renderer coverage for entry points, keyboard behavior, pending,
-   success refresh, and controlled errors.
-5. Run focused renderer tests, affected app tests, typecheck, and lint, then
-   record completion evidence in the task breakdown.
+1. Trace every SPEC-005 acceptance criterion to automated and rendered evidence.
+2. Run formatting, typecheck, lint, the full test suite, and packaging.
+3. Exercise the packaged manual-entry workflow with isolated application data and
+   inspect rendered, persistence, accessibility, and console evidence.
+4. Record verification evidence and update the specification, task breakdown,
+   plan, and project progress when all gates pass.
 
 ---
 
 # Scope Guard
 
-Do not add interval editing/deletion, a separate interval page, analytics entry
-flows, or changes to the established manual-time process boundary.
+Do not add product behavior or modify the established manual-time implementation
+unless verification exposes a SPEC-005 defect.
 
 ---
 
 # Completion
 
-Completion is reached when both entry points open the accessible manual-entry
-surface with correct date defaults, save behavior refreshes authoritative timer
-and history data, controlled failures preserve values, and focused checks pass.
+Completion is reached when AC-005-001 through AC-005-012 and the Definition of
+Done pass, packaged behavior is verified with isolated data, documentation is
+current, and SPEC-005 is marked Verified.

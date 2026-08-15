@@ -299,7 +299,9 @@ describe('TimerService SQLite integration', () => {
     clock.advance(minutes(20));
     const switchedAt = clock.now();
 
-    const switched = valueOf(application.service.switchToTask({ taskId: 'task-b' }));
+    const switched = valueOf(
+      application.service.switchToTask({ taskId: 'task-b' }),
+    );
 
     expect(switched).toMatchObject({
       status: 'running',
@@ -348,7 +350,9 @@ describe('TimerService SQLite integration', () => {
     clock.advance(minutes(10));
     const switchedAt = clock.now();
 
-    const switched = valueOf(application.service.switchToTask({ taskId: 'task-b' }));
+    const switched = valueOf(
+      application.service.switchToTask({ taskId: 'task-b' }),
+    );
 
     expect(switched).toMatchObject({
       status: 'running',
@@ -451,7 +455,9 @@ describe('TimerService SQLite integration', () => {
     clock.advance(minutes(20));
     const changesBefore = totalChanges(application.context);
 
-    expect(application.service.switchToTask({ taskId: 'missing-task' })).toEqual({
+    expect(
+      application.service.switchToTask({ taskId: 'missing-task' }),
+    ).toEqual({
       ok: false,
       error: {
         code: 'TASK_NOT_FOUND',

@@ -9,9 +9,7 @@ import {
 } from '@/main/services/timer-state-reader';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { ManualIntervalCreateResult } from '@/shared/contracts/manual-time';
-import {
-  type CreateManualIntervalInput,
-} from '@/shared/contracts/manual-time';
+import { type CreateManualIntervalInput } from '@/shared/contracts/manual-time';
 import {
   validateCreateManualIntervalInput,
   type ValidatedCreateManualIntervalInput,

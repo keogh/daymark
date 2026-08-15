@@ -20,12 +20,15 @@ describe('manual time IPC handler', () => {
 
     expect(handler.channel).toBe(MANUAL_TIME_CREATE_INTERVAL_CHANNEL);
     expect(
-      handler.listener({}, {
-        taskDescription: '  Focus  ',
-        date: ' 2026-08-14 ',
-        startTime: ' 09:00 ',
-        endTime: ' 10:00 ',
-      }),
+      handler.listener(
+        {},
+        {
+          taskDescription: '  Focus  ',
+          date: ' 2026-08-14 ',
+          startTime: ' 09:00 ',
+          endTime: ' 10:00 ',
+        },
+      ),
     ).toEqual({
       ok: true,
       value: successResult,
@@ -40,9 +43,29 @@ describe('manual time IPC handler', () => {
 
   it.each([
     ['missing input', undefined],
-    ['unknown properties', { taskDescription: 'Focus', date: '2026-08-14', startTime: '09:00', endTime: '10:00', extra: true }],
-    ['missing task source', { date: '2026-08-14', startTime: '09:00', endTime: '10:00' }],
-    ['same-time range', { taskDescription: 'Focus', date: '2026-08-14', startTime: '09:00', endTime: '09:00' }],
+    [
+      'unknown properties',
+      {
+        taskDescription: 'Focus',
+        date: '2026-08-14',
+        startTime: '09:00',
+        endTime: '10:00',
+        extra: true,
+      },
+    ],
+    [
+      'missing task source',
+      { date: '2026-08-14', startTime: '09:00', endTime: '10:00' },
+    ],
+    [
+      'same-time range',
+      {
+        taskDescription: 'Focus',
+        date: '2026-08-14',
+        startTime: '09:00',
+        endTime: '09:00',
+      },
+    ],
   ])('rejects %s before invoking the service', (_label, input) => {
     const { handler, operations } = setup();
 
@@ -68,12 +91,15 @@ describe('manual time IPC handler', () => {
     const { handler } = setup({ error: vi.fn() }, operations);
 
     expect(
-      handler.listener({}, {
-        taskId: 'task-1',
-        date: '2026-08-14',
-        startTime: '09:00',
-        endTime: '10:00',
-      }),
+      handler.listener(
+        {},
+        {
+          taskId: 'task-1',
+          date: '2026-08-14',
+          startTime: '09:00',
+          endTime: '10:00',
+        },
+      ),
     ).toEqual({
       ok: false,
       error: {
@@ -95,12 +121,15 @@ describe('manual time IPC handler', () => {
     const { handler } = setup(logger, operations);
 
     expect(
-      handler.listener({}, {
-        taskDescription: 'private work',
-        date: '2026-08-14',
-        startTime: '09:00',
-        endTime: '10:00',
-      }),
+      handler.listener(
+        {},
+        {
+          taskDescription: 'private work',
+          date: '2026-08-14',
+          startTime: '09:00',
+          endTime: '10:00',
+        },
+      ),
     ).toEqual({
       ok: false,
       error: {

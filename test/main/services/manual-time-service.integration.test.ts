@@ -143,25 +143,25 @@ describe('ManualTimeService SQLite integration', () => {
       startedAt: localTime(2026, 8, 13, 13, 0),
       endedAt: localTime(2026, 8, 13, 14, 0),
     });
-    expect(application.taskService.getSuggestions({ query: 'tegration' })).toEqual(
-      {
-        ok: true,
-        value: {
-          suggestions: [
-            {
-              task: {
-                id: 'integration-1',
-                description: 'Integration Task',
-              },
-              todayDurationMs: 0,
-              lifetimeDurationMs: minutes(60),
-              mostRecentActivityAt: localTime(2026, 8, 13, 13, 0),
+    expect(
+      application.taskService.getSuggestions({ query: 'tegration' }),
+    ).toEqual({
+      ok: true,
+      value: {
+        suggestions: [
+          {
+            task: {
+              id: 'integration-1',
+              description: 'Integration Task',
             },
-          ],
-          now: clock.now(),
-        },
+            todayDurationMs: 0,
+            lifetimeDurationMs: minutes(60),
+            mostRecentActivityAt: localTime(2026, 8, 13, 13, 0),
+          },
+        ],
+        now: clock.now(),
       },
-    );
+    });
   });
 
   it('rejects overlap with a closed interval across tasks', () => {
@@ -283,7 +283,9 @@ interface TestApplication {
   readonly taskService: TaskService;
 }
 
-const valueOfTimer = (result: AppResult<TimerState> | TimerState): TimerState => {
+const valueOfTimer = (
+  result: AppResult<TimerState> | TimerState,
+): TimerState => {
   if ('status' in result) {
     return result;
   }

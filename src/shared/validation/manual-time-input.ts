@@ -152,9 +152,7 @@ const localDateTimeToEpochMs = (date: string, time: string): number => {
   ).getTime();
 };
 
-const hasOnlyManualIntervalKeys = (
-  value: Record<string, unknown>,
-): boolean => {
+const hasOnlyManualIntervalKeys = (value: Record<string, unknown>): boolean => {
   const allowedKeys = new Set([
     'taskId',
     'taskDescription',

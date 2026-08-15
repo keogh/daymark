@@ -222,16 +222,21 @@ describe('DailyHistory', () => {
     const { rerender } = render(<DailyHistory />);
 
     expect(
-      (await screen.findAllByRole('button', {
-        name: 'Play Implement authentication',
-      }))[0],
+      (
+        await screen.findAllByRole('button', {
+          name: 'Play Implement authentication',
+        })
+      )[0],
     ).toBeEnabled();
 
     rerender(
       <DailyHistory
         timer={{
           status: 'paused',
-          currentTask: { id: 'task-1', description: 'Implement authentication' },
+          currentTask: {
+            id: 'task-1',
+            description: 'Implement authentication',
+          },
           sessionStartedAt: snapshotNow - 600_000,
           sessionDurationMs: 600_000,
           taskTodayDurationMs: 5_400_000,
@@ -243,16 +248,21 @@ describe('DailyHistory', () => {
     );
 
     expect(
-      (await screen.findAllByRole('button', {
-        name: 'Resume Implement authentication',
-      }))[0],
+      (
+        await screen.findAllByRole('button', {
+          name: 'Resume Implement authentication',
+        })
+      )[0],
     ).toBeEnabled();
 
     rerender(
       <DailyHistory
         timer={{
           status: 'running',
-          currentTask: { id: 'task-1', description: 'Implement authentication' },
+          currentTask: {
+            id: 'task-1',
+            description: 'Implement authentication',
+          },
           sessionStartedAt: snapshotNow - 600_000,
           sessionDurationMs: 600_000,
           taskTodayDurationMs: 5_400_000,
@@ -264,9 +274,11 @@ describe('DailyHistory', () => {
     );
 
     expect(
-      (await screen.findAllByRole('button', {
-        name: 'Already running Implement authentication',
-      }))[0],
+      (
+        await screen.findAllByRole('button', {
+          name: 'Already running Implement authentication',
+        })
+      )[0],
     ).toBeDisabled();
   });
 
@@ -310,9 +322,11 @@ describe('DailyHistory', () => {
     });
 
     expect(
-      (await screen.findAllByRole('button', {
-        name: 'Play Implement authentication',
-      }))[0],
+      (
+        await screen.findAllByRole('button', {
+          name: 'Play Implement authentication',
+        })
+      )[0],
     ).toBeEnabled();
     expect(playButton).toHaveFocus();
   });
@@ -337,10 +351,12 @@ describe('DailyHistory', () => {
       )[0]!,
     );
 
-    expect(await screen.findByText('The selected task no longer exists.')).toBeVisible();
-    expect(screen.getByText('The selected task no longer exists.')).toHaveTextContent(
-      'The selected task no longer exists.',
-    );
+    expect(
+      await screen.findByText('The selected task no longer exists.'),
+    ).toBeVisible();
+    expect(
+      screen.getByText('The selected task no longer exists.'),
+    ).toHaveTextContent('The selected task no longer exists.');
     expect(
       screen.getByRole('button', { name: 'Play Quick review' }),
     ).toBeEnabled();

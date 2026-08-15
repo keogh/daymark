@@ -297,8 +297,12 @@ describe('ManualTimeService', () => {
         'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ? where id = 1',
       )
       .run('running', 'missing-current', now - minutes(30), now);
-    context.sqlite.prepare('delete from tasks where id = ?').run('missing-current');
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    context.sqlite
+      .prepare('delete from tasks where id = ?')
+      .run('missing-current');
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     const result = service.createInterval({
       taskDescription: 'Safe failure',
@@ -365,13 +369,23 @@ const seedTask = (
     .run(id, description, description.toLowerCase(), createdAt, createdAt);
 };
 
-const seedRunningState = (context: DatabaseContext, startedAt: number): void => {
+const seedRunningState = (
+  context: DatabaseContext,
+  startedAt: number,
+): void => {
   seedTask(context, 'running-task', 'Running Task', startedAt - minutes(30));
   context.sqlite
     .prepare(
       'insert into time_intervals (id, task_id, started_at, ended_at, created_at, updated_at) values (?, ?, ?, ?, ?, ?)',
     )
-    .run('open-interval', 'running-task', startedAt, null, startedAt, startedAt);
+    .run(
+      'open-interval',
+      'running-task',
+      startedAt,
+      null,
+      startedAt,
+      startedAt,
+    );
   context.sqlite
     .prepare(
       'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ? where id = 1',

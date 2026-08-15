@@ -180,7 +180,10 @@ export class TimerService {
       return { ok: true, value: this.#stateReader.getStateAt(transition.now) };
     } catch (error: unknown) {
       if (error instanceof InvalidPersistedTimerStateError) {
-        console.error('Invalid persisted timer state during task switch.', error);
+        console.error(
+          'Invalid persisted timer state during task switch.',
+          error,
+        );
         return internalError();
       }
 

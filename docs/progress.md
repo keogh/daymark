@@ -2,21 +2,19 @@
 
 ## Current Phase
 
-Manual Time Entry in progress
+Manual Time Entry verified
 
 ## Current Specification
 
-SPEC-005 — Manual Time Entry (Tasks TASK-005-001 through TASK-005-003 complete)
+SPEC-005 — Manual Time Entry (Verified 2026-08-15)
 
 ## Current Status
 
-SPEC-005 implementation has completed `TASK-005-001` through
-`TASK-005-003`. The manual-entry boundary now includes explicit contracts,
-renderer-safe error typing, preload exposure, and runtime validation at the
-IPC boundary, while the main-process service layer creates manual intervals
-transactionally with exact task reuse/creation semantics, local-time
-conversion, overlap rejection against closed intervals and the running open
-interval's elapsed range, rollback-safe persistence, and unchanged `AppState`.
+SPEC-005 is verified. Manual Time Entry now creates one closed interval through
+an accessible global or day-scoped flow, supports stable existing-task selection
+and normalized typed-task reuse/creation, rejects invalid and overlapping ranges
+without mutation, preserves current timer state, and refreshes timer/history
+projections authoritatively after save.
 
 ---
 
@@ -27,6 +25,7 @@ interval's elapsed range, rollback-safe persistence, and unchanged `AppState`.
 - SPEC-002 — Daily History (Verified 2026-08-15)
 - SPEC-003 — Task Search and Reuse (Verified 2026-08-15)
 - SPEC-004 — One-Click Task Switching (Verified 2026-08-15)
+- SPEC-005 — Manual Time Entry (Verified 2026-08-15)
 
 SPEC-001 delivered:
 
@@ -114,17 +113,37 @@ running switch, paused switch, paused same-task resume, running same-task
 disabled state, and stale-task inline feedback without touching the real
 application profile.
 
+SPEC-005 delivered:
+
+- accessible global and Daily History day-scoped `Add time` entry points with
+  local-day prefilling, existing-task selection, and typed task descriptions;
+- atomic creation of exactly one closed UTC-timestamp interval with normalized
+  task reuse/creation and unchanged timer `AppState`;
+- global overlap protection across closed intervals and the elapsed portion of a
+  running open interval, with controlled no-mutation failures;
+- a narrow runtime-validated preload/IPC boundary and authoritative timer/history
+  refresh after successful save;
+- shared-validation, service, disposable-SQLite repository/integration,
+  preload/IPC, renderer, and packaged acceptance coverage.
+
+Final acceptance covered AC-005-001 through AC-005-012 and the project Definition
+of Done. Formatting, typecheck, lint, all 312 tests in 43 files, and macOS arm64
+packaging passed on 2026-08-15. An isolated packaged run at 1100×820 verified both
+entry points, local-day prefill, initial focus and labels, successful
+authoritative refresh, value-preserving overlap feedback, clean renderer console,
+and persistence of exactly one closed 30-minute interval without changing idle
+timer state.
+
 ---
 
 # Upcoming Specifications
 
-1. SPEC-005 — Manual Time Entry
-2. SPEC-006 — Edit and Delete Intervals
-3. SPEC-007 — Task Management
-4. SPEC-008 — System Tray
-5. SPEC-009 — Analytics
-6. SPEC-010 — Settings
-7. SPEC-011 — Packaging and Release
+1. SPEC-006 — Edit and Delete Intervals
+2. SPEC-007 — Task Management
+3. SPEC-008 — System Tray
+4. SPEC-009 — Analytics
+5. SPEC-010 — Settings
+6. SPEC-011 — Packaging and Release
 
 ---
 
@@ -136,28 +155,24 @@ None.
 
 # Active Work
 
-SPEC-005 — Manual Time Entry is active. `TASK-005-001` through
-`TASK-005-003` are complete. The next planned task is `TASK-005-004` to add
-the accessible manual-entry UI and authoritative refresh flows.
+SPEC-005 — Manual Time Entry is verified. The next planned specification is
+SPEC-006 — Edit and Delete Intervals.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. `TASK-005-001` through `TASK-005-003` remain within
-the established typed preload API, main-process SQLite ownership,
-timestamp-based interval source of truth, injected Clock, and npm decisions.
-No schema migration, dependency, decision, or architectural deviation was
-required for the shared manual-entry contracts, transactional service flow,
-overlap detection, or manual-entry IPC/preload boundary exposure.
+See `docs/decisions.md`. SPEC-005 remains within the established typed preload
+API, main-process SQLite ownership, timestamp-based interval source of truth,
+injected Clock, local-calendar projection, and npm decisions. No schema
+migration, dependency, decision, or architectural deviation was required.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Completed `TASK-005-003` for SPEC-005. Added the explicit
-`manual-time:create-interval` IPC handler, wired `ManualTimeService` into the
-validated manual-entry preload boundary, and added focused IPC coverage for
-successful delegation, invalid-input rejection, controlled failures, and
-sanitized unexpected exceptions. `npm test -- manual-time`, `npm test --
-preload`, `npm test -- ipc`, `npm run typecheck`, and `npm run lint` passed.
+2026-08-15 — Verified SPEC-005 and completed `TASK-005-005`. AC-005-001 through
+AC-005-012, the Definition of Done, formatting, typecheck, lint, all 312 tests,
+macOS arm64 packaging, and an isolated packaged manual-entry flow passed. The
+packaged flow verified authoritative refresh, controlled overlap preservation,
+clean console output, and exactly one closed interval with unchanged timer state.

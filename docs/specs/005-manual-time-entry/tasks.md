@@ -35,7 +35,7 @@ breakdown to match the specification.
 | TASK-005-002 | Implement transactional manual interval creation | Complete | TASK-005-001 | AC-005-003–008 |
 | TASK-005-003 | Expose the validated manual-entry boundary | Complete | TASK-005-002 | AC-005-009 |
 | TASK-005-004 | Add accessible manual-entry UI and refresh flows | Complete | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
-| TASK-005-005 | Verify Manual Time Entry and update documentation | Pending | TASK-005-004 | AC-005-001–012 |
+| TASK-005-005 | Verify Manual Time Entry and update documentation | Complete | TASK-005-004 | AC-005-001–012 |
 
 ---
 
@@ -334,7 +334,7 @@ TASK-005-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -377,8 +377,30 @@ TASK-005-004.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when
-complete.
+- Verified AC-005-001 through AC-005-012 against the required shared-validation,
+  service, disposable-SQLite repository/integration, preload/IPC, and renderer
+  coverage; the full suite passes with 312 tests across 43 files.
+- Re-ran the packaged macOS arm64 application at 1100×820 with isolated user
+  data. The global and day-scoped actions opened the labeled dialog with the
+  correct local-day prefill and initial task focus; a typed task saved one closed
+  30-minute interval, closed the dialog, and refreshed Daily History without an
+  application reload.
+- Re-submitting the same range from the day-scoped action produced controlled
+  overlap feedback, kept the dialog and entered values intact, and emitted no
+  renderer console warnings or errors.
+- Inspected the isolated SQLite database after the packaged flow: one Task and
+  exactly one closed interval were persisted, and `AppState` remained idle with
+  no current task or active session.
+- No architecture, schema, dependency, or accepted behavior changes were needed.
+  Prettier corrected existing code style in eight SPEC-005/touched service and
+  test files before the final validation pass.
+- Verification commands run on 2026-08-15:
+  - `npm run format:check` ✅
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅
+  - `npm test` ✅ (312 tests in 43 files)
+  - `npm run package` ✅ (macOS arm64)
+  - isolated packaged Electron/CDP manual-entry flow and SQLite inspection ✅
 
 ---
 
