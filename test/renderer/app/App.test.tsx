@@ -57,7 +57,7 @@ describe('App', () => {
     render(<App />);
 
     expect(api.timer.getState).toHaveBeenCalledOnce();
-    expect(screen.getByRole('status')).toHaveTextContent('Loading timer…');
+    expect(screen.getByText('Loading timer…')).toBeVisible();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
     state.resolve({ ok: true, value: idleState });
@@ -417,7 +417,23 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       resume: overrides.resume ?? vi.fn(),
       stop: overrides.stop ?? vi.fn(),
     },
-    history: { getPage: vi.fn() },
+    history: {
+      getPage: vi.fn().mockResolvedValue({
+        ok: true,
+        value: {
+          days: [
+            {
+              dayStartedAt: new Date(1_000).setHours(0, 0, 0, 0),
+              dayEndedAt: new Date(1_000).setHours(24, 0, 0, 0),
+              totalDurationMs: 0,
+              tasks: [],
+            },
+          ],
+          nextBeforeDayStartedAt: null,
+          now: 1_000,
+        },
+      }),
+    },
   };
 
   Object.defineProperty(window, 'timeTracker', {

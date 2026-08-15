@@ -10,6 +10,7 @@ import { Field, FieldError, FieldLabel } from '@/renderer/components/ui/field';
 import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import type { TimerState } from '@/shared/contracts/timer';
+import { DailyHistory } from './DailyHistory';
 import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
 import { useDisplayDuration } from './use-display-duration';
 import {
@@ -41,6 +42,7 @@ export const App = () => {
             />
           )}
       </section>
+      <DailyHistory />
     </main>
   );
 };

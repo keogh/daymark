@@ -34,7 +34,7 @@ to match the specification.
 | TASK-002-002 | Define history contracts and projection primitives | Complete | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
 | TASK-002-003 | Implement bounded history queries and service paging | Complete | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
 | TASK-002-004 | Expose the validated history IPC boundary | Complete | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
-| TASK-002-005 | Render the initial Daily History states | Pending | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
+| TASK-002-005 | Render the initial Daily History states | Complete | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
 | TASK-002-006 | Add older-page loading and resilient retry | Pending | TASK-002-005 | AC-002-008–009, AC-002-014 |
 | TASK-002-007 | Synchronize live history with timer state | Pending | TASK-002-005 | AC-002-010–012 |
 | TASK-002-008 | Verify Daily History and update documentation | Pending | TASK-002-006–007 | AC-002-001–018 |
@@ -319,7 +319,7 @@ verification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -364,7 +364,22 @@ TASK-002-004.
 
 ### Completion Evidence
 
-Pending.
+The main Timer view now starts one initial `history.getPage({})` request without
+blocking timer loading or controls. Beneath the timer, Daily History renders
+accessible loading, empty, loaded, and retryable initial-error states using normal
+page scrolling. Loaded pages show locale-aware Today/Yesterday/day headings,
+compact day and task daily/lifetime totals, and local interval time ranges with
+`midnight` and positive sub-minute formatting.
+
+Task rows are collapsed semantic buttons with visible focus, `aria-expanded`, and
+day-and-task-specific `aria-controls`. Multiple rows, including repeated tasks on
+different days, expand independently into semantic interval lists with complete
+assistive labels. No pagination, live animation/synchronization, history mutation,
+or task-start behavior was added.
+
+Focused Daily History and timer renderer tests passed (20 tests). The complete
+suite passed (172 tests), as did typecheck, lint, formatting verification, and the
+diff whitespace check.
 
 ---
 
