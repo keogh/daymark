@@ -453,6 +453,10 @@ Avoid:
 
 unless there is a documented reason.
 
+Use event-specific React event types. Do not use the deprecated `FormEvent` type;
+for form submission handlers, use `SubmitEvent<HTMLFormElement>` (or let the
+`onSubmit` prop infer that type).
+
 Public process-boundary contracts must be explicitly typed.
 
 Validate untrusted IPC inputs at runtime.

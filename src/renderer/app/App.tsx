@@ -3,8 +3,8 @@ import {
   useId,
   useRef,
   useState,
-  type FormEvent,
   type KeyboardEvent,
+  type SubmitEvent,
 } from 'react';
 
 import {
@@ -94,7 +94,7 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
     inputRef.current?.focus();
   }, [controller.commandError]);
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     suggestions.close();
     void controller.start(description);
