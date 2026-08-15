@@ -6,7 +6,7 @@ SPEC-002 — Daily History
 
 ## Active Task
 
-TASK-002-002 — Define History Contracts and Projection Primitives
+TASK-002-003 — Implement Bounded History Queries and Service Paging
 
 ## Status
 
@@ -26,12 +26,13 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Define the shared history page contracts and strict runtime validation for the
-   optional local-day cursor.
-2. Add pure local-calendar, interval projection, total, deterministic ordering, and
-   bounded activity-day pagination primitives.
-3. Add focused unit tests for closed/open intervals, cross-midnight clipping, exact
-   boundaries, ordering, cursor behavior, and daylight-saving transitions.
+1. Add set-based history query operations for bounded activity discovery,
+   overlapping interval retrieval, and grouped task lifetime totals.
+2. Implement HistoryService paging with one injected Clock snapshot, empty Today,
+   exclusive older cursors, and deterministic projections.
+3. Add disposable-SQLite repository and service integration tests covering open,
+   repeated-task, cross-midnight, exact-boundary, DST, paging, read-only behavior,
+   and query-count scaling.
 4. Run focused history tests, typecheck, lint, and formatting verification; record
    task evidence when all checks pass.
 
@@ -39,16 +40,18 @@ only the execution plan for the active task.
 
 # Scope Guard
 
-Do not add SQLite queries, service orchestration, IPC registration, preload wiring,
-or React history UI in this task.
+Do not add schema changes, IPC registration, preload wiring, or React history UI
+in this task.
 
 ---
 
 # Completion
 
-TASK-002-002 is complete. Shared renderer-facing history contracts and the fixed
-30-activity-day limit are defined alongside strict runtime validation for empty and
-cursor requests. Pure projection utilities cover local calendar boundaries,
-half-open overlap, open and cross-midnight intervals, totals, deterministic
-ordering, and initial/older page selection. Focused history tests, the full test
-suite, typecheck, lint, and formatting verification passed.
+TASK-002-003 is complete. Set-based SQLite query operations discover bounded
+activity pages, retrieve all intervals overlapping the selected day span, and
+aggregate lifetime totals for all rendered tasks without per-task queries.
+HistoryService uses one Clock snapshot, includes empty Today only on initial
+loads, applies exclusive older-day cursors, and returns deterministic projections
+for open, repeated-task, cross-midnight, exact-boundary, and DST cases. Focused
+history tests (28), the complete suite (157), typecheck, lint, and formatting
+verification passed.

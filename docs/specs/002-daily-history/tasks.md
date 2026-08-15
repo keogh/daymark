@@ -32,7 +32,7 @@ to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-002-001 | Establish the renderer styling foundation | Complete | None | AC-002-017–018 |
 | TASK-002-002 | Define history contracts and projection primitives | Complete | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
-| TASK-002-003 | Implement bounded history queries and service paging | Pending | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
+| TASK-002-003 | Implement bounded history queries and service paging | Complete | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
 | TASK-002-004 | Expose the validated history IPC boundary | Pending | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
 | TASK-002-005 | Render the initial Daily History states | Pending | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
 | TASK-002-006 | Add older-page loading and resilient retry | Pending | TASK-002-005 | AC-002-008–009, AC-002-014 |
@@ -185,7 +185,7 @@ verification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -230,7 +230,22 @@ TASK-002-002.
 
 ### Completion Evidence
 
-Pending.
+Added a set-based HistoryQueryRepository that discovers activity candidates in
+fixed-size batches, retrieves all task/interval rows overlapping only the selected
+page span, and calculates lifetime totals for every rendered task in one grouped
+query. No schema or migration changes were required.
+
+HistoryService now obtains exactly one injected Clock snapshot per response,
+projects at most 30 activity days, includes empty Today without consuming an
+activity slot, consumes exclusive older-day cursors, and emits a cursor only when
+older activity exists. Its query count does not grow per rendered task.
+
+Disposable-SQLite repository and service integration coverage verifies half-open
+overlap, open and repeated-task intervals, cross-midnight clipping, exact-midnight
+behavior, 23-hour DST projection, lifetime aggregation, more than 30 activity
+days, complete cursor traversal without duplicates, and read-only requests.
+Focused history tests passed (28 tests), as did the complete suite (157 tests),
+typecheck, lint, and formatting verification.
 
 ---
 
