@@ -474,6 +474,20 @@ input {
   font-weight: 620;
 }
 
+.delete-interval-summary {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.delete-interval-summary p {
+  margin: 0;
+}
+
+.delete-interval-summary__task {
+  overflow-wrap: anywhere;
+  font-weight: 620;
+}
+
 .history-empty {
   padding: 0.5rem 0.25rem 0;
   color: var(--muted-foreground);

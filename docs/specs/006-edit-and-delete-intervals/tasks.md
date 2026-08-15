@@ -35,8 +35,8 @@ breakdown to match the specification.
 | TASK-006-003 | Implement transactional interval deletion | Complete | TASK-006-001 | AC-006-008–012 |
 | TASK-006-004 | Expose validated interval mutation APIs | Complete | TASK-006-002, TASK-006-003 | AC-006-010, AC-006-011, AC-006-013 |
 | TASK-006-005 | Add interval actions and edit workflow | Complete | TASK-006-004 | AC-006-001–007, AC-006-010–014 |
-| TASK-006-006 | Add confirmed deletion workflow | Pending | TASK-006-004 | AC-006-001, AC-006-008–014 |
-| TASK-006-007 | Verify interval correction and update documentation | Pending | TASK-006-005, TASK-006-006 | AC-006-001–014 |
+| TASK-006-006 | Add confirmed deletion workflow | Complete | TASK-006-004 | AC-006-001, AC-006-008–014 |
+| TASK-006-007 | Verify interval correction and update documentation | Complete | TASK-006-005, TASK-006-006 | AC-006-001–014 |
 
 ---
 
@@ -350,7 +350,7 @@ TASK-006-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -392,7 +392,16 @@ TASK-006-004.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- --run test/renderer/app/DeleteIntervalDialog.test.tsx test/renderer/app/DailyHistory.test.tsx` — passed, 2 files and 23 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- Added an accessible confirmation dialog that uses complete persisted bounds to
+  show an unambiguous cross-day range, Task context, and complete removed duration.
+- Added cancel/Escape behavior without mutation, duplicate-submission prevention,
+  pending state, safe controlled failure messages, authoritative refresh after
+  success, and focus return to the invoking Delete action.
+- Covered confirmation content, cancellation, single confirmed mutation,
+  stale-target recovery, refresh ordering, and keyboard dialog operation.
 
 ---
 
@@ -400,7 +409,7 @@ Record commands run, results, and relevant implementation notes when complete.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -443,7 +452,24 @@ project documentation aligned to the completed M4 behavior.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- Acceptance review verified AC-006-001 through AC-006-014 through focused UI,
+  service, repository, integration, preload, IPC, validation, and regression tests.
+- `npm run format:check`, `npm run typecheck`, and `npm run lint` — passed.
+- `npm test` — passed, 51 files and 394 tests.
+- `npm run package` — passed for the macOS arm64 packaged application. The first
+  sandboxed attempt could not resolve GitHub while preparing native dependencies;
+  the required network-enabled rerun passed.
+- An isolated packaged run verified creation then editing to one cross-day
+  interval, clipped cross-day display, overlap rejection against a running open
+  interval, delete cancellation, informative complete-range confirmation,
+  confirmed deletion, authoritative removal from every loaded day, and unchanged
+  running timer state. The renderer console had no warnings or errors.
+- Packaged smoke testing found and resolved a stale loaded-day reconciliation bug;
+  reconciliation now refetches the previously loaded authoritative range instead
+  of retaining days that disappeared after correction, with a renderer regression
+  test covering the deletion case.
+- No schema migration, dependency, architectural decision, or scope deviation was
+  required.
 
 ---
 

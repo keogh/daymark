@@ -41,28 +41,6 @@ const mergeHistoryPages = (
   };
 };
 
-const mergeReconciledPage = (
-  currentPage: HistoryPage,
-  refreshedPage: HistoryPage,
-): HistoryPage => {
-  const refreshedDays = new Map(
-    refreshedPage.days.map((day) => [day.dayStartedAt, day]),
-  );
-  for (const day of currentPage.days) {
-    if (!refreshedDays.has(day.dayStartedAt)) {
-      refreshedDays.set(day.dayStartedAt, day);
-    }
-  }
-
-  return {
-    days: [...refreshedDays.values()].sort(
-      (left, right) => right.dayStartedAt - left.dayStartedAt,
-    ),
-    nextBeforeDayStartedAt: currentPage.nextBeforeDayStartedAt,
-    now: refreshedPage.now,
-  };
-};
-
 export const useHistoryController = (
   refreshRevision = 0,
 ): HistoryController => {
@@ -73,6 +51,11 @@ export const useHistoryController = (
   const olderRequestPending = useRef(false);
   const nextOlderCursor = useRef<number | null>(null);
   const initialRefreshRevision = useRef(refreshRevision);
+  const loadStateRef = useRef(loadState);
+
+  useEffect(() => {
+    loadStateRef.current = loadState;
+  }, [loadState]);
 
   useEffect(() => {
     let isActive = true;
@@ -138,20 +121,50 @@ export const useHistoryController = (
   const reconcile = useCallback(async (): Promise<void> => {
     const version = ++requestVersion.current;
     try {
+      const current = loadStateRef.current;
+      if (current.status !== 'ready') return;
+
+      const targetCursor = current.page.nextBeforeDayStartedAt;
       const result = await window.timeTracker.history.getPage({});
       if (version !== requestVersion.current) {
         return;
       }
+      if (!result.ok) {
+        setLoadState((latest) =>
+          latest.status === 'ready'
+            ? { ...latest, reconciliationStatus: 'error' }
+            : latest,
+        );
+        return;
+      }
+
+      let refreshedPage = result.value;
+      while (
+        refreshedPage.nextBeforeDayStartedAt !== null &&
+        refreshedPage.nextBeforeDayStartedAt !== targetCursor
+      ) {
+        const olderResult = await window.timeTracker.history.getPage({
+          beforeDayStartedAt: refreshedPage.nextBeforeDayStartedAt,
+        });
+        if (version !== requestVersion.current) return;
+        if (!olderResult.ok) {
+          setLoadState((latest) =>
+            latest.status === 'ready'
+              ? { ...latest, reconciliationStatus: 'error' }
+              : latest,
+          );
+          return;
+        }
+        refreshedPage = mergeHistoryPages(refreshedPage, olderResult.value);
+      }
+
       setLoadState((current) => {
         if (current.status !== 'ready') {
           return current;
         }
-        if (!result.ok) {
-          return { ...current, reconciliationStatus: 'error' };
-        }
         return {
           ...current,
-          page: mergeReconciledPage(current.page, result.value),
+          page: refreshedPage,
           reconciliationStatus: 'idle',
         };
       });

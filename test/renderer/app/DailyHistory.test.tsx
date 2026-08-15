@@ -518,6 +518,35 @@ describe('DailyHistory', () => {
     expect(getPage).toHaveBeenCalledTimes(3);
   });
 
+  it('removes stale loaded days when an authoritative refresh has no remaining activity there', async () => {
+    const refreshedPage: HistoryPage = {
+      days: [emptyPage.days[0]!],
+      nextBeforeDayStartedAt: null,
+      now: snapshotNow,
+    };
+    const getPage = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        value: { ...loadedPage, nextBeforeDayStartedAt: null },
+      })
+      .mockResolvedValueOnce({ ok: true, value: refreshedPage });
+    setHistoryApi(getPage);
+    const view = render(<DailyHistory refreshRevision={0} />);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Yesterday' }),
+    ).toBeVisible();
+    view.rerender(<DailyHistory refreshRevision={1} />);
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', { name: 'Yesterday' }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByRole('heading', { name: 'Today' })).toBeVisible();
+  });
+
   it('reconciles on focus and at each local midnight', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 14, 23, 59, 59));

@@ -27,6 +27,7 @@ import {
 import { useLiveHistoryPage } from './use-live-history-page';
 import { formatLocalDateInput } from './local-date-format';
 import { EditIntervalDialog } from './EditIntervalDialog';
+import { DeleteIntervalDialog } from './DeleteIntervalDialog';
 
 export const DailyHistory = ({
   onAddTime = () => undefined,
@@ -352,7 +353,11 @@ const HistoryTaskRow = ({
   const [editInterval, setEditInterval] = useState<HistoryInterval | null>(
     null,
   );
+  const [deleteInterval, setDeleteInterval] = useState<HistoryInterval | null>(
+    null,
+  );
   const editReturnFocusRef = useRef<HTMLButtonElement | null>(null);
+  const deleteReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const intervalListId = `history-intervals-${day.dayStartedAt}-${task.task.id}`;
   const rowId = `${day.dayStartedAt}:${task.task.id}`;
   const isPending = pendingRows[rowId] === true;
@@ -413,6 +418,10 @@ const HistoryTaskRow = ({
                 editReturnFocusRef.current = trigger;
                 setEditInterval(interval);
               }}
+              onDelete={(trigger) => {
+                deleteReturnFocusRef.current = trigger;
+                setDeleteInterval(interval);
+              }}
               taskDescription={task.task.description}
             />
           ))}
@@ -432,6 +441,20 @@ const HistoryTaskRow = ({
           taskDescription={task.task.description}
         />
       )}
+      {deleteInterval !== null && (
+        <DeleteIntervalDialog
+          interval={deleteInterval}
+          onDeleted={onIntervalSaved}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDeleteInterval(null);
+              window.setTimeout(() => deleteReturnFocusRef.current?.focus(), 0);
+            }
+          }}
+          open
+          taskDescription={task.task.description}
+        />
+      )}
     </div>
   );
 };
@@ -440,11 +463,13 @@ const HistoryIntervalRow = ({
   day,
   interval,
   onEdit,
+  onDelete,
   taskDescription,
 }: {
   day: HistoryDay;
   interval: HistoryInterval;
   onEdit: (trigger: HTMLButtonElement) => void;
+  onDelete: (trigger: HTMLButtonElement) => void;
   taskDescription: string;
 }) => {
   const start = formatIntervalTime(interval.projectedStartedAt, false);
@@ -484,6 +509,7 @@ const HistoryIntervalRow = ({
           </Button>
           <Button
             aria-label={`Delete ${taskDescription}, ${start} to ${end}`}
+            onClick={(event) => onDelete(event.currentTarget)}
             size="sm"
             type="button"
             variant="ghost"

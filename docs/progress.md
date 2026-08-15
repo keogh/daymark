@@ -2,19 +2,18 @@
 
 ## Current Phase
 
-Manual Time Entry verified
+Interval Management verified
 
 ## Current Specification
 
-SPEC-005 — Manual Time Entry (Verified 2026-08-15)
+SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
 
 ## Current Status
 
-SPEC-005 is verified. Manual Time Entry now creates one closed interval through
-an accessible global or day-scoped flow, supports stable existing-task selection
-and normalized typed-task reuse/creation, rejects invalid and overlapping ranges
-without mutation, preserves current timer state, and refreshes timer/history
-projections authoritatively after save.
+SPEC-006 is verified. Daily History now supports accessible editing and confirmed
+deletion of closed intervals while preserving interval identity, Task association,
+timer state, global non-overlap, complete cross-day values, and authoritative
+projections across every loaded affected day.
 
 ---
 
@@ -26,6 +25,7 @@ projections authoritatively after save.
 - SPEC-003 — Task Search and Reuse (Verified 2026-08-15)
 - SPEC-004 — One-Click Task Switching (Verified 2026-08-15)
 - SPEC-005 — Manual Time Entry (Verified 2026-08-15)
+- SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
 
 SPEC-001 delivered:
 
@@ -134,16 +134,35 @@ authoritative refresh, value-preserving overlap feedback, clean renderer console
 and persistence of exactly one closed 30-minute interval without changing idle
 timer state.
 
+SPEC-006 delivered:
+
+- accessible Edit and Delete actions for closed Daily History intervals, with
+  running intervals explicitly non-editable;
+- transactional edit/delete operations that preserve Task and timer/AppState,
+  enforce complete local range validation and global non-overlap, and safely reject
+  missing or open targets;
+- complete-value cross-day editing and informative deletion confirmation showing
+  the Task, full range, and complete duration removed;
+- narrow runtime-validated preload/IPC contracts with safe controlled failures;
+- authoritative timer/history refresh, including removal of corrected intervals
+  from every affected day already loaded in the renderer.
+
+Final acceptance covered AC-006-001 through AC-006-014 and the project Definition
+of Done. Formatting, typecheck, lint, all 394 tests in 51 files, and macOS arm64
+packaging passed on 2026-08-15. An isolated packaged run verified cross-day edit
+and display, running-overlap rejection, cancellation, informative confirmed
+deletion, all-day projection refresh, unchanged running state, and a clean renderer
+console.
+
 ---
 
 # Upcoming Specifications
 
-1. SPEC-006 — Edit and Delete Intervals
-2. SPEC-007 — Task Management
-3. SPEC-008 — System Tray
-4. SPEC-009 — Analytics
-5. SPEC-010 — Settings
-6. SPEC-011 — Packaging and Release
+1. SPEC-007 — Task Management
+2. SPEC-008 — System Tray
+3. SPEC-009 — Analytics
+4. SPEC-010 — Settings
+5. SPEC-011 — Packaging and Release
 
 ---
 
@@ -155,10 +174,8 @@ None.
 
 # Active Work
 
-SPEC-006 — Edit and Delete Intervals is active. `TASK-006-001` through
-`TASK-006-004` are complete: correction contracts, transactional edit/delete,
-and the runtime-validated IPC/preload boundary are implemented. The next task is
-`TASK-006-005` — Add interval actions and edit workflow.
+SPEC-006 — Edit and Delete Intervals is complete and verified. The next planned
+specification is SPEC-007 — Task Management.
 
 ---
 
@@ -173,7 +190,7 @@ migration, dependency, decision, or architectural deviation was required.
 
 # Last Updated
 
-2026-08-15 — Completed `TASK-006-004`. Explicit interval update/delete preload
-and IPC APIs now runtime-validate commands before service execution and safely
-map unexpected failures. Focused boundary tests, typecheck, lint, and all 380
-tests in 48 files passed.
+2026-08-15 — Verified SPEC-006. Edit and confirmed-delete workflows now preserve
+timer state and refresh all affected loaded history days authoritatively. Full
+validation, 394 tests in 51 files, macOS arm64 packaging, and isolated packaged
+acceptance passed.

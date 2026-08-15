@@ -168,9 +168,7 @@ describe('IntervalService SQLite integration', () => {
     });
     expect(tasks.findById('task-1')).toBeDefined();
     expect(intervals.findByTask('task-1')).toEqual([]);
-    expect(
-      history.getPage({}).days.flatMap((day) => day.tasks),
-    ).toEqual([]);
+    expect(history.getPage({}).days.flatMap((day) => day.tasks)).toEqual([]);
   });
 
   it('deletes a closed current-session interval while preserving running state and refreshing timer totals', () => {

@@ -6,7 +6,7 @@ SPEC-006 — Edit and Delete Intervals
 
 ## Active Task
 
-TASK-006-005 — Add Interval Actions and Edit Workflow
+TASK-006-007 — Verify Interval Correction and Update Documentation
 
 ## Status
 
@@ -16,25 +16,22 @@ Complete
 
 # Immediate Plan
 
-1. Extend expanded history rows with accessible closed-interval Edit/Delete actions while preserving row expansion and Play/Resume behavior.
-2. Add a focused edit dialog initialized from complete persisted interval bounds, with local validation, pending/error handling, and focus management.
-3. Wire successful edits through the narrow preload API and refresh authoritative history and timer projections.
-4. Add focused renderer and formatting coverage for cross-day values, cancellation, failures, duplicate prevention, refresh, and keyboard behavior.
-5. Run focused renderer/history/timer tests, typecheck, and lint; record task evidence.
+1. Verify AC-006-001 through AC-006-014 against automated coverage and implementation evidence.
+2. Run formatting, typecheck, lint, the full test suite, packaging, and diff checks.
+3. Smoke-test packaged edit, cross-day display, overlap rejection, delete cancellation, confirmed deletion, and timer-state preservation with isolated data.
+4. Update SPEC-006 status, task evidence, and `docs/progress.md` only after every required check passes.
 
 ---
 
 # Scope Guard
 
-Do not add delete confirmation/mutation behavior, Task reassignment or management,
-open-interval correction, or unrelated renderer changes.
+Do not add SPEC-007 Task Management or later roadmap behavior.
 
 ---
 
 # Completion
 
-Completion is reached when TASK-006-005 provides accessible interval actions and a
-complete-value edit workflow, its focused behavior is covered, and required
-validation passes.
+Completion is reached when TASK-006-006 is complete and TASK-006-007 verifies all
+SPEC-006 acceptance criteria, project checks, packaged workflows, and documentation.
 
 All immediate steps and checks completed on 2026-08-15.
