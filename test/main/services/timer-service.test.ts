@@ -7,7 +7,10 @@ import { TimeIntervalRepository } from '@/main/database/repositories/time-interv
 import { TransactionRunner } from '@/main/database/transaction-runner';
 import { DurationProjector } from '@/main/services/duration-projections';
 import { TimerService } from '@/main/services/timer-service';
-import { TimerStateReader } from '@/main/services/timer-state-reader';
+import {
+  InvalidPersistedTimerStateError,
+  TimerStateReader,
+} from '@/main/services/timer-state-reader';
 
 import {
   createDisposableDatabase,
@@ -257,6 +260,367 @@ describe('TimerService', () => {
     expect(countRows(context, 'tasks')).toBe(0);
     expect(countRows(context, 'time_intervals')).toBe(0);
     expect(appState.get().timerStatus).toBe('idle');
+  });
+
+  it('switches from idle to an existing task by ID without creating a duplicate', () => {
+    const now = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+    tasks.insert({
+      id: 'existing-task',
+      description: 'Existing Task',
+      normalizedDescription: 'existing task',
+      createdAt: now - minutes(60),
+      updatedAt: now - minutes(60),
+    });
+
+    const result = service.switchToTask({ taskId: 'existing-task' });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'existing-task',
+          description: 'Existing Task',
+        },
+        sessionStartedAt: now,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 0,
+        taskLifetimeDurationMs: 0,
+        activeIntervalStartedAt: now,
+        now,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(countRows(context, 'tasks')).toBe(1);
+    expect(intervals.findOpen()).toEqual({
+      id: 'generated-1',
+      taskId: 'existing-task',
+      startedAt: now,
+      endedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'existing-task',
+      sessionStartedAt: now,
+      updatedAt: now,
+    });
+  });
+
+  it('returns TASK_NOT_FOUND for switch input when the selected task is missing', () => {
+    const changesBefore = totalChanges(context);
+
+    expect(service.switchToTask({ taskId: 'missing-task' })).toEqual({
+      ok: false,
+      error: {
+        code: 'TASK_NOT_FOUND',
+        message: 'The selected task no longer exists.',
+      },
+    });
+    expect(totalChanges(context)).toBe(changesBefore);
+    expect(countRows(context, 'time_intervals')).toBe(0);
+    expect(appState.get().timerStatus).toBe('idle');
+  });
+
+  it('switches from a running task to a different task atomically at one time', () => {
+    const startedAt = clock.now();
+    seedTask(context, 'target-task', 'Target Task', startedAt - minutes(30));
+    expect(
+      service.start({ source: 'description', description: 'Active Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(25));
+    const switchedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.switchToTask({ taskId: 'target-task' });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'target-task',
+          description: 'Target Task',
+        },
+        sessionStartedAt: startedAt,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 0,
+        taskLifetimeDurationMs: 0,
+        activeIntervalStartedAt: switchedAt,
+        now: switchedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findByTask('generated-1')).toEqual([
+      expect.objectContaining({
+        id: 'generated-2',
+        startedAt,
+        endedAt: switchedAt,
+        updatedAt: switchedAt,
+      }),
+    ]);
+    expect(intervals.findOpen()).toEqual({
+      id: 'generated-3',
+      taskId: 'target-task',
+      startedAt: switchedAt,
+      endedAt: null,
+      createdAt: switchedAt,
+      updatedAt: switchedAt,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'target-task',
+      sessionStartedAt: startedAt,
+      updatedAt: switchedAt,
+    });
+  });
+
+  it('treats switching to the same running task as a successful no-op', () => {
+    const startedAt = clock.now();
+    expect(
+      service.start({ source: 'description', description: 'Same Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(15));
+    const now = clock.now();
+    const changesBefore = totalChanges(context);
+
+    const result = service.switchToTask({ taskId: 'generated-1' });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'generated-1',
+          description: 'Same Task',
+        },
+        sessionStartedAt: startedAt,
+        sessionDurationMs: minutes(15),
+        taskTodayDurationMs: minutes(15),
+        taskLifetimeDurationMs: minutes(15),
+        activeIntervalStartedAt: startedAt,
+        now,
+      },
+    });
+    expect(totalChanges(context)).toBe(changesBefore);
+    expect(intervals.findByTask('generated-1')).toEqual([
+      expect.objectContaining({
+        id: 'generated-2',
+        startedAt,
+        endedAt: null,
+      }),
+    ]);
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+      updatedAt: startedAt,
+    });
+  });
+
+  it('switches from a paused task to a different task with a new session start', () => {
+    const startedAt = clock.now();
+    seedTask(context, 'target-task', 'Target Task', startedAt - minutes(30));
+    expect(
+      service.start({ source: 'description', description: 'Paused Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(20));
+    expect(service.pause().ok).toBe(true);
+    clock.advance(minutes(10));
+    const switchedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.switchToTask({ taskId: 'target-task' });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'target-task',
+          description: 'Target Task',
+        },
+        sessionStartedAt: switchedAt,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 0,
+        taskLifetimeDurationMs: 0,
+        activeIntervalStartedAt: switchedAt,
+        now: switchedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findByTask('generated-1')).toEqual([
+      expect.objectContaining({
+        id: 'generated-2',
+        startedAt,
+        endedAt: startedAt + minutes(20),
+      }),
+    ]);
+    expect(intervals.findOpen()).toEqual({
+      id: 'generated-3',
+      taskId: 'target-task',
+      startedAt: switchedAt,
+      endedAt: null,
+      createdAt: switchedAt,
+      updatedAt: switchedAt,
+    });
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'target-task',
+      sessionStartedAt: switchedAt,
+      updatedAt: switchedAt,
+    });
+  });
+
+  it('resumes the same paused task without resetting sessionStartedAt', () => {
+    const startedAt = clock.now();
+    expect(
+      service.start({ source: 'description', description: 'Paused Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(20));
+    expect(service.pause().ok).toBe(true);
+    clock.advance(minutes(10));
+    const resumedAt = clock.now();
+    const nowSpy = vi.spyOn(clock, 'now');
+
+    const result = service.switchToTask({ taskId: 'generated-1' });
+
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: {
+          id: 'generated-1',
+          description: 'Paused Task',
+        },
+        sessionStartedAt: startedAt,
+        sessionDurationMs: minutes(20),
+        taskTodayDurationMs: minutes(20),
+        taskLifetimeDurationMs: minutes(20),
+        activeIntervalStartedAt: resumedAt,
+        now: resumedAt,
+      },
+    });
+    expect(nowSpy).toHaveBeenCalledTimes(1);
+    expect(intervals.findByTask('generated-1')).toEqual([
+      expect.objectContaining({
+        id: 'generated-2',
+        startedAt,
+        endedAt: startedAt + minutes(20),
+      }),
+      expect.objectContaining({
+        id: 'generated-3',
+        startedAt: resumedAt,
+        endedAt: null,
+      }),
+    ]);
+    expect(appState.get()).toEqual({
+      id: 1,
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+      updatedAt: resumedAt,
+    });
+  });
+
+  it.each([undefined, null, {}, { taskId: '' }, { taskId: 'x', extra: true }])(
+    'rejects malformed switch input without persistence: %j',
+    (input) => {
+      const changesBefore = totalChanges(context);
+
+      expect(service.switchToTask(input)).toMatchObject({
+        ok: false,
+        error: { code: 'INVALID_SWITCH_TASK' },
+      });
+      expect(totalChanges(context)).toBe(changesBefore);
+    },
+  );
+
+  it('maps invalid persisted timer state during switch to INTERNAL_ERROR', () => {
+    seedTask(context, 'target-task', 'Target Task', clock.now() - minutes(30));
+    seedActiveState(context, 'running', clock.now());
+    context.sqlite
+      .prepare("delete from time_intervals where id = 'active-interval'")
+      .run();
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    const changesBefore = totalChanges(context);
+
+    expect(service.switchToTask({ taskId: 'target-task' })).toEqual({
+      ok: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An unexpected error occurred.',
+      },
+    });
+    expect(totalChanges(context)).toBe(changesBefore);
+    expect(consoleError).toHaveBeenCalledWith(
+      'Invalid persisted timer state during task switch.',
+      expect.any(InvalidPersistedTimerStateError),
+    );
+  });
+
+  it('rolls back a running-task switch when the new interval cannot be persisted', () => {
+    const startedAt = clock.now();
+    seedTask(context, 'target-task', 'Target Task', startedAt - minutes(30));
+    expect(
+      service.start({ source: 'description', description: 'Running Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(10));
+    context.sqlite
+      .prepare(
+        "create trigger reject_switch_insert before insert on time_intervals when new.task_id = 'target-task' begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+
+    expect(() => service.switchToTask({ taskId: 'target-task' })).toThrow(
+      'rejected',
+    );
+    expect(intervals.findOpen()).toMatchObject({
+      id: 'generated-2',
+      taskId: 'generated-1',
+      startedAt,
+      endedAt: null,
+    });
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+    });
+  });
+
+  it('rolls back a paused-task switch when AppState cannot be updated', () => {
+    const startedAt = clock.now();
+    seedTask(context, 'target-task', 'Target Task', startedAt - minutes(30));
+    expect(
+      service.start({ source: 'description', description: 'Paused Task' }).ok,
+    ).toBe(true);
+    clock.advance(minutes(10));
+    expect(service.pause().ok).toBe(true);
+    const intervalBeforeSwitch = intervals.findById('generated-2');
+    context.sqlite
+      .prepare(
+        "create trigger reject_paused_switch before update on app_state when old.timer_status = 'paused' and new.current_task_id = 'target-task' begin select raise(abort, 'rejected'); end",
+      )
+      .run();
+
+    expect(() => service.switchToTask({ taskId: 'target-task' })).toThrow(
+      'rejected',
+    );
+    expect(intervals.findById('generated-2')).toEqual(intervalBeforeSwitch);
+    expect(intervals.findOpen()).toBeUndefined();
+    expect(appState.get()).toMatchObject({
+      timerStatus: 'paused',
+      currentTaskId: 'generated-1',
+      sessionStartedAt: startedAt,
+    });
   });
 
   it('pauses a running timer atomically and returns its authoritative duration', () => {
@@ -628,4 +992,17 @@ const seedActiveState = (
       'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ?',
     )
     .run(status, 'active-task', startedAt, startedAt);
+};
+
+const seedTask = (
+  context: DatabaseContext,
+  id: string,
+  description: string,
+  createdAt: number,
+): void => {
+  context.sqlite
+    .prepare(
+      'insert into tasks (id, description, normalized_description, created_at, updated_at) values (?, ?, ?, ?, ?)',
+    )
+    .run(id, description, description.toLowerCase(), createdAt, createdAt);
 };

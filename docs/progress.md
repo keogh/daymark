@@ -10,11 +10,11 @@ SPEC-004 — One-Click Task Switching (Ready for Implementation)
 
 ## Current Status
 
-SPEC-004 is now defined and ready for implementation. The next work extends Daily
-History with one-click Play actions that can start a task from idle, switch from a
-running or paused task by stable ID, treat running same-task activation as a
-no-op, resume paused same-task activation, and refresh authoritative history after
-successful or stale-target outcomes.
+SPEC-004 implementation is in progress. The service layer now supports atomic
+history-task switching by stable task ID across idle, running, and paused timer
+states, including same-task no-op/resume behavior and controlled stale-target
+failures. The next work is exposing that validated boundary through preload and
+IPC, then wiring the Daily History Play controls and refresh behavior.
 
 ---
 
@@ -111,10 +111,10 @@ None.
 
 # Active Work
 
-SPEC-004 is ready for implementation with a companion task breakdown. It is scoped
-to history-row Play and atomic one-click switching semantics across idle, running,
-and paused timer states without adding tray switching, interval actions, or task
-management behavior.
+SPEC-004 is active. TASK-004-002 is complete and TASK-004-003 is next. Current
+scope remains history-row Play and atomic one-click switching semantics across
+idle, running, and paused timer states without adding tray switching, interval
+actions, or task management behavior.
 
 ---
 
@@ -130,7 +130,8 @@ architectural deviation is required by the specification as written.
 
 # Last Updated
 
-2026-08-15 — Designed SPEC-004 — One-Click Task Switching and added its companion
-task breakdown. The next implementation slice is ready, covering history-row Play,
-idle start by stable ID, running/paused switching semantics, same-task handling,
-validated process-boundary input, and authoritative history refresh behavior.
+2026-08-15 — Completed TASK-004-002 for SPEC-004 by adding atomic
+`TimerService.switchToTask(...)` branches for idle start, running switch,
+paused switch, running same-task no-op, paused same-task resume, and controlled
+stale-target failures. Focused timer service/integration tests, typecheck, and
+lint passed. The next slice is TASK-004-003 for preload and IPC exposure.

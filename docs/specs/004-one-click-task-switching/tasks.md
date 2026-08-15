@@ -31,7 +31,7 @@ to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-004-001 | Define switch command contracts and validation | Pending | None | AC-004-007 |
-| TASK-004-002 | Implement atomic timer switch branches | Pending | TASK-004-001 | AC-004-001–006 |
+| TASK-004-002 | Implement atomic timer switch branches | Complete | TASK-004-001 | AC-004-001–006 |
 | TASK-004-003 | Expose the validated switch boundary | Pending | TASK-004-002 | AC-004-001–007 |
 | TASK-004-004 | Add accessible history-row Play controls | Pending | TASK-004-003 | AC-004-001, AC-004-004–010 |
 | TASK-004-005 | Verify One-Click Task Switching and update documentation | Pending | TASK-004-004 | AC-004-001–010 |
@@ -98,7 +98,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -143,7 +143,20 @@ TASK-004-001.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when complete.
+- Added `TimerService.switchToTask(...)` with validated stable-task-ID handling
+  for idle start, running different-task switch, paused different-task switch,
+  running same-task no-op, paused same-task resume, and controlled
+  `TASK_NOT_FOUND` outcomes.
+- Added focused service tests for branch behavior, rollback on transactional
+  failures, malformed input rejection, and invalid persisted-state mapping to
+  `INTERNAL_ERROR`.
+- Added disposable SQLite integration coverage proving persisted interval and
+  `sessionStartedAt` behavior for running switch, paused switch, same-task no-op,
+  same-task resume, and stale-task failures.
+- Verification completed on 2026-08-15:
+  - `npm test -- timer-service` — passed
+  - `npm run typecheck` — passed
+  - `npm run lint` — passed
 
 ---
 

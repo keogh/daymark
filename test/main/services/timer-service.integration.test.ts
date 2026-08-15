@@ -281,6 +281,192 @@ describe('TimerService SQLite integration', () => {
     expect(application.intervals.findOpen()?.taskId).toBe('reusable-task');
   });
 
+  it('atomically switches from a running task to a different history task', () => {
+    const startedAt = clock.now();
+    application.tasks.insert({
+      id: 'task-b',
+      description: 'Task B',
+      normalizedDescription: 'task b',
+      createdAt: startedAt - minutes(60),
+      updatedAt: startedAt - minutes(60),
+    });
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
+    );
+    clock.advance(minutes(20));
+    const switchedAt = clock.now();
+
+    const switched = valueOf(application.service.switchToTask({ taskId: 'task-b' }));
+
+    expect(switched).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'task-b', description: 'Task B' },
+      sessionStartedAt: startedAt,
+      activeIntervalStartedAt: switchedAt,
+      sessionDurationMs: 0,
+    });
+    expect(application.intervals.findByTask('integration-1')).toEqual([
+      expect.objectContaining({
+        startedAt,
+        endedAt: switchedAt,
+      }),
+    ]);
+    expect(application.intervals.findByTask('task-b')).toEqual([
+      expect.objectContaining({
+        startedAt: switchedAt,
+        endedAt: null,
+      }),
+    ]);
+    expect(application.appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'task-b',
+      sessionStartedAt: startedAt,
+      updatedAt: switchedAt,
+    });
+  });
+
+  it('switches from a paused task to a different history task with a new session', () => {
+    const startedAt = clock.now();
+    application.tasks.insert({
+      id: 'task-b',
+      description: 'Task B',
+      normalizedDescription: 'task b',
+      createdAt: startedAt - minutes(60),
+      updatedAt: startedAt - minutes(60),
+    });
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
+    );
+    clock.advance(minutes(20));
+    valueOf(application.service.pause());
+    clock.advance(minutes(10));
+    const switchedAt = clock.now();
+
+    const switched = valueOf(application.service.switchToTask({ taskId: 'task-b' }));
+
+    expect(switched).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'task-b', description: 'Task B' },
+      sessionStartedAt: switchedAt,
+      activeIntervalStartedAt: switchedAt,
+      sessionDurationMs: 0,
+    });
+    expect(application.intervals.findByTask('integration-1')).toEqual([
+      expect.objectContaining({
+        startedAt,
+        endedAt: startedAt + minutes(20),
+      }),
+    ]);
+    expect(application.intervals.findByTask('task-b')).toEqual([
+      expect.objectContaining({
+        startedAt: switchedAt,
+        endedAt: null,
+      }),
+    ]);
+    expect(application.appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'task-b',
+      sessionStartedAt: switchedAt,
+      updatedAt: switchedAt,
+    });
+  });
+
+  it('treats same-task running history play as a persistence no-op', () => {
+    const startedAt = clock.now();
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
+    );
+    clock.advance(minutes(20));
+    const changesBefore = totalChanges(application.context);
+
+    const switched = valueOf(
+      application.service.switchToTask({ taskId: 'integration-1' }),
+    );
+
+    expect(switched).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'integration-1', description: 'Task A' },
+      sessionStartedAt: startedAt,
+      activeIntervalStartedAt: startedAt,
+      sessionDurationMs: minutes(20),
+    });
+    expect(totalChanges(application.context)).toBe(changesBefore);
+    expect(application.intervals.findByTask('integration-1')).toHaveLength(1);
+    expect(application.intervals.findOpen()?.taskId).toBe('integration-1');
+  });
+
+  it('resumes the same paused task from history without resetting its session', () => {
+    const startedAt = clock.now();
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
+    );
+    clock.advance(minutes(20));
+    valueOf(application.service.pause());
+    clock.advance(minutes(10));
+    const resumedAt = clock.now();
+
+    const resumed = valueOf(
+      application.service.switchToTask({ taskId: 'integration-1' }),
+    );
+
+    expect(resumed).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'integration-1', description: 'Task A' },
+      sessionStartedAt: startedAt,
+      activeIntervalStartedAt: resumedAt,
+      sessionDurationMs: minutes(20),
+    });
+    expect(application.intervals.findByTask('integration-1')).toEqual([
+      expect.objectContaining({
+        startedAt,
+        endedAt: startedAt + minutes(20),
+      }),
+      expect.objectContaining({
+        startedAt: resumedAt,
+        endedAt: null,
+      }),
+    ]);
+  });
+
+  it('returns TASK_NOT_FOUND for a stale history task without changing the active timer', () => {
+    const startedAt = clock.now();
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
+    );
+    clock.advance(minutes(20));
+    const changesBefore = totalChanges(application.context);
+
+    expect(application.service.switchToTask({ taskId: 'missing-task' })).toEqual({
+      ok: false,
+      error: {
+        code: 'TASK_NOT_FOUND',
+        message: 'The selected task no longer exists.',
+      },
+    });
+    expect(totalChanges(application.context)).toBe(changesBefore);
+    expect(application.appState.get()).toMatchObject({
+      timerStatus: 'running',
+      currentTaskId: 'integration-1',
+      sessionStartedAt: startedAt,
+    });
+    expect(application.intervals.findOpen()?.taskId).toBe('integration-1');
+  });
+
   it('independently prevents a second open interval in SQLite', () => {
     const state = valueOf(
       application.service.start({
@@ -380,6 +566,17 @@ const countRows = (context: DatabaseContext, table: string): number => {
     .get();
   if (typeof value !== 'number') {
     throw new Error('Expected a numeric row count.');
+  }
+  return value;
+};
+
+const totalChanges = (context: DatabaseContext): number => {
+  const value: unknown = context.sqlite
+    .prepare('select total_changes()')
+    .pluck()
+    .get();
+  if (typeof value !== 'number') {
+    throw new Error('Expected SQLite total_changes() to return a number.');
   }
   return value;
 };
