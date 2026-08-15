@@ -31,7 +31,7 @@ to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-002-001 | Establish the renderer styling foundation | Complete | None | AC-002-017–018 |
-| TASK-002-002 | Define history contracts and projection primitives | Pending | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
+| TASK-002-002 | Define history contracts and projection primitives | Complete | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
 | TASK-002-003 | Implement bounded history queries and service paging | Pending | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
 | TASK-002-004 | Expose the validated history IPC boundary | Pending | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
 | TASK-002-005 | Render the initial Daily History states | Pending | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
@@ -119,7 +119,7 @@ runtime network dependency.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -162,7 +162,22 @@ TASK-002-001.
 
 ### Completion Evidence
 
-Pending.
+Defined the shared HistoryPageInput, HistoryPage, HistoryDay, HistoryTask, and
+HistoryInterval contracts, the explicit history channel, and the fixed
+30-activity-day page limit. Runtime validation accepts only the empty initial shape
+or a finite safe-integer cursor at local midnight no later than Today, rejects
+unknown properties, and returns INVALID_HISTORY_RANGE without requiring a query.
+
+Pure main-process projection primitives now derive DST-aware local calendar-day
+boundaries, clip closed and open intervals with half-open overlap semantics, retain
+cross-midnight interval IDs, calculate daily and lifetime totals from timestamps,
+apply deterministic task/interval ordering, and select initial or exclusive-cursor
+pages while including empty Today without consuming an activity slot.
+
+Focused history contract, validation, and projection tests passed (20 tests),
+including exact-midnight exclusion and America/New_York 23-hour and 25-hour DST
+days. The complete suite passed (149 tests), as did typecheck, lint, and formatting
+verification.
 
 ---
 
