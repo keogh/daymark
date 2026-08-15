@@ -36,7 +36,7 @@ to match the specification.
 | TASK-002-004 | Expose the validated history IPC boundary | Complete | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
 | TASK-002-005 | Render the initial Daily History states | Complete | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
 | TASK-002-006 | Add older-page loading and resilient retry | Complete | TASK-002-005 | AC-002-008–009, AC-002-014 |
-| TASK-002-007 | Synchronize live history with timer state | Pending | TASK-002-005 | AC-002-010–012 |
+| TASK-002-007 | Synchronize live history with timer state | Complete | TASK-002-005 | AC-002-010–012 |
 | TASK-002-008 | Verify Daily History and update documentation | Pending | TASK-002-006–007 | AC-002-001–018 |
 
 ---
@@ -451,7 +451,7 @@ whitespace check.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -494,7 +494,23 @@ TASK-002-005.
 
 ### Completion Evidence
 
-Pending.
+Daily History now advances the open interval's current-day, task-daily,
+task-lifetime, and expanded-interval values from the authoritative history snapshot
+using one renderer-only display tick. Closed and paused history remains fixed, and
+the local projection caps at the current day boundary without per-second IPC or
+database writes.
+
+Successful Start, Pause, Resume, and Stop commands and the existing 60-second timer
+reconciliation publish an authoritative revision that refreshes history. Window
+focus and recurring local-midnight boundaries also request a fresh initial page.
+Successful reconciliation replaces current authoritative days while retaining
+already paginated older days and their expansion state. Failed reconciliation keeps
+the last valid page visible and exposes a non-destructive Retry refresh action.
+
+Focused live-history and timer renderer tests passed (29 tests), including local
+advancement, fixed closed values, transition revisions, focus, recurring midnight,
+and retained-data retry behavior. The complete suite passed (179 tests), as did
+typecheck, lint, formatting verification, and the diff whitespace check.
 
 ---
 

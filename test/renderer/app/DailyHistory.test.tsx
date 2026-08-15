@@ -1,4 +1,5 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -126,10 +127,40 @@ const olderPage: HistoryPage = {
   now: snapshotNow,
 };
 
+const runningPage: HistoryPage = {
+  days: [
+    {
+      dayStartedAt: today,
+      dayEndedAt: tomorrow,
+      totalDurationMs: 60_000,
+      tasks: [
+        {
+          task: { id: 'task-live', description: 'Live task' },
+          dayDurationMs: 60_000,
+          lifetimeDurationMs: 3_660_000,
+          mostRecentActivityAt: snapshotNow,
+          intervals: [
+            {
+              id: 'interval-live',
+              projectedStartedAt: snapshotNow - 60_000,
+              projectedEndedAt: snapshotNow,
+              durationMs: 60_000,
+              isRunning: true,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  nextBeforeDayStartedAt: null,
+  now: snapshotNow,
+};
+
 describe('DailyHistory', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('shows an accessible initial loading state and requests the initial page', () => {
@@ -193,6 +224,96 @@ describe('DailyHistory', () => {
     );
 
     expect(screen.getByRole('listitem')).toHaveAccessibleName(/<1m/);
+  });
+
+  it('advances only running history values locally without additional IPC', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(snapshotNow);
+    const getPage = setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: runningPage }),
+    );
+    render(<DailyHistory />);
+    await act(async () => Promise.resolve());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Live task' }));
+    expect(screen.getByText('1m today · 1h 1m total')).toBeVisible();
+    expect(screen.getByRole('listitem')).toHaveAccessibleName(/1m/);
+
+    await act(() => vi.advanceTimersByTime(60_000));
+
+    expect(screen.getByText('2m today · 1h 2m total')).toBeVisible();
+    expect(screen.getByRole('listitem')).toHaveAccessibleName(/2m/);
+    expect(getPage).toHaveBeenCalledOnce();
+  });
+
+  it('keeps closed history fixed as renderer time advances', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(snapshotNow);
+    const getPage = setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
+    );
+    render(<DailyHistory />);
+    await act(async () => Promise.resolve());
+
+    await act(() => vi.advanceTimersByTime(120_000));
+
+    expect(screen.getByText('1h 30m today · 8h 30m total')).toBeVisible();
+    expect(getPage).toHaveBeenCalledOnce();
+  });
+
+  it('reconciles on a timer revision and retains data with retry after failure', async () => {
+    const refreshedPage = {
+      ...loadedPage,
+      days: [
+        {
+          ...loadedPage.days[0]!,
+          totalDurationMs: 7_200_000,
+        },
+      ],
+    };
+    const getPage = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: loadedPage })
+      .mockResolvedValueOnce({
+        ok: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Hidden' },
+      })
+      .mockResolvedValueOnce({ ok: true, value: refreshedPage });
+    setHistoryApi(getPage);
+    const view = render(<DailyHistory refreshRevision={0} />);
+    expect(await screen.findByText('1h 30m')).toBeVisible();
+
+    view.rerender(<DailyHistory refreshRevision={1} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'History could not be refreshed. Showing the last update.',
+    );
+    expect(screen.getByText('1h 30m')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry refresh' }));
+
+    expect(await screen.findByText('2h')).toBeVisible();
+    expect(getPage).toHaveBeenCalledTimes(3);
+  });
+
+  it('reconciles on focus and at each local midnight', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 14, 23, 59, 59));
+    const getPage = setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: emptyPage }),
+    );
+    render(<DailyHistory />);
+    await act(async () => Promise.resolve());
+
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    await act(async () => Promise.resolve());
+    expect(getPage).toHaveBeenCalledTimes(2);
+
+    await act(async () => vi.advanceTimersByTimeAsync(1_000));
+    expect(getPage).toHaveBeenCalledTimes(3);
+    await act(async () => vi.advanceTimersByTimeAsync(86_400_000));
+    expect(getPage).toHaveBeenCalledTimes(4);
   });
 
   it.each([

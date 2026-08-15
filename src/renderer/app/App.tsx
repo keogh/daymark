@@ -42,7 +42,7 @@ export const App = () => {
             />
           )}
       </section>
-      <DailyHistory />
+      <DailyHistory refreshRevision={controller.authoritativeRevision} />
     </main>
   );
 };

@@ -20,6 +20,7 @@ export interface TimerController {
   readonly resume: () => Promise<void>;
   readonly stop: () => Promise<void>;
   readonly clearCommandError: () => void;
+  readonly authoritativeRevision: number;
 }
 
 const AUTHORITATIVE_SYNC_MS = 60_000;
@@ -35,6 +36,7 @@ export const useTimerController = (): TimerController => {
   });
   const [activeCommand, setActiveCommand] = useState<TimerCommand | null>(null);
   const [commandError, setCommandError] = useState<AppError | null>(null);
+  const [authoritativeRevision, setAuthoritativeRevision] = useState(0);
   const requestVersion = useRef(0);
 
   useEffect(() => {
@@ -81,6 +83,7 @@ export const useTimerController = (): TimerController => {
         }
         if (result.ok) {
           setLoadState({ status: 'ready', timer: result.value });
+          setAuthoritativeRevision((revision) => revision + 1);
         } else {
           setCommandError(result.error);
         }
@@ -140,6 +143,7 @@ export const useTimerController = (): TimerController => {
         .then((result) => {
           if (result.ok && version === requestVersion.current) {
             setLoadState({ status: 'ready', timer: result.value });
+            setAuthoritativeRevision((revision) => revision + 1);
           }
         })
         .catch(() => undefined);
@@ -159,5 +163,6 @@ export const useTimerController = (): TimerController => {
     resume,
     stop,
     clearCommandError,
+    authoritativeRevision,
   };
 };

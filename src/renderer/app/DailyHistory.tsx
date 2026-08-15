@@ -22,9 +22,14 @@ import {
   useHistoryController,
   type HistoryController,
 } from './use-history-controller';
+import { useLiveHistoryPage } from './use-live-history-page';
 
-export const DailyHistory = () => {
-  const controller = useHistoryController();
+export const DailyHistory = ({
+  refreshRevision = 0,
+}: {
+  readonly refreshRevision?: number;
+}) => {
+  const controller = useHistoryController(refreshRevision);
 
   return (
     <section aria-labelledby="history-heading" className="daily-history">
@@ -68,7 +73,7 @@ const HistoryDays = ({
   controller: HistoryController;
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
 }) => {
-  const { page } = state;
+  const page = useLiveHistoryPage(state.page);
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
 
   return (
@@ -81,6 +86,21 @@ const HistoryDays = ({
           <p>No tracked time yet.</p>
           <p>Start your first task above.</p>
         </div>
+      )}
+      {state.reconciliationStatus === 'error' && (
+        <Alert className="history-pagination__error">
+          <AlertDescription>
+            History could not be refreshed. Showing the last update.
+          </AlertDescription>
+          <Button
+            onClick={() => void controller.reconcile()}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            Retry refresh
+          </Button>
+        </Alert>
       )}
       <HistoryPagination controller={controller} state={state} />
     </div>

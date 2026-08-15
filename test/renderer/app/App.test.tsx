@@ -97,6 +97,8 @@ describe('App', () => {
     expect(
       await screen.findByRole('region', { name: 'running timer' }),
     ).toHaveTextContent('Implement authentication');
+    await act(async () => Promise.resolve());
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
   });
 
   it('starts with Enter from the task input', async () => {
@@ -258,6 +260,8 @@ describe('App', () => {
     ).toHaveFocus();
     expect(api.timer.pause).toHaveBeenCalledOnce();
     expect(api.timer.stop).toHaveBeenCalledOnce();
+    await act(async () => Promise.resolve());
+    expect(api.history.getPage).toHaveBeenCalledTimes(4);
   });
 
   it('shows a safe command error and re-enables active controls', async () => {

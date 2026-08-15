@@ -9,12 +9,14 @@ export type HistoryLoadState =
       readonly status: 'ready';
       readonly page: HistoryPage;
       readonly olderPageStatus: 'idle' | 'loading' | 'error';
+      readonly reconciliationStatus: 'idle' | 'error';
     };
 
 export interface HistoryController {
   readonly loadState: HistoryLoadState;
   readonly loadOlder: () => Promise<void>;
   readonly retry: () => Promise<void>;
+  readonly reconcile: () => Promise<void>;
 }
 
 const mergeHistoryPages = (
@@ -39,13 +41,38 @@ const mergeHistoryPages = (
   };
 };
 
-export const useHistoryController = (): HistoryController => {
+const mergeReconciledPage = (
+  currentPage: HistoryPage,
+  refreshedPage: HistoryPage,
+): HistoryPage => {
+  const refreshedDays = new Map(
+    refreshedPage.days.map((day) => [day.dayStartedAt, day]),
+  );
+  for (const day of currentPage.days) {
+    if (!refreshedDays.has(day.dayStartedAt)) {
+      refreshedDays.set(day.dayStartedAt, day);
+    }
+  }
+
+  return {
+    days: [...refreshedDays.values()].sort(
+      (left, right) => right.dayStartedAt - left.dayStartedAt,
+    ),
+    nextBeforeDayStartedAt: currentPage.nextBeforeDayStartedAt,
+    now: refreshedPage.now,
+  };
+};
+
+export const useHistoryController = (
+  refreshRevision = 0,
+): HistoryController => {
   const [loadState, setLoadState] = useState<HistoryLoadState>({
     status: 'loading',
   });
   const requestVersion = useRef(0);
   const olderRequestPending = useRef(false);
   const nextOlderCursor = useRef<number | null>(null);
+  const initialRefreshRevision = useRef(refreshRevision);
 
   useEffect(() => {
     let isActive = true;
@@ -63,6 +90,7 @@ export const useHistoryController = (): HistoryController => {
                   status: 'ready',
                   page: result.value,
                   olderPageStatus: 'idle',
+                  reconciliationStatus: 'idle',
                 }
               : { status: 'error' },
           );
@@ -95,6 +123,7 @@ export const useHistoryController = (): HistoryController => {
                 status: 'ready',
                 page: result.value,
                 olderPageStatus: 'idle',
+                reconciliationStatus: 'idle',
               }
             : { status: 'error' },
         );
@@ -105,6 +134,73 @@ export const useHistoryController = (): HistoryController => {
       }
     }
   }, []);
+
+  const reconcile = useCallback(async (): Promise<void> => {
+    const version = ++requestVersion.current;
+    try {
+      const result = await window.timeTracker.history.getPage({});
+      if (version !== requestVersion.current) {
+        return;
+      }
+      setLoadState((current) => {
+        if (current.status !== 'ready') {
+          return current;
+        }
+        if (!result.ok) {
+          return { ...current, reconciliationStatus: 'error' };
+        }
+        return {
+          ...current,
+          page: mergeReconciledPage(current.page, result.value),
+          reconciliationStatus: 'idle',
+        };
+      });
+    } catch {
+      if (version === requestVersion.current) {
+        setLoadState((current) =>
+          current.status === 'ready'
+            ? { ...current, reconciliationStatus: 'error' }
+            : current,
+        );
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (refreshRevision === initialRefreshRevision.current) {
+      return;
+    }
+    initialRefreshRevision.current = refreshRevision;
+    void reconcile();
+  }, [reconcile, refreshRevision]);
+
+  useEffect(() => {
+    const handleFocus = () => void reconcile();
+    window.addEventListener('focus', handleFocus);
+
+    let midnightTimeout: number;
+    const scheduleMidnightRefresh = () => {
+      const now = new Date();
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      ).getTime();
+      midnightTimeout = window.setTimeout(
+        () => {
+          void reconcile();
+          scheduleMidnightRefresh();
+        },
+        Math.max(0, nextMidnight - now.getTime()),
+      );
+    };
+    scheduleMidnightRefresh();
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.clearTimeout(midnightTimeout);
+    };
+  }, [reconcile]);
 
   const loadOlder = useCallback(async (): Promise<void> => {
     if (olderRequestPending.current) {
@@ -143,6 +239,7 @@ export const useHistoryController = (): HistoryController => {
           status: 'ready',
           page: mergeHistoryPages(current.page, result.value),
           olderPageStatus: 'idle',
+          reconciliationStatus: current.reconciliationStatus,
         };
       });
     } catch {
@@ -155,5 +252,5 @@ export const useHistoryController = (): HistoryController => {
     }
   }, []);
 
-  return { loadOlder, loadState, retry };
+  return { loadOlder, loadState, reconcile, retry };
 };

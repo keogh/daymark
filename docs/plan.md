@@ -6,7 +6,7 @@ SPEC-002 — Daily History
 
 ## Active Task
 
-TASK-002-006 — Add Older-Page Loading and Resilient Retry
+TASK-002-007 — Synchronize Live History with Timer State
 
 ## Status
 
@@ -26,30 +26,30 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Extend the history controller to load one older cursor at a time, append unique
-   days, retain existing data on failure, and retry the failed cursor.
-2. Render cursor-aware Load older, pending, compact pagination-error/Retry, and
-   exhausted states while preserving focus and expanded rows.
-3. Add focused controller-facing renderer tests for merging, duplicate-request
-   prevention, expansion/focus preservation, retry, and exhaustion.
-4. Run focused renderer tests, typecheck, lint, and formatting verification; record
-   task evidence when all checks pass.
+1. Derive running history values locally from the authoritative page snapshot while
+   keeping paused and closed values fixed.
+2. Reconcile the initial history page after successful timer commands, the existing
+   periodic timer snapshot, window focus, and local midnight without discarding
+   loaded history on failure.
+3. Render a non-destructive reconciliation error with Retry and add deterministic
+   tests for live advancement, stability, refresh triggers, midnight, and failure.
+4. Run focused renderer tests, typecheck, lint, formatting verification, and the
+   complete test suite; record task evidence when all checks pass.
 
 ---
 
 # Scope Guard
 
-Do not add automatic infinite scrolling, arbitrary range selection, live
-open-interval animation/synchronization, history mutation commands, or
-Play/task-switching behavior in this task.
+Do not add per-second IPC or database writes, change persisted timer semantics,
+add history mutation commands, or introduce later-spec task actions.
 
 ---
 
 # Completion
 
-TASK-002-006 is complete. Daily History now appends cursor-selected older pages
-without duplicate requests or day sections, preserves loaded content and expanded
-rows, keeps or deliberately transfers keyboard focus, retries failed older pages
-without clearing data, and removes Load older when pagination is exhausted.
-Focused renderer tests (38), the complete suite (175), typecheck, lint, formatting
-verification, and the diff whitespace check passed.
+TASK-002-007 is complete. Daily History derives open-interval values locally,
+reconciles after successful timer commands and periodic timer snapshots, refreshes
+on focus and recurring local midnight, preserves paginated history on success, and
+retains the last valid page with Retry on failure. Focused renderer tests (29), the
+complete suite (179), typecheck, lint, formatting verification, and the diff
+whitespace check passed.
