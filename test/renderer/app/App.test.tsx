@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from '@/renderer/app/App';
 import type { AppResult } from '@/shared/contracts/app-result';
+import type { HistoryPage } from '@/shared/contracts/history';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
 import type { TaskSuggestionPage } from '@/shared/contracts/tasks';
 import type { TimerState } from '@/shared/contracts/timer';
@@ -43,6 +44,35 @@ const pausedState: TimerState = {
   taskLifetimeDurationMs: 18_900_000,
   activeIntervalStartedAt: null,
 };
+
+const historyPageWithTask = (description = 'Implement authentication'): HistoryPage => ({
+  days: [
+    {
+      dayStartedAt: new Date(1_000).setHours(0, 0, 0, 0),
+      dayEndedAt: new Date(1_000).setHours(24, 0, 0, 0),
+      totalDurationMs: 1_800_000,
+      tasks: [
+        {
+          task: { id: 'task-1', description },
+          dayDurationMs: 1_800_000,
+          lifetimeDurationMs: 5_400_000,
+          mostRecentActivityAt: 1_000,
+          intervals: [
+            {
+              id: 'interval-1',
+              projectedStartedAt: 1_000,
+              projectedEndedAt: 1_800_000,
+              durationMs: 1_799_000,
+              isRunning: false,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  nextBeforeDayStartedAt: null,
+  now: 1_000,
+});
 
 describe('App', () => {
   afterEach(() => {
@@ -584,6 +614,45 @@ describe('App', () => {
     expect(api.timer.pause).toHaveBeenCalledOnce();
   });
 
+  it('switches from a history row without disabling timer controls and refreshes history', async () => {
+    const switchResult = deferred<AppResult<TimerState>>();
+    const nextState: TimerState = {
+      ...runningState,
+      currentTask: { id: 'task-1', description: 'Implement authentication' },
+    };
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: pausedState }),
+      getHistoryPage: vi
+        .fn()
+        .mockResolvedValue({ ok: true, value: historyPageWithTask() }),
+      switchToTask: vi.fn(() => switchResult.promise),
+    });
+    render(<App />);
+
+    const playButton = await screen.findByRole('button', {
+      name: 'Resume Implement authentication',
+    });
+    expect(screen.getByRole('button', { name: 'Resume' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+
+    fireEvent.click(playButton);
+
+    expect(api.timer.switchToTask).toHaveBeenCalledWith({ taskId: 'task-1' });
+    expect(
+      screen.getByRole('button', {
+        name: 'Resuming… Implement authentication',
+      }),
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Resume' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+
+    switchResult.resolve({ ok: true, value: nextState });
+
+    expect(await screen.findByRole('button', { name: 'Already running Implement authentication' })).toBeDisabled();
+    await act(async () => Promise.resolve());
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps the active view usable when a command promise rejects', async () => {
     const api = setTimerApi({
       getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
@@ -703,6 +772,7 @@ interface TimerApiOverrides {
   readonly pause?: TimeTrackerAPI['timer']['pause'];
   readonly resume?: TimeTrackerAPI['timer']['resume'];
   readonly stop?: TimeTrackerAPI['timer']['stop'];
+  readonly getHistoryPage?: TimeTrackerAPI['history']['getPage'];
   readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
 }
 
@@ -724,21 +794,23 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       stop: overrides.stop ?? vi.fn(),
     },
     history: {
-      getPage: vi.fn().mockResolvedValue({
-        ok: true,
-        value: {
-          days: [
-            {
-              dayStartedAt: new Date(1_000).setHours(0, 0, 0, 0),
-              dayEndedAt: new Date(1_000).setHours(24, 0, 0, 0),
-              totalDurationMs: 0,
-              tasks: [],
-            },
-          ],
-          nextBeforeDayStartedAt: null,
-          now: 1_000,
-        },
-      }),
+      getPage:
+        overrides.getHistoryPage ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: {
+            days: [
+              {
+                dayStartedAt: new Date(1_000).setHours(0, 0, 0, 0),
+                dayEndedAt: new Date(1_000).setHours(24, 0, 0, 0),
+                totalDurationMs: 0,
+                tasks: [],
+              },
+            ],
+            nextBeforeDayStartedAt: null,
+            now: 1_000,
+          },
+        }),
     },
     tasks: {
       getSuggestions:

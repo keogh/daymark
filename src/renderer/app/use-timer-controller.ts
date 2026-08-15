@@ -17,6 +17,7 @@ export interface TimerController {
   readonly commandError: AppError | null;
   readonly start: (description: string) => Promise<void>;
   readonly startExistingTask: (taskId: string) => Promise<void>;
+  readonly switchToTask: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly pause: () => Promise<void>;
   readonly resume: () => Promise<void>;
   readonly stop: () => Promise<void>;
@@ -148,6 +149,29 @@ export const useTimerController = (): TimerController => {
     () => runCommand('stop', window.timeTracker.timer.stop),
     [runCommand],
   );
+  const switchToTask = useCallback(
+    async (taskId: string): Promise<AppResult<TimerState>> => {
+      const version = ++requestVersion.current;
+      setCommandError(null);
+
+      try {
+        const result = await window.timeTracker.timer.switchToTask({ taskId });
+        if (version === requestVersion.current) {
+          if (result.ok) {
+            setLoadState({ status: 'ready', timer: result.value });
+            setAuthoritativeRevision((revision) => revision + 1);
+          } else if (result.error.code === 'TASK_NOT_FOUND') {
+            setAuthoritativeRevision((revision) => revision + 1);
+          }
+        }
+
+        return result;
+      } catch {
+        return { ok: false, error: unexpectedError };
+      }
+    },
+    [],
+  );
 
   const timer = loadState.status === 'ready' ? loadState.timer : null;
   useEffect(() => {
@@ -179,6 +203,7 @@ export const useTimerController = (): TimerController => {
     commandError,
     start,
     startExistingTask,
+    switchToTask,
     pause,
     resume,
     stop,

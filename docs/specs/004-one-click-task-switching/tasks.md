@@ -33,7 +33,7 @@ to match the specification.
 | TASK-004-001 | Define switch command contracts and validation | Pending | None | AC-004-007 |
 | TASK-004-002 | Implement atomic timer switch branches | Complete | TASK-004-001 | AC-004-001–006 |
 | TASK-004-003 | Expose the validated switch boundary | Complete | TASK-004-002 | AC-004-001–007 |
-| TASK-004-004 | Add accessible history-row Play controls | Pending | TASK-004-003 | AC-004-001, AC-004-004–010 |
+| TASK-004-004 | Add accessible history-row Play controls | Complete | TASK-004-003 | AC-004-001, AC-004-004–010 |
 | TASK-004-005 | Verify One-Click Task Switching and update documentation | Pending | TASK-004-004 | AC-004-001–010 |
 
 ---
@@ -223,7 +223,7 @@ TASK-004-002.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -268,7 +268,20 @@ TASK-004-003.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when complete.
+- Added state-aware Daily History row actions that expose `Play`, `Resume`,
+  pending, and disabled `Already running` labels from the authoritative timer
+  snapshot without disabling unrelated Pause/Resume/Stop controls.
+- Wired row activation through the existing `switchToTask(...)` timer boundary,
+  with row-scoped duplicate-submission prevention and compact non-blocking
+  `TASK_NOT_FOUND` history feedback while still triggering authoritative history
+  refresh after success and stale-task failures.
+- Added focused renderer coverage for history-row labels, pending state,
+  stale-task messaging, and App-level refresh wiring for history-triggered task
+  switching.
+- Verification completed on 2026-08-15:
+  - `npm test -- renderer/app/App.test.tsx renderer/app/DailyHistory.test.tsx` — passed
+  - `npm run typecheck` — passed
+  - `npm run lint` — passed
 
 ---
 

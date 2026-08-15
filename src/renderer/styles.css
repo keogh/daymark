@@ -339,6 +339,13 @@ input {
   border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
+.history-task__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .history-task__toggle {
   display: flex;
   width: 100%;
@@ -352,6 +359,10 @@ input {
   background: transparent;
   text-align: left;
   cursor: pointer;
+}
+
+.history-task__action {
+  min-width: 7.5rem;
 }
 
 .history-task__toggle:hover {
@@ -413,6 +424,13 @@ input {
   margin: 0.25rem 0 0;
 }
 
+.history-action-status {
+  margin: 0;
+  padding: 0.25rem 0.25rem 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
 .history-pagination {
   display: grid;
   justify-items: center;
@@ -450,6 +468,16 @@ input {
 
   .active-timer__clock {
     font-size: clamp(3rem, 17vw, 5rem);
+  }
+
+  .history-task__header {
+    grid-template-columns: 1fr;
+  }
+
+  .history-task__action {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 0.75rem;
   }
 
   .history-task__toggle,

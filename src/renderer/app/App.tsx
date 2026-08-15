@@ -50,7 +50,15 @@ export const App = () => {
             />
           )}
       </section>
-      <DailyHistory refreshRevision={controller.authoritativeRevision} />
+      <DailyHistory
+        onPlayTask={controller.switchToTask}
+        refreshRevision={controller.authoritativeRevision}
+        timer={
+          controller.loadState.status === 'ready'
+            ? controller.loadState.timer
+            : null
+        }
+      />
     </main>
   );
 };

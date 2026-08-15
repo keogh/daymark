@@ -8,11 +8,13 @@ import {
 } from '@/renderer/components/ui/alert';
 import { Button } from '@/renderer/components/ui/button';
 import { Spinner } from '@/renderer/components/ui/spinner';
+import type { AppResult } from '@/shared/contracts/app-result';
 import type {
   HistoryDay,
   HistoryInterval,
   HistoryTask,
 } from '@/shared/contracts/history';
+import type { TimerState } from '@/shared/contracts/timer';
 import {
   formatHistoryDayLabel,
   formatHistoryDuration,
@@ -25,23 +27,82 @@ import {
 import { useLiveHistoryPage } from './use-live-history-page';
 
 export const DailyHistory = ({
+  onPlayTask = () =>
+    Promise.resolve({
+      ok: false as const,
+      error: {
+        code: 'INTERNAL_ERROR' as const,
+        message: 'The timer could not be updated. Please try again.',
+      },
+    }),
   refreshRevision = 0,
+  timer = null,
 }: {
+  readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly refreshRevision?: number;
+  readonly timer?: TimerState | null;
 }) => {
   const controller = useHistoryController(refreshRevision);
+  const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
+  const [historyActionMessage, setHistoryActionMessage] = useState<string | null>(
+    null,
+  );
+
+  const runHistoryTask = async (
+    rowId: string,
+    taskId: string,
+  ): Promise<void> => {
+    if (pendingRows[rowId] === true) {
+      return;
+    }
+
+    setPendingRows((current) => ({ ...current, [rowId]: true }));
+    const result = await onPlayTask(taskId);
+    setPendingRows((current) => {
+      const next = { ...current };
+      delete next[rowId];
+      return next;
+    });
+
+    if (!result.ok && result.error.code === 'TASK_NOT_FOUND') {
+      setHistoryActionMessage(result.error.message);
+      return;
+    }
+
+    if (result.ok) {
+      setHistoryActionMessage(null);
+    }
+  };
 
   return (
     <section aria-labelledby="history-heading" className="daily-history">
       <h2 className="visually-hidden" id="history-heading">
         Daily history
       </h2>
-      <HistoryContent controller={controller} />
+      <HistoryContent
+        controller={controller}
+        historyActionMessage={historyActionMessage}
+        onPlayTask={runHistoryTask}
+        pendingRows={pendingRows}
+        timer={timer}
+      />
     </section>
   );
 };
 
-const HistoryContent = ({ controller }: { controller: HistoryController }) => {
+const HistoryContent = ({
+  controller,
+  historyActionMessage,
+  onPlayTask,
+  pendingRows,
+  timer,
+}: {
+  controller: HistoryController;
+  historyActionMessage: string | null;
+  onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  pendingRows: Record<string, boolean>;
+  timer: TimerState | null;
+}) => {
   if (controller.loadState.status === 'loading') {
     return (
       <div className="history-loading" role="status">
@@ -63,23 +124,56 @@ const HistoryContent = ({ controller }: { controller: HistoryController }) => {
     );
   }
 
-  return <HistoryDays controller={controller} state={controller.loadState} />;
+  return (
+    <HistoryDays
+      controller={controller}
+      historyActionMessage={historyActionMessage}
+      onPlayTask={onPlayTask}
+      pendingRows={pendingRows}
+      state={controller.loadState}
+      timer={timer}
+    />
+  );
 };
 
 const HistoryDays = ({
   controller,
+  historyActionMessage,
+  onPlayTask,
+  pendingRows,
   state,
+  timer,
 }: {
   controller: HistoryController;
+  historyActionMessage: string | null;
+  onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  pendingRows: Record<string, boolean>;
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
+  timer: TimerState | null;
 }) => {
   const page = useLiveHistoryPage(state.page);
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
 
   return (
     <div className="history-days">
+      {historyActionMessage !== null && (
+        <p
+          aria-live="polite"
+          className="history-action-status"
+          role="status"
+        >
+          {historyActionMessage}
+        </p>
+      )}
       {page.days.map((day) => (
-        <HistoryDaySection day={day} key={day.dayStartedAt} now={page.now} />
+        <HistoryDaySection
+          day={day}
+          key={day.dayStartedAt}
+          now={page.now}
+          onPlayTask={onPlayTask}
+          pendingRows={pendingRows}
+          timer={timer}
+        />
       ))}
       {!hasTrackedTime && (
         <div className="history-empty">
@@ -171,7 +265,19 @@ const HistoryPagination = ({
   );
 };
 
-const HistoryDaySection = ({ day, now }: { day: HistoryDay; now: number }) => (
+const HistoryDaySection = ({
+  day,
+  now,
+  onPlayTask,
+  pendingRows,
+  timer,
+}: {
+  day: HistoryDay;
+  now: number;
+  onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  pendingRows: Record<string, boolean>;
+  timer: TimerState | null;
+}) => (
   <section
     aria-labelledby={`history-day-${day.dayStartedAt}`}
     className="history-day"
@@ -183,42 +289,83 @@ const HistoryDaySection = ({ day, now }: { day: HistoryDay; now: number }) => (
       <p>{formatHistoryDuration(day.totalDurationMs)}</p>
     </div>
     {day.tasks.map((task) => (
-      <HistoryTaskRow day={day} key={task.task.id} task={task} />
+      <HistoryTaskRow
+        day={day}
+        key={task.task.id}
+        onPlayTask={onPlayTask}
+        pendingRows={pendingRows}
+        task={task}
+        timer={timer}
+      />
     ))}
   </section>
 );
 
 const HistoryTaskRow = ({
   day,
+  onPlayTask,
+  pendingRows,
   task,
+  timer,
 }: {
   day: HistoryDay;
+  onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  pendingRows: Record<string, boolean>;
   task: HistoryTask;
+  timer: TimerState | null;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const intervalListId = `history-intervals-${day.dayStartedAt}-${task.task.id}`;
+  const rowId = `${day.dayStartedAt}:${task.task.id}`;
+  const isPending = pendingRows[rowId] === true;
+  const isSameTask = timer?.currentTask?.id === task.task.id;
+  const isAlreadyRunning =
+    timer?.status === 'running' && isSameTask === true;
+  const actionLabel =
+    isAlreadyRunning
+      ? 'Already running'
+      : isPending
+        ? timer?.status === 'paused' && isSameTask === true
+          ? 'Resuming…'
+          : 'Starting…'
+        : timer?.status === 'paused' && isSameTask === true
+          ? 'Resume'
+          : 'Play';
 
   return (
     <div className="history-task">
-      <button
-        aria-label={task.task.description}
-        aria-controls={intervalListId}
-        aria-expanded={isExpanded}
-        className="history-task__toggle"
-        onClick={() => setIsExpanded((expanded) => !expanded)}
-        type="button"
-      >
-        <span className="history-task__copy">
-          <span className="history-task__description">
-            {task.task.description}
+      <div className="history-task__header">
+        <button
+          aria-label={task.task.description}
+          aria-controls={intervalListId}
+          aria-expanded={isExpanded}
+          className="history-task__toggle"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+          type="button"
+        >
+          <span className="history-task__copy">
+            <span className="history-task__description">
+              {task.task.description}
+            </span>
+            <span className="history-task__totals">
+              {formatHistoryDuration(task.dayDurationMs)} today ·{' '}
+              {formatHistoryDuration(task.lifetimeDurationMs)} total
+            </span>
           </span>
-          <span className="history-task__totals">
-            {formatHistoryDuration(task.dayDurationMs)} today ·{' '}
-            {formatHistoryDuration(task.lifetimeDurationMs)} total
-          </span>
-        </span>
-        <ChevronDown aria-hidden="true" className="history-task__chevron" />
-      </button>
+          <ChevronDown aria-hidden="true" className="history-task__chevron" />
+        </button>
+        <Button
+          aria-label={`${actionLabel} ${task.task.description}`}
+          className="history-task__action"
+          disabled={isPending || isAlreadyRunning}
+          onClick={() => void onPlayTask(rowId, task.task.id)}
+          size="sm"
+          type="button"
+          variant={isAlreadyRunning ? 'outline' : 'default'}
+        >
+          {actionLabel}
+        </Button>
+      </div>
       {isExpanded && (
         <ul className="history-intervals" id={intervalListId}>
           {task.intervals.map((interval) => (

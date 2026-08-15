@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DailyHistory } from '@/renderer/app/DailyHistory';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { HistoryPage } from '@/shared/contracts/history';
+import type { TimerState } from '@/shared/contracts/timer';
 
 const today = new Date(2026, 7, 14).getTime();
 const tomorrow = new Date(2026, 7, 15).getTime();
@@ -213,6 +214,136 @@ describe('DailyHistory', () => {
     expect(taskButtons[1]!).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getAllByRole('list')).toHaveLength(2);
     expect(screen.getByLabelText(/to midnight, 30m/)).toBeVisible();
+  });
+
+  it('renders state-aware history-row play labels for idle, paused, and running states', async () => {
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+
+    const { rerender } = render(<DailyHistory />);
+
+    expect(
+      (await screen.findAllByRole('button', {
+        name: 'Play Implement authentication',
+      }))[0],
+    ).toBeEnabled();
+
+    rerender(
+      <DailyHistory
+        timer={{
+          status: 'paused',
+          currentTask: { id: 'task-1', description: 'Implement authentication' },
+          sessionStartedAt: snapshotNow - 600_000,
+          sessionDurationMs: 600_000,
+          taskTodayDurationMs: 5_400_000,
+          taskLifetimeDurationMs: 30_600_000,
+          activeIntervalStartedAt: null,
+          now: snapshotNow,
+        }}
+      />,
+    );
+
+    expect(
+      (await screen.findAllByRole('button', {
+        name: 'Resume Implement authentication',
+      }))[0],
+    ).toBeEnabled();
+
+    rerender(
+      <DailyHistory
+        timer={{
+          status: 'running',
+          currentTask: { id: 'task-1', description: 'Implement authentication' },
+          sessionStartedAt: snapshotNow - 600_000,
+          sessionDurationMs: 600_000,
+          taskTodayDurationMs: 5_400_000,
+          taskLifetimeDurationMs: 30_600_000,
+          activeIntervalStartedAt: snapshotNow - 60_000,
+          now: snapshotNow,
+        }}
+      />,
+    );
+
+    expect(
+      (await screen.findAllByRole('button', {
+        name: 'Already running Implement authentication',
+      }))[0],
+    ).toBeDisabled();
+  });
+
+  it('invokes the play action from the row control and prevents duplicate pending activation', async () => {
+    const playResult = createDeferred<AppResult<TimerState>>();
+    const onPlayTask = vi.fn(() => playResult.promise);
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+
+    render(<DailyHistory onPlayTask={onPlayTask} />);
+
+    const playButton = (
+      await screen.findAllByRole('button', {
+        name: 'Play Implement authentication',
+      })
+    )[0]!;
+    playButton.focus();
+
+    fireEvent.click(playButton);
+    fireEvent.click(playButton);
+
+    expect(onPlayTask).toHaveBeenCalledTimes(1);
+    expect(onPlayTask).toHaveBeenCalledWith('task-1');
+    expect(
+      screen.getAllByRole('button', {
+        name: 'Starting… Implement authentication',
+      })[0],
+    ).toBeDisabled();
+
+    playResult.resolve({
+      ok: true,
+      value: {
+        status: 'running',
+        currentTask: { id: 'task-1', description: 'Implement authentication' },
+        sessionStartedAt: snapshotNow,
+        sessionDurationMs: 0,
+        taskTodayDurationMs: 5_400_000,
+        taskLifetimeDurationMs: 30_600_000,
+        activeIntervalStartedAt: snapshotNow,
+        now: snapshotNow,
+      },
+    });
+
+    expect(
+      (await screen.findAllByRole('button', {
+        name: 'Play Implement authentication',
+      }))[0],
+    ).toBeEnabled();
+    expect(playButton).toHaveFocus();
+  });
+
+  it('shows a compact stale-task message after TASK_NOT_FOUND while preserving history controls', async () => {
+    const onPlayTask = vi.fn().mockResolvedValue({
+      ok: false,
+      error: {
+        code: 'TASK_NOT_FOUND' as const,
+        message: 'The selected task no longer exists.',
+      },
+    });
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+
+    render(<DailyHistory onPlayTask={onPlayTask} />);
+
+    fireEvent.click(
+      (
+        await screen.findAllByRole('button', {
+          name: 'Play Implement authentication',
+        })
+      )[0]!,
+    );
+
+    expect(await screen.findByText('The selected task no longer exists.')).toBeVisible();
+    expect(screen.getByText('The selected task no longer exists.')).toHaveTextContent(
+      'The selected task no longer exists.',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Play Quick review' }),
+    ).toBeEnabled();
   });
 
   it('formats a positive sub-minute interval as less than one minute', async () => {
