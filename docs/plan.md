@@ -2,11 +2,11 @@
 
 ## Current Specification
 
-SPEC-005 — Manual Time Entry
+SPEC-006 — Edit and Delete Intervals
 
 ## Active Task
 
-TASK-005-005 — Verify Manual Time Entry and update documentation
+TASK-006-001 — Define Correction Contracts and Validation
 
 ## Status
 
@@ -16,24 +16,20 @@ Complete
 
 # Immediate Plan
 
-1. Trace every SPEC-005 acceptance criterion to automated and rendered evidence.
-2. Run formatting, typecheck, lint, the full test suite, and packaging.
-3. Exercise the packaged manual-entry workflow with isolated application data and
-   inspect rendered, persistence, accessibility, and console evidence.
-4. Record verification evidence and update the specification, task breakdown,
-   plan, and project progress when all gates pass.
+1. Define explicit shared interval update/delete contracts, channels, and preload API types.
+2. Add exact-shape runtime validators for update and delete commands, including local date-time conversion and range validation.
+3. Extend controlled application error codes and add focused shared contract and validator tests.
+4. Run focused tests, typecheck, and lint; record task evidence when all pass.
 
 ---
 
 # Scope Guard
 
-Do not add product behavior or modify the established manual-time implementation
-unless verification exposes a SPEC-005 defect.
+Do not add repository mutations, service transactions, IPC registration, or renderer UI.
 
 ---
 
 # Completion
 
-Completion is reached when AC-005-001 through AC-005-012 and the Definition of
-Done pass, packaged behavior is verified with isolated data, documentation is
-current, and SPEC-005 is marked Verified.
+Completion is reached when shared correction contracts and validators cover the
+TASK-006-001 rules and its focused verification passes.

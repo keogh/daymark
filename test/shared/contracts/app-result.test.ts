@@ -45,6 +45,18 @@ describe('renderer-safe application errors', () => {
     });
   });
 
+  it.each([
+    'INVALID_INTERVAL_UPDATE',
+    'INVALID_INTERVAL_DELETE',
+    'TIME_INTERVAL_NOT_FOUND',
+    'OPEN_INTERVAL_NOT_EDITABLE',
+    'TIME_INTERVAL_OVERLAP',
+  ] as const)('accepts %s as a renderer-safe correction error', (code) => {
+    expect(
+      toRendererSafeError({ code, message: 'Controlled correction failure.' }),
+    ).toEqual({ code, message: 'Controlled correction failure.' });
+  });
+
   it('maps unknown failures to a stable internal error without leaking details', () => {
     expect(toRendererSafeError(new Error('database path is secret'))).toEqual({
       code: 'INTERNAL_ERROR',
