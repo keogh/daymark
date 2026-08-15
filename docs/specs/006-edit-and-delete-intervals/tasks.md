@@ -31,7 +31,7 @@ breakdown to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-006-001 | Define correction contracts and validation | Complete | None | AC-006-005, AC-006-010, AC-006-011, AC-006-013 |
-| TASK-006-002 | Implement transactional interval editing | Pending | TASK-006-001 | AC-006-003–007, AC-006-010–012 |
+| TASK-006-002 | Implement transactional interval editing | Complete | TASK-006-001 | AC-006-003–007, AC-006-010–012 |
 | TASK-006-003 | Implement transactional interval deletion | Pending | TASK-006-001 | AC-006-008–012 |
 | TASK-006-004 | Expose validated interval mutation APIs | Pending | TASK-006-002, TASK-006-003 | AC-006-010, AC-006-011, AC-006-013 |
 | TASK-006-005 | Add interval actions and edit workflow | Pending | TASK-006-004 | AC-006-001–007, AC-006-010–014 |
@@ -104,7 +104,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -147,7 +147,18 @@ TASK-006-001.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- --run test/main/database/repositories/time-interval-repository.test.ts test/main/services/interval-service.test.ts test/main/services/interval-service.integration.test.ts test/main/services/timer-service.test.ts test/main/services/timer-service.integration.test.ts test/main/services/history-service.test.ts test/main/services/history-service.integration.test.ts` — passed, 7 files and 80 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- Added a conditional closed-only repository update and half-open global overlap
+  query that excludes the correction target.
+- Added transactional edit behavior with repeated in-transaction validation,
+  missing/open-target and closed/running-overlap outcomes, timer/AppState
+  preservation checks, rollback, safe unexpected-failure mapping, and local
+  technical logging.
+- Covered unchanged, boundary-touching, cross-day/multi-day, current-session,
+  authoritative projection refresh, and persistence failure behavior with
+  disposable SQLite tests.
 
 ---
 

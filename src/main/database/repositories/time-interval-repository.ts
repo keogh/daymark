@@ -8,6 +8,7 @@ import {
   isNull,
   lt,
   lte,
+  ne,
   or,
 } from 'drizzle-orm';
 
@@ -52,6 +53,20 @@ export class TimeIntervalRepository {
       .update(timeIntervals)
       .set({ endedAt, updatedAt })
       .where(and(eq(timeIntervals.id, id), isNull(timeIntervals.endedAt)))
+      .returning()
+      .get();
+  }
+
+  updateClosed(
+    id: string,
+    startedAt: number,
+    endedAt: number,
+    updatedAt: number,
+  ): TimeInterval | undefined {
+    return this.#db
+      .update(timeIntervals)
+      .set({ startedAt, endedAt, updatedAt })
+      .where(and(eq(timeIntervals.id, id), isNotNull(timeIntervals.endedAt)))
       .returning()
       .get();
   }
@@ -106,6 +121,26 @@ export class TimeIntervalRepository {
       .from(timeIntervals)
       .where(
         and(
+          isNotNull(timeIntervals.endedAt),
+          lt(timeIntervals.startedAt, rangeEndedAt),
+          gt(timeIntervals.endedAt, rangeStartedAt),
+        ),
+      )
+      .orderBy(asc(timeIntervals.startedAt))
+      .all();
+  }
+
+  findOverlappingClosedRangeExcluding(
+    excludedIntervalId: string,
+    rangeStartedAt: number,
+    rangeEndedAt: number,
+  ): TimeInterval[] {
+    return this.#db
+      .select()
+      .from(timeIntervals)
+      .where(
+        and(
+          ne(timeIntervals.id, excludedIntervalId),
           isNotNull(timeIntervals.endedAt),
           lt(timeIntervals.startedAt, rangeEndedAt),
           gt(timeIntervals.endedAt, rangeStartedAt),

@@ -48,6 +48,48 @@ describe('TimeIntervalRepository', () => {
     expect(repository.close(interval.id, 1_600, 1_600)).toBeUndefined();
   });
 
+  it('updates exactly one closed interval while preserving identity and task', () => {
+    const target = createInterval();
+    const other = createInterval({
+      id: 'interval-2',
+      taskId: 'task-2',
+      startedAt: 2_000,
+      endedAt: 2_200,
+    });
+    repository.insert(target);
+    repository.insert(other);
+
+    expect(repository.updateClosed(target.id, 1_100, 1_400, 1_500)).toEqual({
+      ...target,
+      startedAt: 1_100,
+      endedAt: 1_400,
+      updatedAt: 1_500,
+    });
+    expect(repository.findById(other.id)).toEqual(other);
+  });
+
+  it('does not update a missing or open interval through closed correction', () => {
+    const open = createInterval({ endedAt: null });
+    repository.insert(open);
+
+    expect(
+      repository.updateClosed('missing', 1_100, 1_400, 1_500),
+    ).toBeUndefined();
+    expect(
+      repository.updateClosed(open.id, 1_100, 1_400, 1_500),
+    ).toBeUndefined();
+    expect(repository.findById(open.id)).toEqual(open);
+  });
+
+  it('preserves the closed timestamp-order database constraint during update', () => {
+    repository.insert(createInterval());
+
+    expect(() =>
+      repository.updateClosed('interval-1', 1_200, 1_200, 1_500),
+    ).toThrow(/check constraint failed/i);
+    expect(repository.findById('interval-1')).toEqual(createInterval());
+  });
+
   it('rejects missing task references and a second open interval globally', () => {
     expect(() =>
       repository.insert(createInterval({ taskId: 'missing-task' })),
@@ -157,6 +199,25 @@ describe('TimeIntervalRepository', () => {
       taskOneOverlap,
       taskTwoOverlap,
     ]);
+  });
+
+  it('excludes the correction target from global closed overlap detection', () => {
+    const target = createInterval();
+    const overlap = createInterval({
+      id: 'overlap',
+      taskId: 'task-2',
+      startedAt: 1_150,
+      endedAt: 1_300,
+    });
+    repository.insert(target);
+    repository.insert(overlap);
+
+    expect(
+      repository.findOverlappingClosedRangeExcluding(target.id, 1_000, 1_200),
+    ).toEqual([overlap]);
+    expect(
+      repository.findOverlappingClosedRangeExcluding(target.id, 900, 1_150),
+    ).toEqual([]);
   });
 
   it('lists all intervals for a task and preserves task deletion cascade', () => {
