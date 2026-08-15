@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { DailyHistory } from '@/renderer/app/DailyHistory';
@@ -86,6 +92,37 @@ const loadedPage: HistoryPage = {
     },
   ],
   nextBeforeDayStartedAt: 123,
+  now: snapshotNow,
+};
+
+const olderDay = new Date(2026, 7, 12).getTime();
+const olderPage: HistoryPage = {
+  days: [
+    loadedPage.days[1]!,
+    {
+      dayStartedAt: olderDay,
+      dayEndedAt: yesterday,
+      totalDurationMs: 3_600_000,
+      tasks: [
+        {
+          task: { id: 'task-3', description: 'Older work' },
+          dayDurationMs: 3_600_000,
+          lifetimeDurationMs: 3_600_000,
+          mostRecentActivityAt: new Date(2026, 7, 12, 10).getTime(),
+          intervals: [
+            {
+              id: 'interval-older',
+              projectedStartedAt: new Date(2026, 7, 12, 9).getTime(),
+              projectedEndedAt: new Date(2026, 7, 12, 10).getTime(),
+              durationMs: 3_600_000,
+              isRunning: false,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  nextBeforeDayStartedAt: null,
   now: snapshotNow,
 };
 
@@ -182,6 +219,95 @@ describe('DailyHistory', () => {
     expect(getPage).toHaveBeenCalledTimes(2);
     expect(getPage).toHaveBeenLastCalledWith({});
   });
+
+  it('loads one older page at a time and preserves expanded rows', async () => {
+    const deferred = createDeferred<AppResult<HistoryPage>>();
+    const getPage = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: loadedPage })
+      .mockImplementationOnce(() => deferred.promise);
+    setHistoryApi(getPage);
+    render(<DailyHistory />);
+
+    const task = await screen.findAllByRole('button', {
+      name: 'Implement authentication',
+    });
+    fireEvent.click(task[0]!);
+    const loadOlder = screen.getByRole('button', { name: 'Load older' });
+    loadOlder.focus();
+    fireEvent.click(loadOlder);
+    fireEvent.click(loadOlder);
+
+    expect(loadOlder).toBeDisabled();
+    expect(loadOlder).toHaveTextContent('Loading older…');
+    expect(getPage).toHaveBeenCalledTimes(2);
+    expect(getPage).toHaveBeenLastCalledWith({ beforeDayStartedAt: 123 });
+    expect(task[0]).toHaveAttribute('aria-expanded', 'true');
+
+    deferred.resolve({
+      ok: true,
+      value: { ...olderPage, nextBeforeDayStartedAt: 1 },
+    });
+
+    expect(
+      await screen.findByRole('heading', { name: 'Wednesday, Aug 12' }),
+    ).toBeVisible();
+    expect(screen.getAllByRole('heading', { name: 'Yesterday' })).toHaveLength(
+      1,
+    );
+    expect(task[0]).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Load older' })).toHaveFocus();
+  });
+
+  it.each([
+    { ok: false, error: { code: 'INTERNAL_ERROR', message: 'Hidden' } },
+    new Error('IPC disconnected'),
+  ])(
+    'preserves loaded data and retries a failed older page',
+    async (failure) => {
+      const getPage = vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: loadedPage })
+        .mockImplementationOnce(() =>
+          failure instanceof Error
+            ? Promise.reject(failure)
+            : Promise.resolve(failure),
+        )
+        .mockResolvedValueOnce({ ok: true, value: olderPage });
+      setHistoryApi(getPage);
+      render(<DailyHistory />);
+
+      const task = (
+        await screen.findAllByRole('button', {
+          name: 'Implement authentication',
+        })
+      )[0]!;
+      fireEvent.click(task);
+      fireEvent.click(screen.getByRole('button', { name: 'Load older' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Older history could not be loaded.',
+      );
+      expect(screen.getByRole('heading', { name: 'Today' })).toBeVisible();
+      expect(task).toHaveAttribute('aria-expanded', 'true');
+      fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+      expect(
+        await screen.findByRole('heading', { name: 'Wednesday, Aug 12' }),
+      ).toBeVisible();
+      expect(getPage).toHaveBeenLastCalledWith({ beforeDayStartedAt: 123 });
+      expect(task).toHaveAttribute('aria-expanded', 'true');
+      expect(
+        screen.queryByRole('button', { name: 'Load older' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('status', { name: '' })).toHaveTextContent(
+        'All history loaded.',
+      );
+      await waitFor(() =>
+        expect(document.activeElement).toHaveTextContent('All history loaded.'),
+      );
+    },
+  );
 });
 
 const setHistoryApi = (getPage: ReturnType<typeof vi.fn>) => {
@@ -190,4 +316,12 @@ const setHistoryApi = (getPage: ReturnType<typeof vi.fn>) => {
     value: { history: { getPage } },
   });
   return getPage;
+};
+
+const createDeferred = <Value,>() => {
+  let resolve!: (value: Value) => void;
+  const promise = new Promise<Value>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
 };

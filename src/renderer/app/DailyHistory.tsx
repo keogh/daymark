@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import {
@@ -11,7 +11,6 @@ import { Spinner } from '@/renderer/components/ui/spinner';
 import type {
   HistoryDay,
   HistoryInterval,
-  HistoryPage,
   HistoryTask,
 } from '@/shared/contracts/history';
 import {
@@ -59,10 +58,17 @@ const HistoryContent = ({ controller }: { controller: HistoryController }) => {
     );
   }
 
-  return <HistoryDays page={controller.loadState.page} />;
+  return <HistoryDays controller={controller} state={controller.loadState} />;
 };
 
-const HistoryDays = ({ page }: { page: HistoryPage }) => {
+const HistoryDays = ({
+  controller,
+  state,
+}: {
+  controller: HistoryController;
+  state: Extract<HistoryController['loadState'], { status: 'ready' }>;
+}) => {
+  const { page } = state;
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
 
   return (
@@ -75,6 +81,71 @@ const HistoryDays = ({ page }: { page: HistoryPage }) => {
           <p>No tracked time yet.</p>
           <p>Start your first task above.</p>
         </div>
+      )}
+      <HistoryPagination controller={controller} state={state} />
+    </div>
+  );
+};
+
+const HistoryPagination = ({
+  controller,
+  state,
+}: {
+  controller: HistoryController;
+  state: Extract<HistoryController['loadState'], { status: 'ready' }>;
+}) => {
+  const exhaustedStatusRef = useRef<HTMLParagraphElement>(null);
+  const wasLoading = useRef(false);
+  const hasOlderPage = state.page.nextBeforeDayStartedAt !== null;
+  const isLoading = state.olderPageStatus === 'loading';
+
+  useEffect(() => {
+    if (wasLoading.current && !isLoading && !hasOlderPage) {
+      exhaustedStatusRef.current?.focus();
+    }
+    wasLoading.current = isLoading;
+  }, [hasOlderPage, isLoading]);
+
+  if (!hasOlderPage) {
+    return (
+      <p
+        className="history-pagination__exhausted visually-hidden"
+        ref={exhaustedStatusRef}
+        role="status"
+        tabIndex={-1}
+      >
+        All history loaded.
+      </p>
+    );
+  }
+
+  return (
+    <div className="history-pagination">
+      {state.olderPageStatus === 'error' && (
+        <Alert className="history-pagination__error">
+          <AlertDescription>
+            Older history could not be loaded.
+          </AlertDescription>
+          <Button
+            onClick={() => void controller.loadOlder()}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            Retry
+          </Button>
+        </Alert>
+      )}
+      {state.olderPageStatus !== 'error' && (
+        <Button
+          disabled={isLoading}
+          onClick={() => void controller.loadOlder()}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          {isLoading ? 'Loading older…' : 'Load older'}
+        </Button>
       )}
     </div>
   );

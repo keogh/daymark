@@ -35,7 +35,7 @@ to match the specification.
 | TASK-002-003 | Implement bounded history queries and service paging | Complete | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
 | TASK-002-004 | Expose the validated history IPC boundary | Complete | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
 | TASK-002-005 | Render the initial Daily History states | Complete | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
-| TASK-002-006 | Add older-page loading and resilient retry | Pending | TASK-002-005 | AC-002-008–009, AC-002-014 |
+| TASK-002-006 | Add older-page loading and resilient retry | Complete | TASK-002-005 | AC-002-008–009, AC-002-014 |
 | TASK-002-007 | Synchronize live history with timer state | Pending | TASK-002-005 | AC-002-010–012 |
 | TASK-002-008 | Verify Daily History and update documentation | Pending | TASK-002-006–007 | AC-002-001–018 |
 
@@ -387,7 +387,7 @@ diff whitespace check.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -427,7 +427,23 @@ TASK-002-005.
 
 ### Completion Evidence
 
-Pending.
+The renderer history controller now consumes the authoritative older-page cursor,
+admits only one pagination request at a time, appends days in newest-first order,
+and de-duplicates overlapping day sections by local day start. Existing day
+objects remain mounted while pages append, preserving independently expanded task
+rows and focus on the Load older control.
+
+Already loaded history remains visible during pending and failed requests. Both
+AppResult failures and rejected IPC promises show a compact pagination error whose
+Retry reuses the failed cursor. A successful final page removes the Load older
+control and transfers focus to an accessible exhausted-status target instead of
+losing keyboard focus.
+
+Focused Daily History and timer renderer tests passed (38 tests), including rapid
+duplicate activation, cursor input, de-duplication, expansion preservation, focus
+preservation, both failure forms, retry, and exhaustion. The complete suite passed
+(175 tests), as did typecheck, lint, formatting verification, and the diff
+whitespace check.
 
 ---
 
