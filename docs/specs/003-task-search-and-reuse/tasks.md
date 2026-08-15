@@ -35,7 +35,7 @@ to match the specification.
 | TASK-003-003 | Implement task suggestion and explicit-reuse services | Complete | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
 | TASK-003-004 | Expose the validated task suggestion boundary | Complete | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
 | TASK-003-005 | Build the accessible idle-task combobox | Complete | TASK-003-004 | AC-003-001–011, AC-003-016 |
-| TASK-003-006 | Verify Task Search and Reuse and update documentation | Pending | TASK-003-005 | AC-003-001–017 |
+| TASK-003-006 | Verify Task Search and Reuse and update documentation | Complete | TASK-003-005 | AC-003-001–017 |
 
 ---
 
@@ -416,7 +416,7 @@ TASK-003-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -463,6 +463,42 @@ TASK-003-005.
 
 Record the final acceptance matrix, command results, runtime evidence, deviations,
 and documentation updates before marking this task and specification complete.
+
+- Final acceptance matrix:
+
+  | Acceptance criteria | Evidence | Result |
+  | --- | --- | --- |
+  | AC-003-001–004, AC-003-015 | Disposable-SQLite suggestion repository tests cover five-result recency, normalized substring and prefix ordering, every tie-breaker, one-snapshot today/lifetime projections, DST, one-query bounding, and read-only behavior. Development and packaged smoke tests rendered recent ordering, search matching, descriptions, and totals. | Passed |
+  | AC-003-005–008, AC-003-010 | Timer service/integration and renderer tests cover exact-ID keyboard/pointer reuse without duplication, normalized typed Start, wrapping navigation, predictable focus/Escape/blur/Start closure, and silent empty results. Both runtime environments exercised keyboard, pointer, and typed reuse through the running view. | Passed |
+  | AC-003-009, AC-003-011–012 | Renderer tests deterministically cover out-of-order response rejection, recoverable suggestion failures and retries, and controlled stale-selection `TASK_NOT_FOUND`; service tests demonstrate no mutation for a missing ID. | Passed |
+  | AC-003-013–014 | Service, shared validation, IPC, and preload tests cover both active-state rejections and exact-shape runtime validation before queries or mutations. | Passed |
+  | AC-003-016 | Renderer tests cover combobox/listbox/option roles, relationships, highlight, announcements, errors, and retained focus. Runtime inspection confirmed expanded state, controls, active descendant, selected option, and keyboard/pointer operation. | Passed |
+  | AC-003-017 | Source/test review and both runtime environments confirmed no history-row Play, active switching, task management, or interval management controls. | Passed |
+
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 232 tests in 37 files.
+- `npm run package` — passed for macOS arm64. Electron Forge emitted only
+  its existing Vite `inlineDynamicImports` deprecation warning.
+- `git diff --check` — passed after final documentation updates.
+- Browser plugin was unavailable, so isolated rendered verification used Electron
+  CDP. The development app at `http://localhost:5173/` and packaged `file://` app
+  both passed meaningful-content, no-overlay, recent/search, keyboard reuse,
+  pointer reuse, normalized typed reuse, accessibility-state, scope, and restart
+  reconstruction checks. The packaged app had no console warnings/errors and no
+  HTTP(S) resource entries; development used only expected localhost Vite assets
+  and emitted Electron's development-only CSP warning.
+- Renderer inspection found `require`, `process`, and `ipcRenderer` unavailable in
+  both environments. Packaged restart recovered the running reused `Design Review`
+  task from the isolated SQLite profile.
+- Recoverable suggestion failure and deleted-selection flows were verified through
+  deterministic renderer, IPC, and service tests rather than by injecting failures
+  into a production runtime.
+- No schema, migration, architectural decision, or domain-model documentation
+  change was required. Updated the specification status, task evidence,
+  `docs/plan.md`, and `docs/progress.md`.
+- Deviations: none.
 
 ---
 

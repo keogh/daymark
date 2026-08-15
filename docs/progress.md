@@ -2,18 +2,18 @@
 
 ## Current Phase
 
-Task Search and Reuse specification ready
+Task Search and Reuse complete
 
 ## Current Specification
 
-SPEC-003 — Task Search and Reuse (Ready for Implementation)
+SPEC-003 — Task Search and Reuse (Verified)
 
 ## Current Status
 
-SPEC-003 is implementation-ready with a companion task breakdown. It defines
-bounded recent and substring-matched task suggestions, deterministic ordering,
-authoritative daily and lifetime totals, accessible keyboard and pointer reuse, and
-explicit existing-task Start by stable ID.
+SPEC-003 is verified. The idle timer now provides bounded recent and normalized
+substring-matched task suggestions with deterministic prefix/recency ordering,
+authoritative daily and lifetime totals, accessible keyboard and pointer reuse,
+and explicit existing-task Start by stable ID.
 
 ---
 
@@ -22,6 +22,7 @@ explicit existing-task Start by stable ID.
 - SPEC-000 — Project Foundation (Verified 2026-08-13)
 - SPEC-001 — Core Time Tracking (Verified 2026-08-14)
 - SPEC-002 — Daily History (Verified 2026-08-15)
+- SPEC-003 — Task Search and Reuse (Verified 2026-08-15)
 
 SPEC-001 delivered:
 
@@ -63,19 +64,41 @@ covered empty, running, paused, narrow scrolling, renderer reload, paused/runnin
 restart recovery, and offline rendering without runtime network resources or
 packaged console errors.
 
+SPEC-003 delivered:
+
+- at most five recent or normalized substring-matched reusable-task suggestions,
+  with prefix-first and deterministic recency ordering;
+- authoritative local-today and lifetime totals derived from interval timestamps
+  using a single snapshot and existing DST-safe calendar projections;
+- an accessible asynchronous combobox with first-result highlighting, wrapping
+  keyboard navigation, pointer reuse, predictable close/retry behavior, and stale
+  response protection;
+- atomic explicit task reuse by stable ID while preserving normalized typed Start,
+  idle-only transitions, controlled missing-task behavior, and authoritative
+  history refresh;
+- narrow typed and runtime-validated task suggestion and Start boundaries without
+  exposing database, Node.js, or raw Electron capabilities to the renderer.
+
+Final acceptance covered AC-003-001 through AC-003-017 and the project Definition
+of Done. Formatting, typecheck, lint, all 232 tests in 37 files, macOS arm64
+packaging, and diff checks passed. Isolated development and packaged verification
+covered recent discovery, substring search, keyboard and pointer reuse, normalized
+typed reuse, accessibility state, restart reconstruction, scope exclusions, and
+renderer security. The packaged app loaded without HTTP(S) resources or console
+warnings/errors.
+
 ---
 
 # Upcoming Specifications
 
-1. SPEC-003 — Task Search and Reuse
-2. SPEC-004 — One-Click Task Switching
-3. SPEC-005 — Manual Time Entry
-4. SPEC-006 — Edit and Delete Intervals
-5. SPEC-007 — Task Management
-6. SPEC-008 — System Tray
-7. SPEC-009 — Analytics
-8. SPEC-010 — Settings
-9. SPEC-011 — Packaging and Release
+1. SPEC-004 — One-Click Task Switching
+2. SPEC-005 — Manual Time Entry
+3. SPEC-006 — Edit and Delete Intervals
+4. SPEC-007 — Task Management
+5. SPEC-008 — System Tray
+6. SPEC-009 — Analytics
+7. SPEC-010 — Settings
+8. SPEC-011 — Packaging and Release
 
 ---
 
@@ -87,8 +110,7 @@ None.
 
 # Active Work
 
-SPEC-003 is ready for implementation. The first unblocked task is TASK-003-001 —
-Define suggestion and explicit-start contracts. SPEC-004 remains the next planned
+SPEC-003 is verified with no blockers or deviations. SPEC-004 is the next planned
 specification and will define history-row Play and one-click switching while a task
 is running or paused.
 
@@ -96,18 +118,16 @@ is running or paused.
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-002 remained within the established typed preload API,
+See `docs/decisions.md`. SPEC-003 remained within the established typed preload API,
 main-process SQLite, timestamp-based interval, injected Clock, and npm decisions.
-DEC-034 adds Tailwind CSS v4 and selectively adopted, source-owned official shadcn/ui
-components without changing process boundaries or authorizing a wholesale redesign.
-No schema migration or architectural deviation was required.
+It reused SPEC-002 local-calendar projections and source-owned UI primitives. No
+schema migration, dependency, decision, or architectural deviation was required.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Made SPEC-003 ready for implementation with six ordered tasks and
-AC-003-001 through AC-003-017. Product decisions establish five visible results,
-empty-input recents, normalized case-insensitive substring search, prefix-first then
-recent ordering, first-result keyboard highlighting, and authoritative daily and
-lifetime suggestion totals.
+2026-08-15 — Verified SPEC-003 against AC-003-001 through AC-003-017 with 232
+automated tests, macOS arm64 packaging, and isolated development and packaged
+runtime acceptance covering search, keyboard/pointer/typed reuse, restart,
+security, offline packaged resources, accessibility state, and scope exclusions.
