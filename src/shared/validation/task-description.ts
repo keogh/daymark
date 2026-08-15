@@ -1,4 +1,5 @@
 import type { AppResult } from '@/shared/contracts/app-result';
+import { hasExactKeys, isRecord } from '@/shared/validation/object-shape';
 
 export const MAX_TASK_DESCRIPTION_CODE_POINTS = 500;
 
@@ -65,20 +66,6 @@ export const validateStartTaskInput = (
   }
 
   return invalidStartTask();
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const hasExactKeys = (
-  value: Record<string, unknown>,
-  expected: readonly string[],
-): boolean => {
-  const keys = Object.keys(value);
-  return (
-    keys.length === expected.length &&
-    expected.every((key) => keys.includes(key))
-  );
 };
 
 const invalidDescription = (): AppResult<never> => ({

@@ -1,5 +1,6 @@
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { SwitchToTaskInput } from '@/shared/contracts/timer';
+import { hasExactKeys, isRecord } from '@/shared/validation/object-shape';
 
 export type ValidatedSwitchToTaskInput = SwitchToTaskInput;
 
@@ -18,20 +19,6 @@ export const validateSwitchToTaskInput = (
     ok: true,
     value: { taskId: input.taskId },
   };
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const hasExactKeys = (
-  value: Record<string, unknown>,
-  expected: readonly string[],
-): boolean => {
-  const keys = Object.keys(value);
-  return (
-    keys.length === expected.length &&
-    expected.every((key) => keys.includes(key))
-  );
 };
 
 const invalidSwitchTask = (): AppResult<never> => ({
