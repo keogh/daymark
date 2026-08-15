@@ -25,8 +25,10 @@ import {
   type HistoryController,
 } from './use-history-controller';
 import { useLiveHistoryPage } from './use-live-history-page';
+import { formatLocalDateInput } from './local-date-format';
 
 export const DailyHistory = ({
+  onAddTime = () => undefined,
   onPlayTask = () =>
     Promise.resolve({
       ok: false as const,
@@ -38,15 +40,16 @@ export const DailyHistory = ({
   refreshRevision = 0,
   timer = null,
 }: {
+  readonly onAddTime?: (date: string) => void;
   readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly refreshRevision?: number;
   readonly timer?: TimerState | null;
 }) => {
   const controller = useHistoryController(refreshRevision);
   const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
-  const [historyActionMessage, setHistoryActionMessage] = useState<string | null>(
-    null,
-  );
+  const [historyActionMessage, setHistoryActionMessage] = useState<
+    string | null
+  >(null);
 
   const runHistoryTask = async (
     rowId: string,
@@ -83,6 +86,7 @@ export const DailyHistory = ({
         controller={controller}
         historyActionMessage={historyActionMessage}
         onPlayTask={runHistoryTask}
+        onAddTime={onAddTime}
         pendingRows={pendingRows}
         timer={timer}
       />
@@ -94,12 +98,14 @@ const HistoryContent = ({
   controller,
   historyActionMessage,
   onPlayTask,
+  onAddTime,
   pendingRows,
   timer,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  onAddTime: (date: string) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
 }) => {
@@ -129,6 +135,7 @@ const HistoryContent = ({
       controller={controller}
       historyActionMessage={historyActionMessage}
       onPlayTask={onPlayTask}
+      onAddTime={onAddTime}
       pendingRows={pendingRows}
       state={controller.loadState}
       timer={timer}
@@ -140,6 +147,7 @@ const HistoryDays = ({
   controller,
   historyActionMessage,
   onPlayTask,
+  onAddTime,
   pendingRows,
   state,
   timer,
@@ -147,6 +155,7 @@ const HistoryDays = ({
   controller: HistoryController;
   historyActionMessage: string | null;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  onAddTime: (date: string) => void;
   pendingRows: Record<string, boolean>;
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
   timer: TimerState | null;
@@ -157,11 +166,7 @@ const HistoryDays = ({
   return (
     <div className="history-days">
       {historyActionMessage !== null && (
-        <p
-          aria-live="polite"
-          className="history-action-status"
-          role="status"
-        >
+        <p aria-live="polite" className="history-action-status" role="status">
           {historyActionMessage}
         </p>
       )}
@@ -171,6 +176,7 @@ const HistoryDays = ({
           key={day.dayStartedAt}
           now={page.now}
           onPlayTask={onPlayTask}
+          onAddTime={onAddTime}
           pendingRows={pendingRows}
           timer={timer}
         />
@@ -269,12 +275,14 @@ const HistoryDaySection = ({
   day,
   now,
   onPlayTask,
+  onAddTime,
   pendingRows,
   timer,
 }: {
   day: HistoryDay;
   now: number;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
+  onAddTime: (date: string) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
 }) => (
@@ -283,10 +291,21 @@ const HistoryDaySection = ({
     className="history-day"
   >
     <div className="history-day__heading">
-      <h3 id={`history-day-${day.dayStartedAt}`}>
-        {formatHistoryDayLabel(day.dayStartedAt, now)}
-      </h3>
-      <p>{formatHistoryDuration(day.totalDurationMs)}</p>
+      <div>
+        <h3 id={`history-day-${day.dayStartedAt}`}>
+          {formatHistoryDayLabel(day.dayStartedAt, now)}
+        </h3>
+        <p>{formatHistoryDuration(day.totalDurationMs)}</p>
+      </div>
+      <Button
+        aria-label={`Add time for ${formatHistoryDayLabel(day.dayStartedAt, now)}`}
+        onClick={() => onAddTime(formatLocalDateInput(day.dayStartedAt))}
+        size="sm"
+        type="button"
+        variant="outline"
+      >
+        Add time
+      </Button>
     </div>
     {day.tasks.map((task) => (
       <HistoryTaskRow
@@ -319,18 +338,16 @@ const HistoryTaskRow = ({
   const rowId = `${day.dayStartedAt}:${task.task.id}`;
   const isPending = pendingRows[rowId] === true;
   const isSameTask = timer?.currentTask?.id === task.task.id;
-  const isAlreadyRunning =
-    timer?.status === 'running' && isSameTask;
-  const actionLabel =
-    isAlreadyRunning
-      ? 'Already running'
-      : isPending
-        ? timer?.status === 'paused' && isSameTask
-          ? 'Resuming…'
-          : 'Starting…'
-        : timer?.status === 'paused' && isSameTask
-          ? 'Resume'
-          : 'Play';
+  const isAlreadyRunning = timer?.status === 'running' && isSameTask;
+  const actionLabel = isAlreadyRunning
+    ? 'Already running'
+    : isPending
+      ? timer?.status === 'paused' && isSameTask
+        ? 'Resuming…'
+        : 'Starting…'
+      : timer?.status === 'paused' && isSameTask
+        ? 'Resume'
+        : 'Play';
 
   return (
     <div className="history-task">

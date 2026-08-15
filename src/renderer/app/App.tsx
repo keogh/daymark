@@ -18,6 +18,8 @@ import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import type { TimerState } from '@/shared/contracts/timer';
 import { DailyHistory } from './DailyHistory';
+import { ManualTimeEntryDialog } from './ManualTimeEntryDialog';
+import { formatLocalDateInput } from './local-date-format';
 import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
 import { useDisplayDuration } from './use-display-duration';
 import { useTaskSuggestions } from './use-task-suggestions';
@@ -28,6 +30,10 @@ import {
 
 export const App = () => {
   const controller = useTimerController();
+  const [manualEntryDate, setManualEntryDate] = useState<string | null>(null);
+
+  const openGlobalManualEntry = () =>
+    setManualEntryDate(formatLocalDateInput(Date.now()));
 
   return (
     <main className="app-shell">
@@ -50,7 +56,13 @@ export const App = () => {
             />
           )}
       </section>
+      <div className="global-manual-entry">
+        <Button onClick={openGlobalManualEntry} type="button" variant="outline">
+          Add time
+        </Button>
+      </div>
       <DailyHistory
+        onAddTime={(date) => setManualEntryDate(date)}
         onPlayTask={controller.switchToTask}
         refreshRevision={controller.authoritativeRevision}
         timer={
@@ -59,6 +71,16 @@ export const App = () => {
             : null
         }
       />
+      {manualEntryDate !== null && (
+        <ManualTimeEntryDialog
+          initialDate={manualEntryDate}
+          onOpenChange={(open) => {
+            if (!open) setManualEntryDate(null);
+          }}
+          onSaved={controller.refresh}
+          open
+        />
+      )}
     </main>
   );
 };

@@ -45,7 +45,9 @@ const pausedState: TimerState = {
   activeIntervalStartedAt: null,
 };
 
-const historyPageWithTask = (description = 'Implement authentication'): HistoryPage => ({
+const historyPageWithTask = (
+  description = 'Implement authentication',
+): HistoryPage => ({
   days: [
     {
       dayStartedAt: new Date(1_000).setHours(0, 0, 0, 0),
@@ -102,6 +104,125 @@ describe('App', () => {
     expect(startButton).toHaveAttribute('data-slot', 'button');
     expect(startButton).toHaveAttribute('data-variant', 'default');
     expect(startButton).toBeDisabled();
+  });
+
+  it('opens the global manual-entry dialog with an accessible local-day form', async () => {
+    const expectedDate = new Date();
+    const expectedDateValue = `${expectedDate.getFullYear()}-${String(expectedDate.getMonth() + 1).padStart(2, '0')}-${String(expectedDate.getDate()).padStart(2, '0')}`;
+    setTimerApi();
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Add time' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Add time' });
+    expect(dialog).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Task' })).toHaveFocus();
+    expect(screen.getByLabelText('Date')).toHaveValue(expectedDateValue);
+    expect(screen.getByLabelText('Start time')).toBeVisible();
+    expect(screen.getByLabelText('End time')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save time' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+  });
+
+  it('prefills a history day and closes with Escape without saving', async () => {
+    const api = setTimerApi({
+      getHistoryPage: vi.fn().mockResolvedValue({
+        ok: true,
+        value: historyPageWithTask(),
+      }),
+    });
+    render(<App />);
+
+    const dayAction = await screen.findByRole('button', {
+      name: /Add time for/,
+    });
+    fireEvent.click(dayAction);
+    const selectedDay = new Date(new Date(1_000).setHours(0, 0, 0, 0));
+    const selectedDateValue = `${selectedDay.getFullYear()}-${String(selectedDay.getMonth() + 1).padStart(2, '0')}-${String(selectedDay.getDate()).padStart(2, '0')}`;
+    expect(screen.getByLabelText('Date')).toHaveValue(selectedDateValue);
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(api.manualTime.createInterval).not.toHaveBeenCalled();
+  });
+
+  it('saves a selected existing task once and refreshes timer and history authoritatively', async () => {
+    const save = deferred<AppResult<{ intervalId: string }>>();
+    const api = setTimerApi({
+      createManualInterval: vi.fn(() => save.promise),
+      getSuggestions: vi.fn().mockResolvedValue({
+        ok: true,
+        value: suggestionPage([suggestion('task-a', 'Alpha')]),
+      }),
+    });
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Add time' }));
+    const task = screen.getByRole('combobox', { name: 'Task' });
+    fireEvent.change(task, { target: { value: 'Al' } });
+    await screen.findByRole('option', { name: 'Alpha' });
+    fireEvent.keyDown(task, { key: 'Enter' });
+    expect(task).toHaveValue('Alpha');
+    fireEvent.change(screen.getByLabelText('Start time'), {
+      target: { value: '09:00' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '10:00' },
+    });
+    const selectedDate = screen.getByLabelText<HTMLInputElement>('Date').value;
+
+    const saveButton = screen.getByRole('button', { name: 'Save time' });
+    fireEvent.click(saveButton);
+    fireEvent.click(saveButton);
+    expect(api.manualTime.createInterval).toHaveBeenCalledOnce();
+    expect(api.manualTime.createInterval).toHaveBeenCalledWith({
+      taskId: 'task-a',
+      date: selectedDate,
+      startTime: '09:00',
+      endTime: '10:00',
+    });
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeDisabled();
+
+    save.resolve({ ok: true, value: { intervalId: 'manual-1' } });
+    expect(
+      await screen.findByRole('button', { name: 'Add time' }),
+    ).toBeVisible();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(api.timer.getState).toHaveBeenCalledTimes(2);
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves typed values and shows a controlled overlap error', async () => {
+    const api = setTimerApi({
+      createManualInterval: vi.fn().mockResolvedValue({
+        ok: false,
+        error: { code: 'TIME_INTERVAL_OVERLAP', message: 'Internal detail' },
+      }),
+    });
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Add time' }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Task' }), {
+      target: { value: 'Planning' },
+    });
+    fireEvent.change(screen.getByLabelText('Start time'), {
+      target: { value: '09:00' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '10:00' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save time' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'overlaps an existing entry',
+    );
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Task' })).toHaveValue(
+      'Planning',
+    );
+    expect(screen.getByLabelText('Start time')).toHaveValue('09:00');
+    expect(screen.getByLabelText('End time')).toHaveValue('10:00');
+    expect(api.manualTime.createInterval).toHaveBeenCalledWith(
+      expect.objectContaining({ taskDescription: 'Planning' }),
+    );
   });
 
   it('starts a trimmed description with the Start button and shows pending state', async () => {
@@ -648,7 +769,11 @@ describe('App', () => {
 
     switchResult.resolve({ ok: true, value: nextState });
 
-    expect(await screen.findByRole('button', { name: 'Already running Implement authentication' })).toBeDisabled();
+    expect(
+      await screen.findByRole('button', {
+        name: 'Already running Implement authentication',
+      }),
+    ).toBeDisabled();
     await act(async () => Promise.resolve());
     expect(api.history.getPage).toHaveBeenCalledTimes(2);
   });

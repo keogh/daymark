@@ -21,6 +21,7 @@ export interface TimerController {
   readonly pause: () => Promise<void>;
   readonly resume: () => Promise<void>;
   readonly stop: () => Promise<void>;
+  readonly refresh: () => Promise<void>;
   readonly clearCommandError: () => void;
   readonly authoritativeRevision: number;
 }
@@ -196,6 +197,19 @@ export const useTimerController = (): TimerController => {
   }, [activeCommand, timer]);
 
   const clearCommandError = useCallback(() => setCommandError(null), []);
+  const refresh = useCallback(async (): Promise<void> => {
+    const version = ++requestVersion.current;
+    try {
+      const result = await window.timeTracker.timer.getState();
+      if (result.ok && version === requestVersion.current) {
+        setLoadState({ status: 'ready', timer: result.value });
+      }
+    } catch {
+      // Keep the last usable timer snapshot while history still reconciles.
+    } finally {
+      setAuthoritativeRevision((revision) => revision + 1);
+    }
+  }, []);
 
   return {
     loadState,
@@ -207,6 +221,7 @@ export const useTimerController = (): TimerController => {
     pause,
     resume,
     stop,
+    refresh,
     clearCommandError,
     authoritativeRevision,
   };

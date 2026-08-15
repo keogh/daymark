@@ -34,7 +34,7 @@ breakdown to match the specification.
 | TASK-005-001 | Define manual-entry contracts and validation | Complete | None | AC-005-009 |
 | TASK-005-002 | Implement transactional manual interval creation | Complete | TASK-005-001 | AC-005-003–008 |
 | TASK-005-003 | Expose the validated manual-entry boundary | Complete | TASK-005-002 | AC-005-009 |
-| TASK-005-004 | Add accessible manual-entry UI and refresh flows | Pending | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
+| TASK-005-004 | Add accessible manual-entry UI and refresh flows | Complete | TASK-005-003 | AC-005-001, AC-005-002, AC-005-010–012 |
 | TASK-005-005 | Verify Manual Time Entry and update documentation | Pending | TASK-005-004 | AC-005-001–012 |
 
 ---
@@ -257,7 +257,7 @@ TASK-005-002.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -305,8 +305,28 @@ TASK-005-003.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when
-complete.
+- Added the shared `ManualTimeEntryDialog` focused surface with Radix focus
+  management, explicitly labeled task/date/time fields, existing-task combobox
+  selection, typed-description guidance, inline range and controlled-error
+  feedback, Escape/cancel behavior, and pending submission protection.
+- Added the global Timer `Add time` entry point and day-level Daily History
+  actions with local current-day and selected-day prefilling.
+- Added authoritative post-save timer reload and history reconciliation through
+  the existing controller revision flow; refresh failure preserves the last
+  usable timer snapshot while still reconciling history.
+- Added renderer coverage in `test/renderer/app/App.test.tsx` for both entry
+  points, labels and focus, keyboard cancellation and selection, pending
+  duplicate prevention, successful close-and-refresh, and value-preserving
+  controlled overlap feedback.
+- Verification commands run on 2026-08-15:
+  - `npm test -- App DailyHistory` ✅ (62 tests)
+  - `npm run typecheck` ✅
+  - `npm run lint` ✅
+  - `npm test` ✅ (312 tests)
+  - `npm run package` ✅
+  - packaged Electron CDP flow at 1100×820 ✅ (global/day entry, local-day
+    prefill, successful authoritative refresh, preserved overlap failure, clean
+    console, screenshot inspected)
 
 ---
 
