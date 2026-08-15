@@ -44,7 +44,7 @@ to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -83,7 +83,14 @@ None.
 
 ### Completion Evidence
 
-Record commands run, results, and any relevant implementation notes when complete.
+- Added `SwitchToTaskInput`, `TIMER_SWITCH_TO_TASK_CHANNEL`,
+  `INVALID_SWITCH_TASK`, and shared exact-shape runtime validation without
+  changing timer behavior or registering IPC.
+- Added focused tests for malformed switch input and renderer-safe error typing.
+- Verification completed on 2026-08-15:
+  - `npm test -- switch-to-task app-result task-description` — passed
+  - `npm run typecheck` — passed
+  - `npm run lint` — passed
 
 ---
 
