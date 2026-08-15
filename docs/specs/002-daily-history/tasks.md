@@ -3,7 +3,7 @@
 ## Source
 
 - Specification: `docs/specs/002-daily-history/spec.md`
-- Specification status: Draft
+- Specification status: Ready for Implementation
 - Last reviewed against specification: 2026-08-14
 
 The specification is the source of truth for behavior. This file only decomposes
@@ -30,7 +30,7 @@ to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-002-001 | Establish the renderer styling foundation | Pending | None | AC-002-017–018 |
+| TASK-002-001 | Establish the renderer styling foundation | Complete | None | AC-002-017–018 |
 | TASK-002-002 | Define history contracts and projection primitives | Pending | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
 | TASK-002-003 | Implement bounded history queries and service paging | Pending | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
 | TASK-002-004 | Expose the validated history IPC boundary | Pending | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
@@ -47,7 +47,7 @@ to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -95,7 +95,23 @@ None.
 
 ### Completion Evidence
 
-Pending.
+Tailwind CSS v4 is integrated through the existing Electron Forge Vite renderer.
+The official shadcn 4.18.0 CLI validated the manual Electron configuration as the
+Radix Nova preset with Lucide icons and added only Button, Input, Field, Spinner,
+Alert, and Field's required Label and Separator dependencies. Light neutral/slate
+semantic tokens retain the existing blue primary treatment.
+
+The idle, running, paused, loading, and error timer branches now use the reviewed
+source-owned primitives without changing controller behavior, labels, keyboard
+access, focus restoration, pending states, or the specialized timer layout.
+Focused renderer and boundary tests passed (20 tests), including explicit source-
+owned component, variant, focus, pending, and invalid-state assertions. Typecheck,
+lint, formatting verification, and macOS arm64 packaging passed. A live Electron
+development smoke test at `http://localhost:5173/` verified the focused idle input,
+disabled-to-enabled Start interaction, rendered Tailwind styling, and no relevant
+renderer console errors; the sole console warning was Electron's documented
+development-only CSP warning. The packaged production renderer completed without a
+runtime network dependency.
 
 ---
 

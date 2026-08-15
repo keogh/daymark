@@ -2,18 +2,17 @@
 
 ## Current Phase
 
-Daily History specification review
+Daily History implementation
 
 ## Current Specification
 
-SPEC-002 — Daily History (Draft)
+SPEC-002 — Daily History (In Progress)
 
 ## Current Status
 
-SPEC-001 is verified. The draft SPEC-002 behavior, acceptance criteria, and task
-breakdown are prepared for review. The accepted renderer tooling decision records
-incremental Tailwind CSS v4 and selective official shadcn/ui adoption as supporting
-infrastructure for Daily History.
+SPEC-001 is verified. SPEC-002 implementation is active. TASK-002-001 established
+Tailwind CSS v4, light semantic theme tokens, and the minimal official Radix Nova
+shadcn/ui renderer foundation while preserving verified timer behavior.
 
 ---
 
@@ -66,6 +65,13 @@ None.
 
 ---
 
+# Active Work
+
+TASK-002-001 is complete. The next unblocked task is TASK-002-002 — Define history
+contracts and projection primitives.
+
+---
+
 # Important Decisions
 
 See `docs/decisions.md`. SPEC-001 remained within the established Electron, React,
@@ -78,5 +84,6 @@ or authorizing a wholesale redesign.
 
 # Last Updated
 
-2026-08-14 — Prepared draft SPEC-002, its companion task breakdown, and the accepted
-renderer styling/component decision for review.
+2026-08-14 — Completed TASK-002-001. Tailwind CSS v4, official Radix Nova
+source-owned primitives, semantic light tokens, focused renderer regression tests,
+live Electron smoke testing, and macOS arm64 packaging passed.

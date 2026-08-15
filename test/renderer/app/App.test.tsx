@@ -66,7 +66,11 @@ describe('App', () => {
       name: 'Task description',
     });
     expect(input).toHaveFocus();
-    expect(screen.getByRole('button', { name: 'Start' })).toBeDisabled();
+    expect(input).toHaveAttribute('data-slot', 'input');
+    const startButton = screen.getByRole('button', { name: 'Start' });
+    expect(startButton).toHaveAttribute('data-slot', 'button');
+    expect(startButton).toHaveAttribute('data-variant', 'default');
+    expect(startButton).toBeDisabled();
   });
 
   it('starts a trimmed description with the Start button and shows pending state', async () => {
@@ -125,6 +129,10 @@ describe('App', () => {
       'Task description must contain between 1 and 500 characters.',
     );
     expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input.closest('[data-slot="field"]')).toHaveAttribute(
+      'data-invalid',
+      'true',
+    );
     expect(input).toHaveFocus();
     expect(api.timer.start).not.toHaveBeenCalled();
   });
@@ -220,7 +228,9 @@ describe('App', () => {
     render(<App />);
 
     expect(await screen.findByRole('button', { name: 'Pause' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Stop' })).toBeEnabled();
+    const stopButton = screen.getByRole('button', { name: 'Stop' });
+    expect(stopButton).toHaveAttribute('data-variant', 'outline');
+    expect(stopButton).toBeEnabled();
     expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
       '00:00:00',
     );

@@ -1,4 +1,57 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+}
+
 :root {
+  --radius: 0.75rem;
+  --background: #f5f7fb;
+  --foreground: #172033;
+  --card: #ffffff;
+  --card-foreground: #172033;
+  --popover: #ffffff;
+  --popover-foreground: #172033;
+  --primary: #3156d3;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f6;
+  --secondary-foreground: #344054;
+  --muted: #eef1f6;
+  --muted-foreground: #667085;
+  --accent: #eef1f6;
+  --accent-foreground: #344054;
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --border: #c9d1df;
+  --input: #c9d1df;
+  --ring: #4c6ef5;
   color: #172033;
   background: #f5f7fb;
   font-family:
@@ -24,12 +77,6 @@ body {
 button,
 input {
   font: inherit;
-}
-
-button:focus-visible,
-input:focus-visible {
-  outline: 3px solid rgb(76 110 245 / 28%);
-  outline-offset: 2px;
 }
 
 .app-shell {
@@ -84,71 +131,8 @@ input:focus-visible {
   min-width: 0;
 }
 
-.start-form input {
-  width: 100%;
-  min-height: 3.5rem;
-  padding: 0.875rem 1rem;
-  border: 1px solid #c9d1df;
-  border-radius: 0.75rem;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
-  color: #172033;
-  font-size: 1rem;
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.start-form input::placeholder {
-  color: #7b879b;
-}
-
-.start-form input:hover:not(:disabled) {
-  border-color: #aab5c6;
-}
-
-.start-form input:focus {
-  border-color: #4c6ef5;
-  box-shadow: 0 0 0 4px rgb(76 110 245 / 12%);
-}
-
-.start-form input[aria-invalid='true'] {
-  border-color: #d92d20;
-}
-
-.start-form button {
-  min-height: 3.5rem;
-  padding: 0.875rem 1.5rem;
-  border: 0;
-  border-radius: 0.75rem;
-  background: #3156d3;
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.9375rem;
-  font-weight: 680;
-  transition:
-    background 140ms ease,
-    transform 140ms ease;
-}
-
-.start-form button:hover:not(:disabled) {
-  background: #2748b9;
-}
-
-.start-form button:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.start-form button:disabled,
-.start-form input:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
-}
-
 .start-form__error {
   margin: 0.625rem 0 0 0.25rem;
-  color: #b42318;
-  font-size: 0.875rem;
   line-height: 1.4;
 }
 
@@ -171,10 +155,7 @@ input:focus-visible {
   width: 1.75rem;
   height: 1.75rem;
   margin: 0 auto;
-  border: 3px solid #d8deea;
-  border-top-color: #3156d3;
-  border-radius: 50%;
-  animation: spin 700ms linear infinite;
+  color: var(--primary);
 }
 
 .timer-message--error h2 {
@@ -223,50 +204,8 @@ input:focus-visible {
   margin-top: 2rem;
 }
 
-.timer-controls button {
-  min-width: 7rem;
-  min-height: 3rem;
-  padding: 0.75rem 1.25rem;
-  border: 0;
-  border-radius: 0.75rem;
-  background: #3156d3;
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.9375rem;
-  font-weight: 680;
-  transition:
-    background 140ms ease,
-    transform 140ms ease;
-}
-
-.timer-controls button:hover:not(:disabled) {
-  background: #2748b9;
-}
-
-.timer-controls button:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.timer-controls .timer-controls__stop {
-  border: 1px solid #c9d1df;
-  background: #fff;
-  color: #344054;
-}
-
-.timer-controls .timer-controls__stop:hover:not(:disabled) {
-  border-color: #aab5c6;
-  background: #f9fafb;
-}
-
-.timer-controls button:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
-}
-
 .active-timer .active-timer__error {
   margin-top: 1rem;
-  color: #b42318;
-  font-size: 0.875rem;
 }
 
 .visually-hidden {
@@ -279,12 +218,6 @@ input:focus-visible {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 560px) {
@@ -304,7 +237,7 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .start-form button {
+  .start-form [data-slot='button'] {
     width: 100%;
   }
 

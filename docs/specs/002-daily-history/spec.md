@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+In Progress
 
 ## Milestone
 
@@ -1115,4 +1115,3 @@ This specification is complete when:
 - Do not install community registry blocks or all available components.
 - Preserve source-owned component accessibility and semantic-token conventions.
 - Do not add a new state-management framework for history.
-
