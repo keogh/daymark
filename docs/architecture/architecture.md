@@ -138,6 +138,7 @@ The renderer owns:
 - forms;
 - modals;
 - visual timer updates;
+- local animation of history values derived from authoritative snapshots;
 - navigation.
 
 Renderer styling uses Tailwind CSS utilities for layout and composition plus
@@ -183,7 +184,7 @@ interface TimeTrackerAPI {
   };
 
   history: {
-    getRange(input: HistoryRangeInput): Promise<HistoryDay[]>;
+    getPage(input: HistoryPageInput): Promise<AppResult<HistoryPage>>;
   };
 
   intervals: {
@@ -247,6 +248,12 @@ AnalyticsService
 AppStateService
 TrayService
 ```
+
+`HistoryService` obtains one authoritative time snapshot from the injected Clock
+and builds bounded local-calendar-day projections. Daily history is read-only:
+stored intervals remain the source of truth, including intervals crossing midnight.
+The renderer may animate the open interval from the returned snapshot, but refreshes
+through the explicit history API after timer transitions and reconciliation events.
 
 ---
 
@@ -407,6 +414,8 @@ TaskSummaryQueries
 ```
 
 This is useful because daily history is a projection rather than a simple entity list.
+The implemented history query path retrieves bounded activity-day pages and task
+lifetime totals with set-based queries rather than one query per rendered row.
 
 ---
 
@@ -492,7 +501,7 @@ tasks:search
 tasks:rename
 tasks:delete
 
-history:get-range
+history:get-page
 
 intervals:create
 intervals:update

@@ -37,7 +37,7 @@ to match the specification.
 | TASK-002-005 | Render the initial Daily History states | Complete | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
 | TASK-002-006 | Add older-page loading and resilient retry | Complete | TASK-002-005 | AC-002-008–009, AC-002-014 |
 | TASK-002-007 | Synchronize live history with timer state | Complete | TASK-002-005 | AC-002-010–012 |
-| TASK-002-008 | Verify Daily History and update documentation | Pending | TASK-002-006–007 | AC-002-001–018 |
+| TASK-002-008 | Verify Daily History and update documentation | Complete | TASK-002-006–007 | AC-002-001–018 |
 
 ---
 
@@ -518,7 +518,7 @@ typecheck, lint, formatting verification, and the diff whitespace check.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -562,7 +562,26 @@ TASK-002-006 and TASK-002-007.
 
 ### Completion Evidence
 
-Pending.
+Audited AC-002-001 through AC-002-018 against the production implementation and
+the required unit, disposable-SQLite repository/integration, IPC/preload, and React
+Testing Library coverage. The complete suite passed with 179 tests across 32 files.
+Formatting, typecheck, lint, packaging for macOS arm64, and the diff whitespace
+check also passed.
+
+The development application and packaged application were launched with isolated
+user data. The packaged run blocked external hostname resolution and loaded no HTTP
+resources. It rendered the empty, running, paused, reload, and restart states
+without console errors. Start, Pause, Resume, and Stop succeeded;
+renderer reload preserved paused state; complete restarts recovered both paused and
+running state. A 420 x 560 viewport retained normal vertical page scrolling, had no
+horizontal overflow, and wrapped a long task description. Pointer/keyboard
+expansion, focus styling and preservation, pagination/error states, midnight/DST
+behavior, and later-spec control exclusion are covered by deterministic renderer
+and service tests. No schema change or migration was introduced.
+
+Architecture, plan, progress, task, and specification documentation now reflect the
+verified read-only Daily History implementation. SPEC-002 is Verified as of
+2026-08-15.
 
 ---
 

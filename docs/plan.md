@@ -6,7 +6,7 @@ SPEC-002 — Daily History
 
 ## Active Task
 
-TASK-002-007 — Synchronize Live History with Timer State
+TASK-002-008 — Verify Daily History and Update Documentation
 
 ## Status
 
@@ -26,30 +26,27 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Derive running history values locally from the authoritative page snapshot while
-   keeping paused and closed values fixed.
-2. Reconcile the initial history page after successful timer commands, the existing
-   periodic timer snapshot, window focus, and local midnight without discarding
-   loaded history on failure.
-3. Render a non-destructive reconciliation error with Retry and add deterministic
-   tests for live advancement, stability, refresh triggers, midnight, and failure.
-4. Run focused renderer tests, typecheck, lint, formatting verification, and the
-   complete test suite; record task evidence when all checks pass.
+1. Audit AC-002-001 through AC-002-018 against current automated coverage and
+   implementation boundaries.
+2. Run the complete formatting, typecheck, lint, test, packaging, and diff checks.
+3. Exercise the development and packaged applications with isolated user data,
+   including keyboard, focus, scrolling, reload, restart, running, paused, and
+   offline rendering behavior.
+4. Update the architecture, task evidence, specification status, plan, and project
+   progress only when all verification evidence is satisfactory.
 
 ---
 
 # Scope Guard
 
-Do not add per-second IPC or database writes, change persisted timer semantics,
-add history mutation commands, or introduce later-spec task actions.
+Do not add product behavior, history mutation commands, or later-spec task actions.
 
 ---
 
 # Completion
 
-TASK-002-007 is complete. Daily History derives open-interval values locally,
-reconciles after successful timer commands and periodic timer snapshots, refreshes
-on focus and recurring local midnight, preserves paginated history on success, and
-retains the last valid page with Retry on failure. Focused renderer tests (29), the
-complete suite (179), typecheck, lint, formatting verification, and the diff
-whitespace check passed.
+TASK-002-008 is complete. AC-002-001 through AC-002-018 were audited; all 179 tests,
+formatting, typecheck, lint, packaging, and diff checks passed. Isolated development
+and packaged workflows verified empty, running, paused, history, narrow scrolling,
+reload, paused/running restart recovery, and offline packaged rendering. SPEC-002
+and its affected documentation are verified and current.
