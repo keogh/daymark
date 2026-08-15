@@ -45,6 +45,16 @@ export class TimerService {
     if (!validation.ok) {
       return validation;
     }
+    if (validation.value.source !== 'description') {
+      return {
+        ok: false,
+        error: {
+          code: 'INVALID_START_TASK',
+          message: 'Starting an existing task is not available yet.',
+        },
+      };
+    }
+    const description = validation.value;
 
     const now = this.#clock.now();
     const transition = this.#transactions.run<AppResult<true>>(() => {
@@ -53,7 +63,6 @@ export class TimerService {
         return timerNotIdle();
       }
 
-      const description = validation.value;
       const task =
         this.#tasks.findByNormalizedDescription(
           description.normalizedDescription,

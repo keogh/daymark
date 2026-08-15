@@ -102,15 +102,23 @@ export const useTimerController = (): TimerController => {
 
   const start = useCallback(
     async (description: string): Promise<void> => {
-      const validation = validateStartTaskInput({ description });
+      const validation = validateStartTaskInput({
+        source: 'description',
+        description,
+      });
       if (!validation.ok) {
         setCommandError(validation.error);
         return;
       }
+      if (validation.value.source !== 'description') {
+        return;
+      }
+      const validatedDescription = validation.value.description;
 
       await runCommand('start', () =>
         window.timeTracker.timer.start({
-          description: validation.value.description,
+          source: 'description',
+          description: validatedDescription,
         }),
       );
     },

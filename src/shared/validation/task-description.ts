@@ -1,38 +1,84 @@
 import type { AppResult } from '@/shared/contracts/app-result';
-import type { StartTaskInput } from '@/shared/contracts/timer';
 
 export const MAX_TASK_DESCRIPTION_CODE_POINTS = 500;
 
 export interface ValidatedTaskDescription {
+  readonly source: 'description';
   readonly description: string;
   readonly normalizedDescription: string;
 }
 
+export interface ValidatedExistingTaskStart {
+  readonly source: 'existing-task';
+  readonly taskId: string;
+}
+
+export type ValidatedStartTaskInput =
+  ValidatedTaskDescription | ValidatedExistingTaskStart;
+
+export const normalizeTaskText = (value: string): string =>
+  value.trim().replace(/\s+/gu, ' ').toLocaleLowerCase();
+
 export const validateStartTaskInput = (
   input: unknown,
-): AppResult<ValidatedTaskDescription> => {
-  if (typeof input !== 'object' || input === null) {
-    return invalidDescription();
+): AppResult<ValidatedStartTaskInput> => {
+  if (!isRecord(input) || typeof input.source !== 'string') {
+    return invalidStartTask();
   }
 
-  const description = (input as Partial<StartTaskInput>).description;
-  if (typeof description !== 'string') {
-    return invalidDescription();
+  if (input.source === 'description') {
+    if (!hasExactKeys(input, ['source', 'description'])) {
+      return invalidStartTask();
+    }
+    if (typeof input.description !== 'string') {
+      return invalidDescription();
+    }
+
+    const description = input.description.trim();
+    const length = Array.from(description).length;
+    if (length === 0 || length > MAX_TASK_DESCRIPTION_CODE_POINTS) {
+      return invalidDescription();
+    }
+
+    return {
+      ok: true,
+      value: {
+        source: 'description',
+        description,
+        normalizedDescription: normalizeTaskText(description),
+      },
+    };
   }
 
-  const trimmedDescription = description.trim();
-  const length = Array.from(trimmedDescription).length;
-  if (length === 0 || length > MAX_TASK_DESCRIPTION_CODE_POINTS) {
-    return invalidDescription();
+  if (input.source === 'existing-task') {
+    if (!hasExactKeys(input, ['source', 'taskId'])) {
+      return invalidStartTask();
+    }
+    if (typeof input.taskId !== 'string' || input.taskId.trim().length === 0) {
+      return invalidStartTask();
+    }
+
+    return {
+      ok: true,
+      value: { source: 'existing-task', taskId: input.taskId },
+    };
   }
 
-  return {
-    ok: true,
-    value: {
-      description: trimmedDescription,
-      normalizedDescription: trimmedDescription.toLocaleLowerCase(),
-    },
-  };
+  return invalidStartTask();
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const hasExactKeys = (
+  value: Record<string, unknown>,
+  expected: readonly string[],
+): boolean => {
+  const keys = Object.keys(value);
+  return (
+    keys.length === expected.length &&
+    expected.every((key) => keys.includes(key))
+  );
 };
 
 const invalidDescription = (): AppResult<never> => ({
@@ -40,5 +86,13 @@ const invalidDescription = (): AppResult<never> => ({
   error: {
     code: 'INVALID_TASK_DESCRIPTION',
     message: 'Task description must contain between 1 and 500 characters.',
+  },
+});
+
+const invalidStartTask = (): AppResult<never> => ({
+  ok: false,
+  error: {
+    code: 'INVALID_START_TASK',
+    message: 'Start task input is invalid.',
   },
 });

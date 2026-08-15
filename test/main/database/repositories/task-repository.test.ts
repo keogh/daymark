@@ -52,9 +52,12 @@ describe('TaskRepository', () => {
   ])('reuses the first task for equivalent input %j', (description) => {
     const firstTask = createTask();
     repository.insert(firstTask);
-    const validated = validateStartTaskInput({ description });
+    const validated = validateStartTaskInput({
+      source: 'description',
+      description,
+    });
     expect(validated.ok).toBe(true);
-    if (!validated.ok) {
+    if (!validated.ok || validated.value.source !== 'description') {
       return;
     }
 

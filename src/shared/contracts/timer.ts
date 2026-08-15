@@ -24,9 +24,15 @@ export interface TimerState {
   readonly now: number;
 }
 
-export interface StartTaskInput {
-  readonly description: string;
-}
+export type StartTaskInput =
+  | {
+      readonly source: 'description';
+      readonly description: string;
+    }
+  | {
+      readonly source: 'existing-task';
+      readonly taskId: string;
+    };
 
 export interface TimerAPI {
   getState(this: void): Promise<AppResult<TimerState>>;

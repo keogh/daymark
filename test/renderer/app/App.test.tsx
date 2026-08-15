@@ -87,6 +87,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Start' }));
 
     expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'description',
       description: 'Implement authentication',
     });
     expect(screen.getByRole('button', { name: 'Starting…' })).toBeDisabled();
@@ -113,6 +114,7 @@ describe('App', () => {
     fireEvent.submit(input.closest('form') as HTMLFormElement);
 
     expect(api.timer.start).toHaveBeenCalledWith({
+      source: 'description',
       description: 'Code review',
     });
   });

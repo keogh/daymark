@@ -61,6 +61,7 @@ describe('TimerService', () => {
     const nowSpy = vi.spyOn(clock, 'now');
 
     const result = service.start({
+      source: 'description',
       description: '  Implement authentication  ',
     });
 
@@ -118,7 +119,10 @@ describe('TimerService', () => {
       updatedAt: 100,
     });
 
-    const result = service.start({ description: ' IMPLEMENT AUTHENTICATION ' });
+    const result = service.start({
+      source: 'description',
+      description: ' IMPLEMENT AUTHENTICATION ',
+    });
 
     expect(result.ok && result.value.currentTask).toEqual({
       id: 'existing-task',
@@ -128,14 +132,24 @@ describe('TimerService', () => {
     expect(countRows(context, 'tasks')).toBe(1);
   });
 
+  it.each([undefined, null, {}])(
+    'rejects malformed input without persistence: %j',
+    (input) => {
+      const changesBefore = totalChanges(context);
+
+      expect(service.start(input)).toMatchObject({
+        ok: false,
+        error: { code: 'INVALID_START_TASK' },
+      });
+      expect(totalChanges(context)).toBe(changesBefore);
+    },
+  );
+
   it.each([
-    undefined,
-    null,
-    {},
-    { description: '' },
-    { description: ' \n ' },
-    { description: 'x'.repeat(501) },
-  ])('rejects invalid input without persistence: %j', (input) => {
+    { source: 'description', description: '' },
+    { source: 'description', description: ' \n ' },
+    { source: 'description', description: 'x'.repeat(501) },
+  ])('rejects invalid descriptions without persistence: %j', (input) => {
     const changesBefore = totalChanges(context);
 
     expect(service.start(input)).toMatchObject({
@@ -151,7 +165,9 @@ describe('TimerService', () => {
       seedActiveState(context, status, clock.now());
       const changesBefore = totalChanges(context);
 
-      expect(service.start({ description: 'Another task' })).toMatchObject({
+      expect(
+        service.start({ source: 'description', description: 'Another task' }),
+      ).toMatchObject({
         ok: false,
         error: { code: 'TIMER_NOT_IDLE' },
       });
@@ -170,9 +186,9 @@ describe('TimerService', () => {
       )
       .run();
 
-    expect(() => service.start({ description: 'Rolled back task' })).toThrow(
-      'rejected',
-    );
+    expect(() =>
+      service.start({ source: 'description', description: 'Rolled back task' }),
+    ).toThrow('rejected');
     expect(countRows(context, 'tasks')).toBe(0);
     expect(countRows(context, 'time_intervals')).toBe(0);
     expect(appState.get().timerStatus).toBe('idle');
@@ -180,7 +196,9 @@ describe('TimerService', () => {
 
   it('pauses a running timer atomically and returns its authoritative duration', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Active Task' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Active Task' }).ok,
+    ).toBe(true);
     clock.advance(minutes(30));
     const pausedAt = clock.now();
     const nowSpy = vi.spyOn(clock, 'now');
@@ -242,7 +260,10 @@ describe('TimerService', () => {
 
   it('rolls back the interval close when paused AppState cannot be persisted', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Rollback Pause' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Rollback Pause' })
+        .ok,
+    ).toBe(true);
     clock.advance(minutes(10));
     context.sqlite
       .prepare(
@@ -265,7 +286,9 @@ describe('TimerService', () => {
 
   it('resumes a paused timer atomically with a second interval and preserved session', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Active Task' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Active Task' }).ok,
+    ).toBe(true);
     clock.advance(minutes(30));
     expect(service.pause().ok).toBe(true);
     clock.advance(minutes(30));
@@ -334,7 +357,10 @@ describe('TimerService', () => {
 
   it('rolls back the resumed interval when running AppState cannot be persisted', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Rollback Resume' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Rollback Resume' })
+        .ok,
+    ).toBe(true);
     clock.advance(minutes(10));
     expect(service.pause().ok).toBe(true);
     const intervalCount = countRows(context, 'time_intervals');
@@ -356,7 +382,10 @@ describe('TimerService', () => {
 
   it('stops a running timer atomically and preserves its final lifetime duration', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Completed Task' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Completed Task' })
+        .ok,
+    ).toBe(true);
     clock.advance(minutes(30));
     const stoppedAt = clock.now();
     const nowSpy = vi.spyOn(clock, 'now');
@@ -403,7 +432,9 @@ describe('TimerService', () => {
   });
 
   it('stops a paused timer without creating or modifying intervals', () => {
-    expect(service.start({ description: 'Paused Task' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Paused Task' }).ok,
+    ).toBe(true);
     clock.advance(minutes(30));
     expect(service.pause().ok).toBe(true);
     const intervalBeforeStop = intervals.findById('generated-2');
@@ -455,7 +486,9 @@ describe('TimerService', () => {
 
   it('rolls back a running interval close when idle AppState cannot be persisted', () => {
     const startedAt = clock.now();
-    expect(service.start({ description: 'Rollback Stop' }).ok).toBe(true);
+    expect(
+      service.start({ source: 'description', description: 'Rollback Stop' }).ok,
+    ).toBe(true);
     clock.advance(minutes(10));
     context.sqlite
       .prepare(

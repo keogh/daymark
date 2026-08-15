@@ -54,12 +54,16 @@ describe('timer IPC handlers', () => {
       value: idleState,
     });
     expect(
-      handlers.get(TIMER_START_CHANNEL)?.({}, { description: '  Focus  ' }),
+      handlers.get(TIMER_START_CHANNEL)?.(
+        {},
+        { source: 'description', description: '  Focus  ' },
+      ),
     ).toEqual({
       ok: true,
       value: idleState,
     });
     expect(operations.commands.start).toHaveBeenCalledWith({
+      source: 'description',
       description: 'Focus',
     });
     expect(handlers.get(TIMER_PAUSE_CHANNEL)?.({})).toEqual({
@@ -89,7 +93,10 @@ describe('timer IPC handlers', () => {
     );
 
     expect(
-      handlers.get(TIMER_START_CHANNEL)?.({}, { description: '   ' }),
+      handlers.get(TIMER_START_CHANNEL)?.(
+        {},
+        { source: 'description', description: '   ' },
+      ),
     ).toEqual({
       ok: false,
       error: {

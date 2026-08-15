@@ -64,7 +64,7 @@ describe('preload API', () => {
     expect(Object.keys(api.history)).toEqual(['getPage']);
     await expect(api.system.healthCheck()).resolves.toEqual(response);
     await api.timer.getState();
-    await api.timer.start({ description: 'Focus' });
+    await api.timer.start({ source: 'description', description: 'Focus' });
     await api.timer.pause();
     await api.timer.resume();
     await api.timer.stop();
@@ -72,7 +72,7 @@ describe('preload API', () => {
     expect(electronMocks.invoke.mock.calls).toEqual([
       [SYSTEM_HEALTH_CHECK_CHANNEL],
       [TIMER_GET_STATE_CHANNEL],
-      [TIMER_START_CHANNEL, { description: 'Focus' }],
+      [TIMER_START_CHANNEL, { source: 'description', description: 'Focus' }],
       [TIMER_PAUSE_CHANNEL],
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],

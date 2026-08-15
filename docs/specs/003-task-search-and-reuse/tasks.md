@@ -30,7 +30,7 @@ to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-003-001 | Define suggestion and explicit-start contracts | Pending | None | AC-003-007, AC-003-012–014 |
+| TASK-003-001 | Define suggestion and explicit-start contracts | Complete | None | AC-003-007, AC-003-012–014 |
 | TASK-003-002 | Implement bounded suggestion queries and projections | Pending | TASK-003-001 | AC-003-001–004, AC-003-015 |
 | TASK-003-003 | Implement task suggestion and explicit-reuse services | Pending | TASK-003-002 | AC-003-001–004, AC-003-005–007, AC-003-012–015 |
 | TASK-003-004 | Expose the validated task suggestion boundary | Pending | TASK-003-003 | AC-003-001–004, AC-003-011–015 |
@@ -45,7 +45,7 @@ to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -87,7 +87,22 @@ None.
 
 ### Completion Evidence
 
-Record commands run, results, and implementation notes when complete.
+- Added bounded task-suggestion request/page/API contracts, the discriminated Start
+  contract, and SPEC-003 controlled error codes.
+- Added exact-shape runtime validation for suggestion requests and both Start
+  variants, including Unicode code-point limits, task-text normalization, unknown
+  properties, invalid discriminants, and empty task IDs.
+- Mechanically migrated existing description Start callers without implementing
+  suggestion queries, explicit reuse, or UI behavior.
+- `npm test -- test/shared test/main/ipc/timer.test.ts test/preload/index.test.ts
+  test/main/services/timer-service.test.ts
+  test/main/services/timer-service.integration.test.ts
+  test/main/database/repositories/task-repository.test.ts` — passed, 84 tests.
+- `npm run format:check` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 200 tests.
+- `git diff --check` — passed.
 
 ---
 

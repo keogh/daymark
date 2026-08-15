@@ -48,9 +48,17 @@ export const registerTimerHandlers = (
       if (!validation.ok) {
         return validation;
       }
-      return operations.commands.start({
-        description: validation.value.description,
-      });
+      return operations.commands.start(
+        validation.value.source === 'description'
+          ? {
+              source: 'description',
+              description: validation.value.description,
+            }
+          : {
+              source: 'existing-task',
+              taskId: validation.value.taskId,
+            },
+      );
     }),
   );
   ipc.handle(

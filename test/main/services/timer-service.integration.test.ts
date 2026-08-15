@@ -68,7 +68,10 @@ describe('TimerService SQLite integration', () => {
   it('persists the complete 09:00 to 10:20 workflow with 65 active minutes', () => {
     const startedAt = clock.now();
     const started = valueOf(
-      application.service.start({ description: 'Task A' }),
+      application.service.start({
+        source: 'description',
+        description: 'Task A',
+      }),
     );
     const taskId = started.currentTask?.id;
     expect(taskId).toBeDefined();
@@ -130,7 +133,12 @@ describe('TimerService SQLite integration', () => {
 
   it('reconstructs running state after a complete application restart', () => {
     clock.set(localTime(2026, 8, 14, 10));
-    valueOf(application.service.start({ description: 'Running Recovery' }));
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Running Recovery',
+      }),
+    );
 
     clock.advance(minutes(50));
     application = restartApplication();
@@ -146,7 +154,12 @@ describe('TimerService SQLite integration', () => {
 
   it('reconstructs paused state without counting closed time', () => {
     clock.set(localTime(2026, 8, 14, 10));
-    valueOf(application.service.start({ description: 'Paused Recovery' }));
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Paused Recovery',
+      }),
+    );
     clock.advance(minutes(30));
     valueOf(application.service.pause());
 
@@ -173,9 +186,17 @@ describe('TimerService SQLite integration', () => {
       error: { code: 'NO_CURRENT_TASK' },
     });
 
-    valueOf(application.service.start({ description: 'Transition Defense' }));
+    valueOf(
+      application.service.start({
+        source: 'description',
+        description: 'Transition Defense',
+      }),
+    );
     expect(
-      application.service.start({ description: 'Another Task' }),
+      application.service.start({
+        source: 'description',
+        description: 'Another Task',
+      }),
     ).toMatchObject({ ok: false, error: { code: 'TIMER_NOT_IDLE' } });
     expect(application.service.resume()).toMatchObject({
       ok: false,
@@ -195,7 +216,10 @@ describe('TimerService SQLite integration', () => {
 
   it('independently prevents a second open interval in SQLite', () => {
     const state = valueOf(
-      application.service.start({ description: 'Constraint Defense' }),
+      application.service.start({
+        source: 'description',
+        description: 'Constraint Defense',
+      }),
     );
     const taskId = required(state.currentTask?.id);
     const now = clock.now();
@@ -218,7 +242,10 @@ describe('TimerService SQLite integration', () => {
     const aug13Start = localTime(2026, 8, 13, 23, 45);
     clock.set(aug13Start);
     const started = valueOf(
-      application.service.start({ description: 'Midnight Task' }),
+      application.service.start({
+        source: 'description',
+        description: 'Midnight Task',
+      }),
     );
     const taskId = required(started.currentTask?.id);
 
