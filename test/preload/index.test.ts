@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SYSTEM_HEALTH_CHECK_CHANNEL } from '@/shared/contracts/system-health';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
 import {
   TIMER_GET_STATE_CHANNEL,
   TIMER_PAUSE_CHANNEL,
@@ -52,7 +53,7 @@ describe('preload API', () => {
     if (api === undefined) {
       throw new Error('Preload API was not exposed.');
     }
-    expect(Object.keys(api)).toEqual(['system', 'timer']);
+    expect(Object.keys(api)).toEqual(['system', 'timer', 'history']);
     expect(Object.keys(api.timer)).toEqual([
       'getState',
       'start',
@@ -60,12 +61,14 @@ describe('preload API', () => {
       'resume',
       'stop',
     ]);
+    expect(Object.keys(api.history)).toEqual(['getPage']);
     await expect(api.system.healthCheck()).resolves.toEqual(response);
     await api.timer.getState();
     await api.timer.start({ description: 'Focus' });
     await api.timer.pause();
     await api.timer.resume();
     await api.timer.stop();
+    await api.history.getPage({ beforeDayStartedAt: 0 });
     expect(electronMocks.invoke.mock.calls).toEqual([
       [SYSTEM_HEALTH_CHECK_CHANNEL],
       [TIMER_GET_STATE_CHANNEL],
@@ -73,6 +76,7 @@ describe('preload API', () => {
       [TIMER_PAUSE_CHANNEL],
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],
+      [HISTORY_GET_PAGE_CHANNEL, { beforeDayStartedAt: 0 }],
     ]);
   });
 });

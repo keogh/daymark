@@ -417,6 +417,7 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       resume: overrides.resume ?? vi.fn(),
       stop: overrides.stop ?? vi.fn(),
     },
+    history: { getPage: vi.fn() },
   };
 
   Object.defineProperty(window, 'timeTracker', {

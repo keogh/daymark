@@ -33,7 +33,7 @@ to match the specification.
 | TASK-002-001 | Establish the renderer styling foundation | Complete | None | AC-002-017–018 |
 | TASK-002-002 | Define history contracts and projection primitives | Complete | TASK-002-001 | AC-002-002–006, AC-002-010–011, AC-002-015–016 |
 | TASK-002-003 | Implement bounded history queries and service paging | Complete | TASK-002-002 | AC-002-001–006, AC-002-008–009, AC-002-015–016 |
-| TASK-002-004 | Expose the validated history IPC boundary | Pending | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
+| TASK-002-004 | Expose the validated history IPC boundary | Complete | TASK-002-003 | AC-002-001–006, AC-002-008–009, AC-002-015 |
 | TASK-002-005 | Render the initial Daily History states | Pending | TASK-002-004 | AC-002-001–007, AC-002-013, AC-002-017 |
 | TASK-002-006 | Add older-page loading and resilient retry | Pending | TASK-002-005 | AC-002-008–009, AC-002-014 |
 | TASK-002-007 | Synchronize live history with timer state | Pending | TASK-002-005 | AC-002-010–012 |
@@ -253,7 +253,7 @@ typecheck, lint, and formatting verification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -294,7 +294,24 @@ TASK-002-003.
 
 ### Completion Evidence
 
-Pending.
+Registered one explicit `history:get-page` handler that validates the complete
+input shape at request time before invoking HistoryService. Empty initial input is
+accepted; unknown properties and malformed, unsafe, future, or non-local-midnight
+cursors return `INVALID_HISTORY_RANGE` without querying history. Unexpected clock,
+database, projection, and handler failures are logged in the main process and
+mapped to the renderer-safe `INTERNAL_ERROR` value without exposing technical
+details.
+
+The typed preload surface now exposes only `window.timeTracker.history.getPage`
+for history access. Production lifecycle wiring constructs HistoryQueryRepository
+and HistoryService from the initialized application database and shared SystemClock,
+then registers the handler before window creation. No generic IPC access, renderer
+history UI, mutations, dependencies, schema changes, or migrations were added.
+
+Focused shared, preload, and main IPC boundary tests passed (27 tests), including
+all required cursor rejection classes, delegation, and unexpected-failure mapping.
+The complete suite passed (166 tests), as did typecheck, lint, and formatting
+verification.
 
 ---
 

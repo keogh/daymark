@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
 import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
   type TimeTrackerAPI,
@@ -22,6 +23,9 @@ const timeTrackerApi: TimeTrackerAPI = {
     pause: () => ipcRenderer.invoke(TIMER_PAUSE_CHANNEL),
     resume: () => ipcRenderer.invoke(TIMER_RESUME_CHANNEL),
     stop: () => ipcRenderer.invoke(TIMER_STOP_CHANNEL),
+  },
+  history: {
+    getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),
   },
 };
 

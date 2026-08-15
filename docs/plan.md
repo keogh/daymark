@@ -6,7 +6,7 @@ SPEC-002 — Daily History
 
 ## Active Task
 
-TASK-002-003 — Implement Bounded History Queries and Service Paging
+TASK-002-004 — Expose the Validated History IPC Boundary
 
 ## Status
 
@@ -26,32 +26,30 @@ only the execution plan for the active task.
 
 # Immediate Plan
 
-1. Add set-based history query operations for bounded activity discovery,
-   overlapping interval retrieval, and grouped task lifetime totals.
-2. Implement HistoryService paging with one injected Clock snapshot, empty Today,
-   exclusive older cursors, and deterministic projections.
-3. Add disposable-SQLite repository and service integration tests covering open,
-   repeated-task, cross-midnight, exact-boundary, DST, paging, read-only behavior,
-   and query-count scaling.
-4. Run focused history tests, typecheck, lint, and formatting verification; record
+1. Add the narrow history IPC handler with request-time validation and safe error
+   mapping.
+2. Expose `history.getPage` through the typed preload API and wire HistoryService
+   into the existing application lifecycle.
+3. Add focused IPC, preload, contract, lifecycle, and failure-mapping tests.
+4. Run focused boundary tests, typecheck, lint, and formatting verification; record
    task evidence when all checks pass.
 
 ---
 
 # Scope Guard
 
-Do not add schema changes, IPC registration, preload wiring, or React history UI
-in this task.
+Do not add schema changes, generic IPC methods, renderer history components, or
+history mutation commands in this task.
 
 ---
 
 # Completion
 
-TASK-002-003 is complete. Set-based SQLite query operations discover bounded
-activity pages, retrieve all intervals overlapping the selected day span, and
-aggregate lifetime totals for all rendered tasks without per-task queries.
-HistoryService uses one Clock snapshot, includes empty Today only on initial
-loads, applies exclusive older-day cursors, and returns deterministic projections
-for open, repeated-task, cross-midnight, exact-boundary, and DST cases. Focused
-history tests (28), the complete suite (157), typecheck, lint, and formatting
-verification passed.
+TASK-002-004 is complete. The renderer now has one typed
+`window.timeTracker.history.getPage` preload method backed by the explicit
+`history:get-page` handler. The main-process boundary validates the full request
+shape and cursor before service access, preserves expected validation errors, and
+logs and sanitizes unexpected failures. The production lifecycle constructs the
+history repository and service from the initialized database and shared clock.
+Focused boundary tests (27), the complete suite (166), typecheck, lint, and
+formatting verification passed.
