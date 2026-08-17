@@ -1,6 +1,6 @@
 # AGENTS.md
 
-# Time Tracker — Codex Working Instructions
+# Time Tracker — Coding Agent Working Instructions
 
 ## 1. Purpose
 
