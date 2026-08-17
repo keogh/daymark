@@ -57,6 +57,23 @@ describe('renderer-safe application errors', () => {
     ).toEqual({ code, message: 'Controlled correction failure.' });
   });
 
+  it.each([
+    'INVALID_TASK_RENAME',
+    'INVALID_TASK_DELETE',
+    'TASK_DESCRIPTION_CONFLICT',
+    'ACTIVE_TASK_CANNOT_BE_DELETED',
+  ] as const)(
+    'accepts %s as a renderer-safe task management error',
+    (code) => {
+      expect(
+        toRendererSafeError({
+          code,
+          message: 'Controlled task management failure.',
+        }),
+      ).toEqual({ code, message: 'Controlled task management failure.' });
+    },
+  );
+
   it('maps unknown failures to a stable internal error without leaking details', () => {
     expect(toRendererSafeError(new Error('database path is secret'))).toEqual({
       code: 'INTERNAL_ERROR',

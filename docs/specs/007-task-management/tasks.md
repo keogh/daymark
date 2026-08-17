@@ -30,7 +30,7 @@ breakdown to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-007-001 | Define task management contracts and validation | Pending | None | AC-007-004, AC-007-005, AC-007-010, AC-007-012 |
+| TASK-007-001 | Define task management contracts and validation | Complete | None | AC-007-004, AC-007-005, AC-007-010, AC-007-012 |
 | TASK-007-002 | Implement transactional task rename | Pending | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
 | TASK-007-003 | Implement transactional task deletion and deletion summary | Pending | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
 | TASK-007-004 | Expose validated task management APIs | Pending | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
@@ -46,7 +46,7 @@ breakdown to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -86,6 +86,31 @@ None.
 
 - Acceptance criteria: AC-007-004, AC-007-005, AC-007-010, AC-007-012
 - Specification sections: 9, 10, 12, 13, 16
+
+### Completion Evidence
+
+- `npx vitest run --run test/shared/contracts/app-result.test.ts test/shared/contracts/tasks.test.ts test/shared/validation/task-management-input.test.ts` — passed, 3 files and 55 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` (full suite) — passed, 52 files and 439 tests.
+- Added `RenameTaskInput`, `DeleteTaskInput`, `TaskDeletionSummaryInput`,
+  `TaskSummary`, `TaskMutationResult`, `TaskDeletionResult`,
+  `TaskDeletionSummary`, and the `tasks:rename` / `tasks:delete` /
+  `tasks:get-deletion-summary` channel constants to
+  `src/shared/contracts/tasks.ts`.
+- Added `INVALID_TASK_RENAME`, `INVALID_TASK_DELETE`,
+  `TASK_DESCRIPTION_CONFLICT`, and `ACTIVE_TASK_CANNOT_BE_DELETED` to
+  `AppErrorCode`, reusing the existing `TASK_NOT_FOUND` and `INTERNAL_ERROR`
+  codes.
+- Added `src/shared/validation/task-management-input.ts` with exact-shape
+  validators for rename, delete, and deletion-summary input, reusing
+  `task-description.ts` normalization/length rules and the strict
+  already-trimmed-ID convention established by `interval-correction-input.ts`.
+- Consistent with the SPEC-004/SPEC-006 precedent (`SwitchToTaskInput` /
+  `IntervalsAPI` were defined before their API surface was wired), the
+  `TasksAPI` interface and preload/`TimeTrackerAPI` wiring are intentionally
+  deferred to TASK-007-004 so this task stays self-contained without touching
+  IPC registration or renderer/preload code.
 
 ---
 
