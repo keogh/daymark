@@ -31,7 +31,7 @@ breakdown to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-007-001 | Define task management contracts and validation | Complete | None | AC-007-004, AC-007-005, AC-007-010, AC-007-012 |
-| TASK-007-002 | Implement transactional task rename | Pending | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
+| TASK-007-002 | Implement transactional task rename | Complete | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
 | TASK-007-003 | Implement transactional task deletion and deletion summary | Pending | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
 | TASK-007-004 | Expose validated task management APIs | Pending | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
 | TASK-007-005 | Add task actions and rename workflow | Pending | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
@@ -118,7 +118,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -161,6 +161,48 @@ TASK-007-001.
 
 - Acceptance criteria: AC-007-003–005, AC-007-009–011
 - Specification sections: 7–9, 12–14, 17–18
+
+### Completion Evidence
+
+- `npx vitest run --run test/main/database/repositories/task-repository.test.ts test/main/services/task-service.test.ts test/main/services/task-service.integration.test.ts test/main/services/timer-service.integration.test.ts test/main/services/manual-time-service.integration.test.ts test/main/ipc/tasks.test.ts` — passed, 6 files and 46 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` (full suite) — passed, 53 files and 451 tests.
+- Added `TaskRepository.findByNormalizedDescriptionExcluding(...)` (collision
+  lookup excluding the target Task) and `TaskRepository.updateDescription(...)`
+  (conditional update by `id`, returning the updated row or `undefined`) to
+  `src/main/database/repositories/task-repository.ts`.
+- Added `TaskService.rename(input)` to `src/main/services/task-service.ts`:
+  validates input, runs in one `TransactionRunner` transaction, loads the
+  target Task (`TASK_NOT_FOUND` if missing), checks the self-excluded
+  normalized-description collision (`TASK_DESCRIPTION_CONFLICT`), updates
+  description/normalizedDescription/updatedAt via `Clock.now()`, and returns
+  `TaskMutationResult`. Reused `IntervalService`'s
+  `InvalidPersistedTimerStateError` + `console.error`/`INTERNAL_ERROR` pattern
+  for unexpected persistence failures. `TaskService` now takes `tasks:
+  TaskRepository` and `transactions: TransactionRunner` dependencies in
+  addition to the existing `clock` and `suggestionQueries`.
+- Updated `registerApplicationLifecycle` (`src/main/app/lifecycle.ts`) and the
+  `TaskService` construction sites in
+  `test/main/services/timer-service.integration.test.ts` and
+  `test/main/services/manual-time-service.integration.test.ts` to pass the new
+  `tasks`/`transactions` dependencies so the app and existing test suites keep
+  compiling; no IPC/preload/renderer wiring was touched (deferred to
+  TASK-007-004).
+- Repository tests cover `updateDescription` (exact-one-row update preserving
+  ID, missing-target `undefined`) and
+  `findByNormalizedDescriptionExcluding` (collision found, self-match
+  excluded, no match).
+- Service tests (disposable SQLite, no mocked repositories) cover valid
+  rename, self-collision exclusion (AC-007-004), different-Task collision
+  without mutation (AC-007-005), missing target (AC-007-010), invalid input,
+  and transaction rollback mapped to a logged `INTERNAL_ERROR`.
+- New `test/main/services/task-service.integration.test.ts` proves: a Task
+  visible across two loaded Daily History days is renamed on both
+  (AC-007-011), and renaming the currently active Task — both running and
+  paused — leaves `AppState` and every interval unchanged while
+  `TimerStateReader.getState()` reflects the new description without altering
+  timer status or session timing (AC-007-009).
 
 ---
 

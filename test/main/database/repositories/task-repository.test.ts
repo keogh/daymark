@@ -96,6 +96,71 @@ describe('TaskRepository', () => {
     ).toThrow(/unique constraint failed/i);
   });
 
+  it('updates exactly one task description and normalized description, preserving identity', () => {
+    const task = createTask();
+    repository.insert(task);
+    const other = {
+      ...createTask(),
+      id: 'task-2',
+      description: 'Other task',
+      normalizedDescription: 'other task',
+    };
+    repository.insert(other);
+
+    const updated = repository.updateDescription(
+      task.id,
+      'Implement OAuth',
+      'implement oauth',
+      2_000,
+    );
+
+    expect(updated).toEqual({
+      ...task,
+      description: 'Implement OAuth',
+      normalizedDescription: 'implement oauth',
+      updatedAt: 2_000,
+    });
+    expect(repository.findById(task.id)).toEqual(updated);
+    expect(repository.findById(other.id)).toEqual(other);
+  });
+
+  it('returns undefined when updating a missing task', () => {
+    expect(
+      repository.updateDescription('missing-task', 'New', 'new', 2_000),
+    ).toBeUndefined();
+  });
+
+  it('finds a normalized-description collision excluding the target task', () => {
+    const task = createTask();
+    repository.insert(task);
+    const other = {
+      ...createTask(),
+      id: 'task-2',
+      description: 'Other task',
+      normalizedDescription: 'other task',
+    };
+    repository.insert(other);
+
+    expect(
+      repository.findByNormalizedDescriptionExcluding(
+        other.normalizedDescription,
+        task.id,
+      ),
+    ).toEqual(other);
+    expect(
+      repository.findByNormalizedDescriptionExcluding(
+        task.normalizedDescription,
+        task.id,
+      ),
+    ).toBeUndefined();
+    expect(
+      repository.findByNormalizedDescriptionExcluding(
+        'no such description',
+        task.id,
+      ),
+    ).toBeUndefined();
+  });
+
   it('preserves the task-to-interval cascade inherited from the foundation', () => {
     const task = createTask();
     repository.insert(task);

@@ -61,6 +61,8 @@ describe('TimerService SQLite integration', () => {
     const taskService = new TaskService({
       clock,
       suggestionQueries: new TaskSuggestionQueryRepository(context.db),
+      tasks,
+      transactions: new TransactionRunner(context.sqlite),
     });
 
     return {

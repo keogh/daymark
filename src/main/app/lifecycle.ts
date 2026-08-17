@@ -88,6 +88,8 @@ export const registerApplicationLifecycle = (): void => {
         const taskService = new TaskService({
           clock,
           suggestionQueries: taskSuggestionQueries,
+          tasks,
+          transactions: new TransactionRunner(context.sqlite),
         });
 
         registerSystemHealthHandler(

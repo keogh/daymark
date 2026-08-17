@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 
 import type { ApplicationDatabase } from '@/main/database/database';
 import { tasks } from '@/main/database/schema';
@@ -20,6 +20,36 @@ export class TaskRepository {
       .select()
       .from(tasks)
       .where(eq(tasks.normalizedDescription, normalizedDescription))
+      .get();
+  }
+
+  findByNormalizedDescriptionExcluding(
+    normalizedDescription: string,
+    excludedTaskId: string,
+  ): Task | undefined {
+    return this.#db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.normalizedDescription, normalizedDescription),
+          ne(tasks.id, excludedTaskId),
+        ),
+      )
+      .get();
+  }
+
+  updateDescription(
+    id: string,
+    description: string,
+    normalizedDescription: string,
+    updatedAt: number,
+  ): Task | undefined {
+    return this.#db
+      .update(tasks)
+      .set({ description, normalizedDescription, updatedAt })
+      .where(eq(tasks.id, id))
+      .returning()
       .get();
   }
 
