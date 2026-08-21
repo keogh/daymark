@@ -8,7 +8,12 @@ import {
   INTERVALS_UPDATE_CHANNEL,
 } from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
-import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
+import {
+  TASKS_DELETE_CHANNEL,
+  TASKS_GET_DELETION_SUMMARY_CHANNEL,
+  TASKS_GET_SUGGESTIONS_CHANNEL,
+  TASKS_RENAME_CHANNEL,
+} from '@/shared/contracts/tasks';
 import {
   TIMER_GET_STATE_CHANNEL,
   TIMER_PAUSE_CHANNEL,
@@ -79,7 +84,12 @@ describe('preload API', () => {
     expect(Object.keys(api.history)).toEqual(['getPage']);
     expect(Object.keys(api.intervals)).toEqual(['update', 'delete']);
     expect(Object.keys(api.manualTime)).toEqual(['createInterval']);
-    expect(Object.keys(api.tasks)).toEqual(['getSuggestions']);
+    expect(Object.keys(api.tasks)).toEqual([
+      'getSuggestions',
+      'rename',
+      'delete',
+      'getDeletionSummary',
+    ]);
     await expect(api.system.healthCheck()).resolves.toEqual(response);
     await api.timer.getState();
     await api.timer.start({ source: 'description', description: 'Focus' });
@@ -104,6 +114,9 @@ describe('preload API', () => {
       endTime: '10:00',
     });
     await api.tasks.getSuggestions({ query: 'focus' });
+    await api.tasks.rename({ taskId: 'task-1', description: 'Deep focus' });
+    await api.tasks.delete({ taskId: 'task-2' });
+    await api.tasks.getDeletionSummary({ taskId: 'task-3' });
     expect(electronMocks.invoke.mock.calls).toEqual([
       [SYSTEM_HEALTH_CHECK_CHANNEL],
       [TIMER_GET_STATE_CHANNEL],
@@ -135,6 +148,9 @@ describe('preload API', () => {
         },
       ],
       [TASKS_GET_SUGGESTIONS_CHANNEL, { query: 'focus' }],
+      [TASKS_RENAME_CHANNEL, { taskId: 'task-1', description: 'Deep focus' }],
+      [TASKS_DELETE_CHANNEL, { taskId: 'task-2' }],
+      [TASKS_GET_DELETION_SUMMARY_CHANNEL, { taskId: 'task-3' }],
     ]);
   });
 });

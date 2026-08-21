@@ -6,7 +6,12 @@ import {
   INTERVALS_UPDATE_CHANNEL,
 } from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
-import { TASKS_GET_SUGGESTIONS_CHANNEL } from '@/shared/contracts/tasks';
+import {
+  TASKS_DELETE_CHANNEL,
+  TASKS_GET_DELETION_SUMMARY_CHANNEL,
+  TASKS_GET_SUGGESTIONS_CHANNEL,
+  TASKS_RENAME_CHANNEL,
+} from '@/shared/contracts/tasks';
 import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
   type TimeTrackerAPI,
@@ -47,6 +52,10 @@ const timeTrackerApi: TimeTrackerAPI = {
   tasks: {
     getSuggestions: (input) =>
       ipcRenderer.invoke(TASKS_GET_SUGGESTIONS_CHANNEL, input),
+    rename: (input) => ipcRenderer.invoke(TASKS_RENAME_CHANNEL, input),
+    delete: (input) => ipcRenderer.invoke(TASKS_DELETE_CHANNEL, input),
+    getDeletionSummary: (input) =>
+      ipcRenderer.invoke(TASKS_GET_DELETION_SUMMARY_CHANNEL, input),
   },
 };
 

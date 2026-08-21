@@ -965,6 +965,22 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
           ok: true,
           value: { suggestions: [], now: 1_000 },
         }),
+      rename: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { task: { id: 'task-1', description: 'Renamed task' } },
+      }),
+      delete: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { taskId: 'task-1' },
+      }),
+      getDeletionSummary: vi.fn().mockResolvedValue({
+        ok: true,
+        value: {
+          task: { id: 'task-1', description: 'Task' },
+          intervalCount: 0,
+          lifetimeDurationMs: 0,
+        },
+      }),
     },
   };
 

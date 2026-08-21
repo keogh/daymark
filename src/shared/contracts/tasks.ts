@@ -3,8 +3,7 @@ import type { AppResult } from './app-result';
 export const TASKS_GET_SUGGESTIONS_CHANNEL = 'tasks:get-suggestions';
 export const TASKS_RENAME_CHANNEL = 'tasks:rename';
 export const TASKS_DELETE_CHANNEL = 'tasks:delete';
-export const TASKS_GET_DELETION_SUMMARY_CHANNEL =
-  'tasks:get-deletion-summary';
+export const TASKS_GET_DELETION_SUMMARY_CHANNEL = 'tasks:get-deletion-summary';
 export const TASK_SUGGESTION_LIMIT = 5;
 
 export interface TaskSuggestionInput {
@@ -63,4 +62,16 @@ export interface TasksAPI {
     this: void,
     input: TaskSuggestionInput,
   ): Promise<AppResult<TaskSuggestionPage>>;
+  rename(
+    this: void,
+    input: RenameTaskInput,
+  ): Promise<AppResult<TaskMutationResult>>;
+  delete(
+    this: void,
+    input: DeleteTaskInput,
+  ): Promise<AppResult<TaskDeletionResult>>;
+  getDeletionSummary(
+    this: void,
+    input: TaskDeletionSummaryInput,
+  ): Promise<AppResult<TaskDeletionSummary>>;
 }

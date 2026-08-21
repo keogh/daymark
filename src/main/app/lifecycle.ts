@@ -113,7 +113,7 @@ export const registerApplicationLifecycle = (): void => {
           { createInterval: manualTimeService },
           console,
         );
-        registerTasksHandler(ipcMain, { getSuggestions: taskService }, console);
+        registerTasksHandler(ipcMain, { tasks: taskService }, console);
       },
       createNormalWindow: createMainWindow,
       logInitializationFailure: (error) => {

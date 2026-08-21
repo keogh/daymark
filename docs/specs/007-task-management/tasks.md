@@ -33,7 +33,7 @@ breakdown to match the specification.
 | TASK-007-001 | Define task management contracts and validation | Complete | None | AC-007-004, AC-007-005, AC-007-010, AC-007-012 |
 | TASK-007-002 | Implement transactional task rename | Complete | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
 | TASK-007-003 | Implement transactional task deletion and deletion summary | Complete | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
-| TASK-007-004 | Expose validated task management APIs | Pending | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
+| TASK-007-004 | Expose validated task management APIs | Complete | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
 | TASK-007-005 | Add task actions and rename workflow | Pending | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
 | TASK-007-006 | Add task deletion workflow with informative confirmation | Pending | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
 | TASK-007-007 | Verify task management and update documentation | Pending | TASK-007-005, TASK-007-006 | AC-007-001–013 |
@@ -284,7 +284,7 @@ TASK-007-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -318,6 +318,25 @@ and deletion-summary operations without widening renderer privileges.
 
 - Run focused preload/IPC tests and boundary regressions, then
   `npm run typecheck` and `npm run lint`.
+
+### Completion Evidence
+
+- `npx vitest run --run test/main/ipc/tasks.test.ts test/preload/index.test.ts test/renderer/app/App.test.tsx` — passed, 3 files and 41 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 53 files and 471 tests.
+- Extended `TasksAPI` and the preload bridge with explicit `rename`, `delete`,
+  and `getDeletionSummary` methods routed only through their named channels.
+- Registered all three task-management IPC handlers with exact-shape runtime
+  validation before service execution, explicit validated-value
+  reconstruction, controlled-error sanitization, and operation-only logging
+  for unexpected failures without user-created descriptions.
+- Updated application lifecycle composition to expose the complete bounded
+  `TaskService` API and updated renderer test composition for the extended
+  public contract without implementing TASK-007-005 or TASK-007-006 UI.
+- IPC and preload tests prove explicit exposure and routing, normalization,
+  rejection before service execution for malformed and extra-property input,
+  controlled failure passthrough, and sanitized unexpected-failure mapping.
 
 ### Traceability
 
