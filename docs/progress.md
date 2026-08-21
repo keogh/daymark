@@ -21,6 +21,10 @@ SPEC-009 is also designed and queued as Ready for Implementation, but its task
 breakdown explicitly requires SPEC-008 to be Verified before Analytics
 implementation begins.
 
+SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
+requires SPEC-009 to be Verified before Settings and UX Polish implementation
+begins.
+
 ---
 
 # Completed Specifications
@@ -190,7 +194,8 @@ renderer console.
 # Upcoming Specifications
 
 1. SPEC-009 — Analytics (Ready for Implementation; queued behind SPEC-008)
-2. SPEC-010 — Settings
+2. SPEC-010 — Settings and UX Polish (Ready for Implementation; queued behind
+   SPEC-009)
 3. SPEC-011 — Packaging and Release
 
 ---
@@ -210,6 +215,10 @@ Platform Asset Selection. No implementation task is currently in progress.
 SPEC-009 — Analytics has a complete companion task breakdown. Its first task is
 TASK-009-001 — Define Analytics Contracts, Validation, and Calendar Projections,
 but it remains pending until SPEC-008 is Verified.
+
+SPEC-010 — Settings and UX Polish has a complete companion task breakdown. Its
+first task is TASK-010-001 — Add Settings Persistence and Contracts, but all
+SPEC-010 implementation remains pending until SPEC-009 is Verified.
 
 ---
 
@@ -232,11 +241,20 @@ shows five deterministically ranked Tasks, uses an accessible noninteractive cha
 and advances open-interval presentation locally without per-second IPC or database
 reads. No schema migration or new runtime dependency is planned.
 
+SPEC-010 fixes persisted settings to Monday/Sunday week start and System/Light/Dark
+appearance with Monday/System defaults. Changes apply without a Save button;
+System follows operating-system appearance changes live without persistence
+writes. Settings use a new constrained singleton SQLite row, Analytics reads week
+start authoritatively in the main process, and the whole-app UX pass is limited to
+documented consistency, accessibility, keyboard, state, duration, and
+minimum-window defects rather than redesign. A schema migration is planned; no new
+runtime dependency is planned.
+
 ---
 
 # Last Updated
 
-2026-08-21 — Designed SPEC-009 and created its implementation task breakdown.
-SPEC-009 is Ready for Implementation but queued behind verification of SPEC-008;
+2026-08-21 — Designed SPEC-010 and created its implementation task breakdown.
+SPEC-010 is Ready for Implementation but queued behind verification of SPEC-009;
 SPEC-008 remains the active implementation specification and SPEC-007 remains the
 latest verified implementation milestone.

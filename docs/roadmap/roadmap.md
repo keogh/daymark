@@ -419,7 +419,7 @@ Suggested sequence:
 007 Task Management
 008 System Tray
 009 Analytics
-010 Settings
+010 Settings and UX Polish
 011 Packaging and Release
 ```
 
