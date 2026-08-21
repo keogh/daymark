@@ -31,7 +31,7 @@ breakdown to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-008-001 | Define tray presentation and platform asset selection | Pending | None | AC-008-001–004, AC-008-017 |
+| TASK-008-001 | Define tray presentation and platform asset selection | Complete | None | AC-008-001–004, AC-008-017 |
 | TASK-008-002 | Implement owned close, restore, and quit lifecycle | Pending | None | AC-008-009–011, AC-008-013, AC-008-015 |
 | TASK-008-003 | Implement authoritative tray service and timer commands | Pending | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Pending | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
@@ -46,7 +46,7 @@ breakdown to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -92,7 +92,17 @@ None.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- test/main/tray/presentation.test.ts test/main/tray/assets.test.ts`
+  — passed 12 focused tests across 2 files.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npx prettier --check src/main/tray test/main/tray docs/plan.md docs/specs/008-system-tray-and-window-lifecycle/tasks.md`
+  and `git diff --check` — passed.
+- Added pure idle/running/paused menu presentation, unbounded duration and
+  Unicode-safe Task-description formatting, deterministic development/packaged
+  asset selection, and application-owned 1x/2x macOS template plus fallback
+  assets. Native Tray/Menu creation and packaging composition remain scoped to
+  later SPEC-008 tasks.
 
 ---
 
@@ -390,4 +400,3 @@ After all implementation tasks are complete:
 - perform the isolated packaged-application workflow from specification §25;
 - update documentation and `docs/progress.md`;
 - change specification and task statuses only when their stated conditions hold.
-
