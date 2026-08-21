@@ -32,7 +32,7 @@ breakdown to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-008-001 | Define tray presentation and platform asset selection | Complete | None | AC-008-001–004, AC-008-017 |
-| TASK-008-002 | Implement owned close, restore, and quit lifecycle | Pending | None | AC-008-009–011, AC-008-013, AC-008-015 |
+| TASK-008-002 | Implement owned close, restore, and quit lifecycle | Complete | None | AC-008-009–011, AC-008-013, AC-008-015 |
 | TASK-008-003 | Implement authoritative tray service and timer commands | Pending | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Pending | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Pending | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
@@ -110,7 +110,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -158,7 +158,18 @@ None.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- test/main/app/window-owner.test.ts test/main/app/shutdown.test.ts
+  test/main/app/startup.test.ts test/main/app/window-options.test.ts` — passed 16
+  focused lifecycle, startup, and secure-window tests across 4 files.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npx prettier --write` on changed source, test, and task documents plus
+  `git diff --check` — passed.
+- Added one testable main-window owner for close-to-hide, retained restore,
+  exceptional replacement, application activation, and tray double-click
+  restoration. Added explicit quit state and reverse-order, idempotent cleanup;
+  the existing database lifecycle now participates in that path without any
+  timer-service dependency or transition.
 
 ---
 

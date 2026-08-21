@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, dialog, ipcMain } from 'electron';
 import { randomUUID } from 'node:crypto';
 
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
@@ -28,10 +28,26 @@ import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 import { TaskService } from '@/main/services/task-service';
 import { createMainWindow } from './create-window';
+import { ApplicationShutdown } from './shutdown';
 import { startApplication } from './startup';
+import { MainWindowOwner } from './window-owner';
 
 export const registerApplicationLifecycle = (): void => {
   let databaseLifecycle: DatabaseLifecycle | undefined;
+  const shutdown = new ApplicationShutdown({
+    quitApplication: () => app.quit(),
+    logCleanupFailure: (error) => {
+      console.error('Failed to clean up an application resource.', error);
+    },
+  });
+  const windowOwner = new MainWindowOwner({
+    createWindow: createMainWindow,
+    isQuitting: () => shutdown.isQuitting(),
+    requestForegroundAttention: () => app.focus(),
+  });
+
+  shutdown.addCleanupHook(() => windowOwner.dispose());
+  shutdown.addCleanupHook(() => databaseLifecycle?.close());
 
   void app.whenReady().then(() => {
     const lifecycle = new DatabaseLifecycle({
@@ -115,7 +131,9 @@ export const registerApplicationLifecycle = (): void => {
         );
         registerTasksHandler(ipcMain, { tasks: taskService }, console);
       },
-      createNormalWindow: createMainWindow,
+      createNormalWindow: () => {
+        windowOwner.open();
+      },
       logInitializationFailure: (error) => {
         console.error('Failed to initialize the local database.', error);
       },
@@ -125,25 +143,21 @@ export const registerApplicationLifecycle = (): void => {
           'The local database could not be initialized. Please restart the application.',
         );
       },
-      quitApplication: () => app.quit(),
+      quitApplication: () => shutdown.requestQuit(),
     });
 
     if (started) {
       app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          createMainWindow();
-        }
+        windowOwner.handleApplicationActivation();
       });
     }
   });
 
   app.on('will-quit', () => {
-    databaseLifecycle?.close();
+    shutdown.handleApplicationShutdown();
   });
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
-  });
+  // The ready application remains reachable through its tray even when an
+  // exceptional window destruction leaves no normal windows open.
+  app.on('window-all-closed', () => undefined);
 };

@@ -6,17 +6,18 @@ SPEC-008 — System Tray and Window Lifecycle
 
 ## Active Task
 
-None. TASK-008-001 is complete; TASK-008-002 is the next unblocked task.
+None. TASK-008-002 is complete; TASK-008-003 is the next unblocked task.
 
 ## Status
 
-TASK-008-001 complete
+TASK-008-002 complete
 
 ---
 
 # Immediate Plan
 
-1. Select TASK-008-002 — Implement Owned Close, Restore, and Quit Lifecycle.
+1. Select TASK-008-003 — Implement Authoritative Tray Service and Timer
+   Commands.
 2. Mark only that task In Progress and replace this list with its immediate
    implementation steps and focused checks.
 3. Continue in dependency order using the SPEC-008 task breakdown.
