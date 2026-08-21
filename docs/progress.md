@@ -25,6 +25,11 @@ SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
 begins.
 
+SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
+SPEC-011 remains dependent on verification of SPEC-010 and all preceding work.
+SPEC-012 is the final MVP release gate and cannot begin until SPEC-011 and every
+earlier specification are Verified.
+
 ---
 
 # Completed Specifications
@@ -198,6 +203,8 @@ renderer console.
    SPEC-009)
 3. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
    Implementation; queued behind SPEC-010)
+4. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
+   behind SPEC-011)
 
 ---
 
@@ -230,6 +237,16 @@ Its first task is TASK-011-001 — Establish Distribution Metadata and Release
 Contracts. Implementation remains pending until SPEC-010 and every preceding
 specification are Verified.
 
+SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
+Implementation. It defines one exact candidate and acceptance-evidence ledger;
+connected whole-product regression; persistence, recovery, accessibility,
+offline, security, and privacy audits; review of SPEC-011's identified native
+platform evidence; owner hands-on acceptance on macOS Apple Silicon; bounded
+release-blocker remediation; and an owner-recorded `GO` or `NO-GO` that does not
+publish the draft prerelease. Its first task is TASK-012-001 — Establish Candidate,
+Evidence, and Defect Contracts. Implementation remains pending until SPEC-011 and
+every preceding specification are Verified.
+
 ---
 
 # Important Decisions
@@ -260,11 +277,20 @@ documented consistency, accessibility, keyboard, state, duration, and
 minimum-window defects rather than redesign. A schema migration is planned; no new
 runtime dependency is planned.
 
+SPEC-012 applies DEC-035 and DEC-036. It fixes the final MVP outcome to an
+evidence-backed owner `GO` or `NO-GO` for an unsigned personal-testing prerelease;
+keeps publication as a separate manual owner action; requires direct owner testing
+only on available macOS Apple Silicon while retaining the full identified
+SPEC-011 platform-evidence requirement; permits only bounded fixes for already
+specified release blockers; and leaves signing/notarization and trusted public
+distribution to later work. No schema, product API, product UI, or runtime
+dependency change is planned.
+
 ---
 
 # Last Updated
 
-2026-08-21 — Designed SPEC-010 and created its implementation task breakdown.
-SPEC-010 is Ready for Implementation but queued behind verification of SPEC-009;
-SPEC-008 remains the active implementation specification and SPEC-007 remains the
-latest verified implementation milestone.
+2026-08-21 — Designed SPEC-012 and created its implementation task breakdown.
+SPEC-012 is Ready for Implementation but queued behind verification of SPEC-011
+and every preceding specification. SPEC-008 remains the active implementation
+specification and SPEC-007 remains the latest verified implementation milestone.

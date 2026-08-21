@@ -699,3 +699,55 @@ architecture.
 - No signing secret, certificate placeholder, auto-updater, telemetry, or runtime
   networking is introduced.
 - SPEC-011 defines the exact artifact, CI, release, and acceptance contracts.
+
+---
+
+# DEC-036 — MVP Release Readiness and Owner Approval
+
+## Status
+
+Accepted
+
+## Decision
+
+The final MVP release gate evaluates one exact checksummed candidate and ends with
+an owner-recorded `GO` or `NO-GO` decision. A `GO` means only that the candidate is
+ready for the owner to publish as an unsigned personal-testing prerelease. It does
+not publish the GitHub Release; publication remains a separate deliberate owner
+action.
+
+Every acceptance criterion from SPEC-000 through SPEC-011 must have current,
+attributable evidence. The owner performs direct hands-on acceptance on macOS Apple
+Silicon. Required Intel macOS, Windows, and Linux claims reuse the identified
+native installation evidence required by SPEC-011 and must not be represented as
+owner-tested.
+
+SPEC-012 may repair a release blocker only when existing specified behavior is
+unambiguous and the repair is narrowly scoped. Material behavior changes update
+their originating specification first; features, architectural changes, and broad
+work remain separate. Any candidate-affecting repair requires rebuilt artifacts
+and rerun evidence.
+
+Signing, notarization, and trusted general-public distribution are not part of the
+MVP release-readiness gate.
+
+## Context
+
+Feature-level acceptance and distribution smoke tests do not by themselves create
+one complete final-release judgment. The project owner has an Apple Silicon Mac
+for manual evaluation but does not have direct access to every supported target.
+The release process must distinguish owner experience from evidence gathered on
+other identified native environments while still enforcing the complete target
+matrix.
+
+## Consequences
+
+- Missing, stale, contradictory, or unattributable required evidence produces
+  `NO-GO`; unavailable local hardware does not create a waiver.
+- CI may recommend a result but cannot approve or publish a release.
+- Failed evidence is retained and linked to reruns rather than overwritten.
+- No acceptance criterion may be reclassified as a cosmetic issue.
+- A later specification and owner-provided credentials are required before the
+  project claims signed general-public production distribution.
+- SPEC-012 defines the evidence ledger, defect policy, integrated regression,
+  owner acceptance, and final decision contract.
