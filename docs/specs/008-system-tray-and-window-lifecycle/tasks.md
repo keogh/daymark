@@ -36,7 +36,7 @@ breakdown to match the specification.
 | TASK-008-003 | Implement authoritative tray service and timer commands | Complete | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Complete | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Complete | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
-| TASK-008-006 | Verify System Tray and update documentation | Pending | TASK-008-005 | AC-008-001–018 |
+| TASK-008-006 | Verify System Tray and update documentation | In Progress | TASK-008-005 | AC-008-001–018 |
 
 ---
 
@@ -401,7 +401,7 @@ in a safe order with complete failure cleanup and restart reconstruction.
 
 ### Status
 
-Pending
+In Progress
 
 ### Outcome
 

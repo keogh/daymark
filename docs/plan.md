@@ -6,20 +6,23 @@ SPEC-008 — System Tray and Window Lifecycle
 
 ## Active Task
 
-None. TASK-008-005 is complete; TASK-008-006 is the next unblocked task.
+TASK-008-006 — Verify System Tray and Update Documentation
 
 ## Status
 
-TASK-008-005 complete
+In Progress
 
 ---
 
 # Immediate Plan
 
-1. Select TASK-008-006 — Verify System Tray and update documentation.
-2. Mark only that task In Progress and replace this list with its immediate
-   acceptance, packaged-workflow, and documentation checks.
-3. Continue in dependency order using the SPEC-008 task breakdown.
+1. Map AC-008-001 through AC-008-018 to automated coverage and inspect the
+   platform, asset, lifecycle, persistence, and process-boundary implementation.
+2. Run formatting, typecheck, lint, the complete test suite, and packaging.
+3. Exercise the isolated packaged macOS workflow from specification §25,
+   including SQLite inspection around Quit-while-running and relaunch.
+4. Record deferred Windows/Linux physical validation, update progress and
+   specification evidence, and reconcile statuses only after every check passes.
 
 ---
 
