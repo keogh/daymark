@@ -255,6 +255,42 @@ describe('DailyHistory', () => {
     ).toBeEnabled();
   });
 
+  it('opens keyboard-accessible task actions independently and returns focus after Rename closes', async () => {
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
+    render(<DailyHistory />);
+
+    const toggle = (
+      await screen.findAllByRole('button', {
+        name: 'Implement authentication',
+      })
+    )[0]!;
+    const play = screen.getAllByRole('button', {
+      name: 'Play Implement authentication',
+    })[0]!;
+    const actions = screen.getAllByRole('button', {
+      name: 'Task actions for Implement authentication',
+    })[0]!;
+
+    actions.focus();
+    fireEvent.keyDown(actions, { key: 'ArrowDown' });
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Rename' }),
+    ).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Delete task' })).toBeVisible();
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(play).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    expect(screen.getByRole('dialog', { name: 'Rename Task' })).toBeVisible();
+    expect(screen.getByLabelText('Task description')).toHaveValue(
+      'Implement authentication',
+    );
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+
+    await waitFor(() => expect(actions).toHaveFocus());
+  });
+
   it('keeps a running interval inspectable without correction actions', async () => {
     setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: runningPage }));
     render(<DailyHistory />);
@@ -686,7 +722,15 @@ describe('DailyHistory', () => {
 const setHistoryApi = (getPage: ReturnType<typeof vi.fn>) => {
   Object.defineProperty(window, 'timeTracker', {
     configurable: true,
-    value: { history: { getPage } },
+    value: {
+      history: { getPage },
+      tasks: {
+        rename: vi.fn().mockResolvedValue({
+          ok: true,
+          value: { task: { id: 'task-1', description: 'Renamed task' } },
+        }),
+      },
+    },
   });
   return getPage;
 };

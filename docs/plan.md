@@ -6,7 +6,7 @@ SPEC-007 — Task Management
 
 ## Active Task
 
-TASK-007-004 — Expose Validated Task Management APIs
+TASK-007-005 — Add Task Actions and Rename Workflow
 
 ## Status
 
@@ -16,27 +16,28 @@ Complete
 
 # Immediate Plan
 
-1. Extend the shared `TasksAPI` and preload bridge with explicit rename,
-   delete, and deletion-summary methods and channels.
-2. Register main-process handlers that exact-shape validate each input before
-   delegating to `TaskService` and sanitize unexpected failures.
-3. Wire all task operations through application lifecycle composition.
-4. Add focused IPC and preload tests for exposure, routing, validation,
-   controlled failures, and unexpected-failure sanitization.
-5. Run focused boundary tests, then `npm run typecheck` and `npm run lint`.
+1. Add an accessible Task actions menu to every Daily History task-row instance.
+2. Add a prefilled Rename Task dialog with local validation, cancellation,
+   pending-state duplicate prevention, and controlled inline errors.
+3. Wire successful rename to authoritative history and timer refreshes so every
+   loaded occurrence and the active timer description update together.
+4. Add focused renderer tests for menu separation, dialog focus/keyboard use,
+   validation, collision and stale-target failures, pending behavior, refresh,
+   and active-task rename.
+5. Run focused renderer regressions, then `npm run typecheck` and `npm run lint`.
 
 ---
 
 # Scope Guard
 
-No task actions control, rename dialog, delete confirmation UI, or renderer
-refresh behavior in this task (TASK-007-005–006).
+No deletion-summary loading, delete confirmation, or delete command behavior in
+this task; those remain in TASK-007-006.
 
 ---
 
 # Completion
 
-Completion is reached when all three task-management APIs are explicitly
-exposed, routed, runtime validated, and safely error-mapped with passing
-focused tests, `npm run typecheck`, and `npm run lint`, and the task breakdown
-records TASK-007-004 as Complete with evidence.
+Completion is reached when task rows expose the accessible actions menu, the
+rename workflow satisfies TASK-007-005 behavior, authoritative refresh is
+verified, focused tests and static checks pass, and the task breakdown records
+TASK-007-005 as Complete with evidence.

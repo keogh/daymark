@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Ellipsis, Pencil, Trash2 } from 'lucide-react';
 
 import {
   Alert,
@@ -7,6 +7,13 @@ import {
   AlertTitle,
 } from '@/renderer/components/ui/alert';
 import { Button } from '@/renderer/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/renderer/components/ui/dropdown-menu';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type {
@@ -28,6 +35,7 @@ import { useLiveHistoryPage } from './use-live-history-page';
 import { formatLocalDateInput } from './local-date-format';
 import { EditIntervalDialog } from './EditIntervalDialog';
 import { DeleteIntervalDialog } from './DeleteIntervalDialog';
+import { RenameTaskDialog } from './RenameTaskDialog';
 
 export const DailyHistory = ({
   onAddTime = () => undefined,
@@ -42,12 +50,14 @@ export const DailyHistory = ({
   refreshRevision = 0,
   timer = null,
   onIntervalSaved = () => Promise.resolve(),
+  onTaskRenamed = () => Promise.resolve(),
 }: {
   readonly onAddTime?: (date: string) => void;
   readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly refreshRevision?: number;
   readonly timer?: TimerState | null;
   readonly onIntervalSaved?: () => Promise<void>;
+  readonly onTaskRenamed?: () => Promise<void>;
 }) => {
   const controller = useHistoryController(refreshRevision);
   const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
@@ -94,6 +104,7 @@ export const DailyHistory = ({
         pendingRows={pendingRows}
         timer={timer}
         onIntervalSaved={onIntervalSaved}
+        onTaskRenamed={onTaskRenamed}
       />
     </section>
   );
@@ -107,6 +118,7 @@ const HistoryContent = ({
   pendingRows,
   timer,
   onIntervalSaved,
+  onTaskRenamed,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -115,6 +127,7 @@ const HistoryContent = ({
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
+  onTaskRenamed: () => Promise<void>;
 }) => {
   if (controller.loadState.status === 'loading') {
     return (
@@ -147,6 +160,7 @@ const HistoryContent = ({
       state={controller.loadState}
       timer={timer}
       onIntervalSaved={onIntervalSaved}
+      onTaskRenamed={onTaskRenamed}
     />
   );
 };
@@ -160,6 +174,7 @@ const HistoryDays = ({
   state,
   timer,
   onIntervalSaved,
+  onTaskRenamed,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -169,6 +184,7 @@ const HistoryDays = ({
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
+  onTaskRenamed: () => Promise<void>;
 }) => {
   const page = useLiveHistoryPage(state.page);
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
@@ -190,6 +206,7 @@ const HistoryDays = ({
           pendingRows={pendingRows}
           timer={timer}
           onIntervalSaved={onIntervalSaved}
+          onTaskRenamed={onTaskRenamed}
         />
       ))}
       {!hasTrackedTime && (
@@ -290,6 +307,7 @@ const HistoryDaySection = ({
   pendingRows,
   timer,
   onIntervalSaved,
+  onTaskRenamed,
 }: {
   day: HistoryDay;
   now: number;
@@ -298,6 +316,7 @@ const HistoryDaySection = ({
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
+  onTaskRenamed: () => Promise<void>;
 }) => (
   <section
     aria-labelledby={`history-day-${day.dayStartedAt}`}
@@ -329,6 +348,7 @@ const HistoryDaySection = ({
         task={task}
         timer={timer}
         onIntervalSaved={onIntervalSaved}
+        onTaskRenamed={onTaskRenamed}
       />
     ))}
   </section>
@@ -341,6 +361,7 @@ const HistoryTaskRow = ({
   task,
   timer,
   onIntervalSaved,
+  onTaskRenamed,
 }: {
   day: HistoryDay;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
@@ -348,6 +369,7 @@ const HistoryTaskRow = ({
   task: HistoryTask;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
+  onTaskRenamed: () => Promise<void>;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [editInterval, setEditInterval] = useState<HistoryInterval | null>(
@@ -356,8 +378,10 @@ const HistoryTaskRow = ({
   const [deleteInterval, setDeleteInterval] = useState<HistoryInterval | null>(
     null,
   );
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
   const editReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const deleteReturnFocusRef = useRef<HTMLButtonElement | null>(null);
+  const taskActionsRef = useRef<HTMLButtonElement | null>(null);
   const intervalListId = `history-intervals-${day.dayStartedAt}-${task.task.id}`;
   const rowId = `${day.dayStartedAt}:${task.task.id}`;
   const isPending = pendingRows[rowId] === true;
@@ -406,6 +430,32 @@ const HistoryTaskRow = ({
         >
           {actionLabel}
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              aria-label={`Task actions for ${task.task.description}`}
+              className="history-task__menu-trigger"
+              ref={taskActionsRef}
+              size="icon-sm"
+              type="button"
+              variant="ghost"
+            >
+              <Ellipsis aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuItem onSelect={() => setIsRenameOpen(true)}>
+                <Pencil data-icon="inline-start" />
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive">
+                <Trash2 data-icon="inline-start" />
+                Delete task
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       {isExpanded && (
         <ul className="history-intervals" id={intervalListId}>
@@ -453,6 +503,19 @@ const HistoryTaskRow = ({
           }}
           open
           taskDescription={task.task.description}
+        />
+      )}
+      {isRenameOpen && (
+        <RenameTaskDialog
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsRenameOpen(false);
+              window.setTimeout(() => taskActionsRef.current?.focus(), 0);
+            }
+          }}
+          onRenamed={onTaskRenamed}
+          open
+          task={task.task}
         />
       )}
     </div>

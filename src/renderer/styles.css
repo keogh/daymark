@@ -372,7 +372,7 @@ input {
 
 .history-task__header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.75rem;
 }
@@ -394,6 +394,10 @@ input {
 
 .history-task__action {
   min-width: 7.5rem;
+}
+
+.history-task__menu-trigger {
+  flex: none;
 }
 
 .history-task__toggle:hover {

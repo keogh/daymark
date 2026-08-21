@@ -4,6 +4,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -780,6 +781,82 @@ describe('App', () => {
     expect(api.history.getPage).toHaveBeenCalledTimes(2);
   });
 
+  it('renames the active task and refreshes the timer plus every loaded history occurrence', async () => {
+    const renamedDescription = 'Implement secure authentication';
+    const firstDay = historyPageWithTask();
+    const secondDay = {
+      ...firstDay.days[0]!,
+      dayStartedAt: firstDay.days[0]!.dayStartedAt - 86_400_000,
+      dayEndedAt: firstDay.days[0]!.dayEndedAt - 86_400_000,
+    };
+    const initialHistory: HistoryPage = {
+      ...firstDay,
+      days: [firstDay.days[0]!, secondDay],
+    };
+    const renamedHistory: HistoryPage = {
+      ...initialHistory,
+      days: initialHistory.days.map((day) => ({
+        ...day,
+        tasks: day.tasks.map((historyTask) => ({
+          ...historyTask,
+          task: { ...historyTask.task, description: renamedDescription },
+        })),
+      })),
+    };
+    const renamedTimer = {
+      ...runningState,
+      currentTask: {
+        ...runningState.currentTask!,
+        description: renamedDescription,
+      },
+    };
+    const api = setTimerApi({
+      getState: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: runningState })
+        .mockResolvedValueOnce({ ok: true, value: renamedTimer }),
+      getHistoryPage: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: initialHistory })
+        .mockResolvedValueOnce({ ok: true, value: renamedHistory }),
+      renameTask: vi.fn().mockResolvedValue({
+        ok: true,
+        value: {
+          task: { id: 'task-1', description: renamedDescription },
+        },
+      }),
+    });
+    render(<App />);
+
+    const actions = (
+      await screen.findAllByRole('button', {
+        name: 'Task actions for Implement authentication',
+      })
+    )[0]!;
+    fireEvent.keyDown(actions, { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Rename' }));
+    fireEvent.change(screen.getByLabelText('Task description'), {
+      target: { value: renamedDescription },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(api.tasks.rename).toHaveBeenCalledWith({
+      taskId: 'task-1',
+      description: renamedDescription,
+    });
+    expect(
+      await screen.findByRole('region', { name: 'running timer' }),
+    ).toHaveTextContent(renamedDescription);
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole('button', { name: renamedDescription }),
+      ).toHaveLength(2),
+    );
+    expect(api.timer.getState).toHaveBeenCalledTimes(2);
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('keeps the active view usable when a command promise rejects', async () => {
     const api = setTimerApi({
       getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
@@ -902,6 +979,7 @@ interface TimerApiOverrides {
   readonly getHistoryPage?: TimeTrackerAPI['history']['getPage'];
   readonly createManualInterval?: TimeTrackerAPI['manualTime']['createInterval'];
   readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
+  readonly renameTask?: TimeTrackerAPI['tasks']['rename'];
 }
 
 const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
@@ -965,10 +1043,12 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
           ok: true,
           value: { suggestions: [], now: 1_000 },
         }),
-      rename: vi.fn().mockResolvedValue({
-        ok: true,
-        value: { task: { id: 'task-1', description: 'Renamed task' } },
-      }),
+      rename:
+        overrides.renameTask ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: { task: { id: 'task-1', description: 'Renamed task' } },
+        }),
       delete: vi.fn().mockResolvedValue({
         ok: true,
         value: { taskId: 'task-1' },

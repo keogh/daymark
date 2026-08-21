@@ -34,7 +34,7 @@ breakdown to match the specification.
 | TASK-007-002 | Implement transactional task rename | Complete | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
 | TASK-007-003 | Implement transactional task deletion and deletion summary | Complete | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
 | TASK-007-004 | Expose validated task management APIs | Complete | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
-| TASK-007-005 | Add task actions and rename workflow | Pending | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
+| TASK-007-005 | Add task actions and rename workflow | Complete | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
 | TASK-007-006 | Add task deletion workflow with informative confirmation | Pending | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
 | TASK-007-007 | Verify task management and update documentation | Pending | TASK-007-005, TASK-007-006 | AC-007-001–013 |
 
@@ -349,7 +349,7 @@ and deletion-summary operations without widening renderer privileges.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -387,6 +387,26 @@ TASK-007-004.
 
 - Run focused Daily History/rename renderer tests and relevant history/timer
   tests, then `npm run typecheck` and `npm run lint`.
+
+### Completion Evidence
+
+- `npx vitest run --run test/renderer/app/RenameTaskDialog.test.tsx test/renderer/app/DailyHistory.test.tsx test/renderer/app/App.test.tsx` — passed, 3 files and 55 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 54 files and 477 tests.
+- `npm run package` — passed for the macOS arm64 Electron package.
+- Packaged-app smoke verification with an isolated temporary profile proved
+  keyboard menu activation, Rename/Delete task-action discoverability, complete
+  description prefill, managed field focus, successful rename/close/refresh,
+  and zero captured renderer console warnings or errors.
+- Added the source-owned shadcn/ui Dropdown Menu and a labeled per-row Task
+  actions trigger that remains independent from expand/collapse and Play/Resume.
+- Added `RenameTaskDialog` with shared exact-input validation, Cancel and Escape
+  behavior, pending duplicate prevention, controlled collision/missing/internal
+  errors, preserved input on failure, and focus return to the invoking trigger.
+- Successful rename calls the existing authoritative timer refresh, whose
+  revision reconciles every currently loaded history day; renderer coverage
+  proves the active timer and two loaded Task occurrences update together.
 
 ### Traceability
 

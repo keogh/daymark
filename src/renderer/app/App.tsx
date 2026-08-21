@@ -65,6 +65,7 @@ export const App = () => {
         onAddTime={(date) => setManualEntryDate(date)}
         onIntervalSaved={controller.refresh}
         onPlayTask={controller.switchToTask}
+        onTaskRenamed={controller.refresh}
         refreshRevision={controller.authoritativeRevision}
         timer={
           controller.loadState.status === 'ready'
