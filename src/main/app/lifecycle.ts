@@ -1,4 +1,4 @@
-import { app, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { randomUUID } from 'node:crypto';
 
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
@@ -31,9 +31,13 @@ import { createMainWindow } from './create-window';
 import { ApplicationShutdown } from './shutdown';
 import { startApplication } from './startup';
 import { MainWindowOwner } from './window-owner';
+import { publishTimerState } from '@/main/timer/state-publisher';
+import { TimerPresentationSynchronization } from '@/main/timer/state-synchronization';
+import { selectTrayAsset, type TrayPlatform } from '@/main/tray/assets';
+import { ElectronTrayAdapter } from '@/main/tray/native';
+import { IntervalTrayScheduler, SystemTrayService } from '@/main/tray/service';
 
 export const registerApplicationLifecycle = (): void => {
-  let databaseLifecycle: DatabaseLifecycle | undefined;
   const shutdown = new ApplicationShutdown({
     quitApplication: () => app.quit(),
     logCleanupFailure: (error) => {
@@ -46,19 +50,20 @@ export const registerApplicationLifecycle = (): void => {
     requestForegroundAttention: () => app.focus(),
   });
 
-  shutdown.addCleanupHook(() => windowOwner.dispose());
-  shutdown.addCleanupHook(() => databaseLifecycle?.close());
-
   void app.whenReady().then(() => {
     const lifecycle = new DatabaseLifecycle({
       databasePath: resolveDatabasePath(app.getPath('userData')),
       migrationsFolder: resolveMigrationsPath(app.getAppPath()),
     });
-    databaseLifecycle = lifecycle;
+    shutdown.addCleanupHook(() => lifecycle.close());
+    shutdown.addCleanupHook(() => windowOwner.dispose());
+
+    let stateReader: TimerStateReader | undefined;
+    let trayService: SystemTrayService | undefined;
 
     const started = startApplication({
       initializeDatabase: () => lifecycle.initialize(),
-      registerApplicationServices: () => {
+      initializeApplicationServices: () => {
         const context = lifecycle.getContext();
         const appState = new AppStateRepository(context.db);
         const tasks = new TaskRepository(context.db);
@@ -68,7 +73,7 @@ export const registerApplicationLifecycle = (): void => {
           context.db,
         );
         const clock = new SystemClock();
-        const stateReader = new TimerStateReader({
+        stateReader = new TimerStateReader({
           appState,
           tasks,
           intervals,
@@ -109,19 +114,56 @@ export const registerApplicationLifecycle = (): void => {
           transactions: new TransactionRunner(context.sqlite),
         });
 
+        const asset = selectTrayAsset({
+          platform: process.platform as TrayPlatform,
+          isPackaged: app.isPackaged,
+          appPath: app.getAppPath(),
+          resourcesPath: process.resourcesPath,
+        });
+        trayService = new SystemTrayService({
+          native: new ElectronTrayAdapter(asset.iconPath),
+          scheduler: new IntervalTrayScheduler(),
+          clock,
+          commands: timerService,
+          readState: () => stateReader!.getState(),
+          publishState: (state) =>
+            publishTimerState(BrowserWindow.getAllWindows(), state),
+          openWindow: () => windowOwner.open(),
+          handleDoubleClick:
+            process.platform === 'darwin'
+              ? undefined
+              : () => windowOwner.handleTrayDoubleClick(),
+          quitApplication: () => shutdown.requestQuit(),
+          showError: (message) =>
+            dialog.showErrorBox('Time Tracker timer error', message),
+          logUnexpectedError: (message, error) => console.error(message, error),
+        });
+        shutdown.addCleanupHook(() => trayService?.dispose());
+
+        const synchronization = new TimerPresentationSynchronization({
+          synchronizeTray: (state) => trayService?.synchronize(state),
+          publishState: (state) =>
+            publishTimerState(BrowserWindow.getAllWindows(), state),
+          readState: () => stateReader!.getState(),
+        });
+
         registerSystemHealthHandler(
           ipcMain,
           new SystemHealthService(lifecycle),
         );
         registerTimerHandlers(
           ipcMain,
-          { getState: stateReader, commands: timerService },
+          {
+            getState: stateReader,
+            commands: timerService,
+            synchronize: synchronization,
+          },
           console,
         );
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
         registerIntervalsHandlers(
           ipcMain,
-          { commands: intervalService },
+          { commands: intervalService, synchronize: synchronization },
           console,
         );
         registerManualTimeHandler(
@@ -129,21 +171,28 @@ export const registerApplicationLifecycle = (): void => {
           { createInterval: manualTimeService },
           console,
         );
-        registerTasksHandler(ipcMain, { tasks: taskService }, console);
+        registerTasksHandler(
+          ipcMain,
+          { tasks: taskService, synchronize: synchronization },
+          console,
+        );
       },
+      readInitialTimerState: () => stateReader!.getState(),
+      initializeTray: (initialState) => trayService!.initialize(initialState),
       createNormalWindow: () => {
         windowOwner.open();
       },
       logInitializationFailure: (error) => {
-        console.error('Failed to initialize the local database.', error);
+        console.error('Failed to initialize Time Tracker.', error);
       },
       showInitializationFailure: () => {
         dialog.showErrorBox(
           'Time Tracker could not start',
-          'The local database could not be initialized. Please restart the application.',
+          'Required local resources could not be initialized. Please restart the application.',
         );
       },
-      quitApplication: () => shutdown.requestQuit(),
+      cleanupAfterFailure: () => shutdown.handleApplicationShutdown(),
+      quitApplication: () => app.quit(),
     });
 
     if (started) {

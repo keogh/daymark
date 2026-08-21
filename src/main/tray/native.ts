@@ -14,6 +14,7 @@ export interface NativeTrayHandle {
   setTitle(title: string): void;
   setToolTip(tooltip: string): void;
   destroy(): void;
+  onDoubleClick?(listener: () => void): void;
 }
 
 export interface NativeTrayAdapter {
@@ -29,7 +30,14 @@ export class ElectronTrayAdapter implements NativeTrayAdapter {
   }
 
   createTray(): NativeTrayHandle {
-    return new Tray(this.#iconPath);
+    const tray = new Tray(this.#iconPath);
+    return {
+      setContextMenu: (menu) => tray.setContextMenu(menu as Menu),
+      setTitle: (title) => tray.setTitle(title),
+      setToolTip: (tooltip) => tray.setToolTip(tooltip),
+      destroy: () => tray.destroy(),
+      onDoubleClick: (listener) => tray.on('double-click', listener),
+    };
   }
 
   buildMenu(items: readonly NativeTrayMenuItem[]): unknown {

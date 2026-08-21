@@ -35,6 +35,7 @@ export interface TrayServiceDependencies {
   readonly readState: () => TimerState | Promise<TimerState>;
   readonly publishState: (state: TimerState) => void | Promise<void>;
   readonly openWindow: () => void;
+  readonly handleDoubleClick?: () => void;
   readonly quitApplication: () => void;
   readonly showError: (message: string) => void;
   readonly logUnexpectedError: (message: string, error: unknown) => void;
@@ -65,6 +66,9 @@ export class SystemTrayService {
     this.#state = initialState;
 
     try {
+      if (this.#dependencies.handleDoubleClick) {
+        tray.onDoubleClick?.(this.#dependencies.handleDoubleClick);
+      }
       this.#render();
       this.#reconcileTicker();
     } catch (error: unknown) {

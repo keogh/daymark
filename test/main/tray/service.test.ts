@@ -33,6 +33,16 @@ describe('SystemTrayService', () => {
     );
   });
 
+  it('connects the supported native double-click restoration gesture', () => {
+    const handleDoubleClick = vi.fn();
+    const fixture = createFixture({ handleDoubleClick });
+
+    fixture.service.initialize(idleState());
+    fixture.native.doubleClick();
+
+    expect(handleDoubleClick).toHaveBeenCalledOnce();
+  });
+
   it('keeps one ticker across running snapshots and updates duration locally', () => {
     const fixture = createFixture();
     fixture.service.initialize(runningState());
@@ -156,6 +166,7 @@ class FakeNativeAdapter {
   createCount = 0;
   currentMenu: readonly NativeTrayMenuItem[] = [];
   readonly destroy = vi.fn();
+  #doubleClickListener: (() => void) | undefined;
   readonly tray: NativeTrayHandle = {
     setContextMenu: (menu) => {
       this.currentMenu = menu as readonly NativeTrayMenuItem[];
@@ -163,6 +174,9 @@ class FakeNativeAdapter {
     setTitle: vi.fn(),
     setToolTip: vi.fn(),
     destroy: this.destroy,
+    onDoubleClick: (listener) => {
+      this.#doubleClickListener = listener;
+    },
   };
 
   createTray(): NativeTrayHandle {
@@ -172,6 +186,10 @@ class FakeNativeAdapter {
 
   buildMenu(items: readonly NativeTrayMenuItem[]): unknown {
     return items;
+  }
+
+  doubleClick(): void {
+    this.#doubleClickListener?.();
   }
 }
 
@@ -203,7 +221,7 @@ class FakeScheduler implements TrayScheduler {
   }
 }
 
-const createFixture = () => {
+const createFixture = (overrides: Partial<TrayServiceDependencies> = {}) => {
   const native = new FakeNativeAdapter();
   const scheduler = new FakeScheduler();
   const clock = new FakeClock(2_000);
@@ -233,6 +251,7 @@ const createFixture = () => {
     quitApplication: vi.fn(),
     showError: vi.fn(),
     logUnexpectedError: vi.fn(),
+    ...overrides,
   };
 
   return {

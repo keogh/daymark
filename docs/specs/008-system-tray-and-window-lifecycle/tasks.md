@@ -35,7 +35,7 @@ breakdown to match the specification.
 | TASK-008-002 | Implement owned close, restore, and quit lifecycle | Complete | None | AC-008-009–011, AC-008-013, AC-008-015 |
 | TASK-008-003 | Implement authoritative tray service and timer commands | Complete | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Complete | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
-| TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Pending | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
+| TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Complete | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
 | TASK-008-006 | Verify System Tray and update documentation | Pending | TASK-008-005 | AC-008-001–018 |
 
 ---
@@ -322,7 +322,7 @@ TASK-008-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -371,7 +371,29 @@ in a safe order with complete failure cleanup and restart reconstruction.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- test/main/app/startup.test.ts test/main/app/shutdown.test.ts
+  test/main/app/window-owner.test.ts test/main/app/packaging.test.ts
+  test/main/tray/service.test.ts test/main/tray/service.integration.test.ts
+  test/main/services/timer-service.integration.test.ts
+  test/main/timer/state-synchronization.test.ts
+  test/main/timer/state-publisher.test.ts` — passed 41 focused startup,
+  lifecycle, tray, synchronization, SQLite command, and restart tests across 9
+  files.
+- `npm run format:check`, `npm run typecheck`, and `npm run lint` — passed.
+- `npm test` — passed all 528 tests across 64 files.
+- `npm run package` — passed for macOS arm64 after allowing Forge's required
+  packaging download; the initial sandboxed attempts failed only because DNS
+  access to GitHub was unavailable.
+- Inspected the packaged application and confirmed the application-owned SVG,
+  fallback PNG, and 1x/2x macOS template PNGs exist under
+  `Contents/Resources/assets/tray`; the native template image is 16x16 RGBA.
+- Composed database/service readiness, one reconstructed initial snapshot,
+  native tray creation, timer synchronization/publication, and single-window
+  ownership in deterministic order. Connected Open, non-macOS tray
+  double-click, macOS activation, explicit/OS quit, safe native errors, and
+  reverse-order idempotent cleanup. Tray/icon initialization failure is fatal
+  before window creation and cleans partial resources before exit.
+- `git diff --check` — passed.
 
 ---
 
