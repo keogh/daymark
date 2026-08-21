@@ -33,7 +33,7 @@ breakdown to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-008-001 | Define tray presentation and platform asset selection | Complete | None | AC-008-001–004, AC-008-017 |
 | TASK-008-002 | Implement owned close, restore, and quit lifecycle | Complete | None | AC-008-009–011, AC-008-013, AC-008-015 |
-| TASK-008-003 | Implement authoritative tray service and timer commands | Pending | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
+| TASK-008-003 | Implement authoritative tray service and timer commands | Complete | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Pending | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Pending | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
 | TASK-008-006 | Verify System Tray and update documentation | Pending | TASK-008-005 | AC-008-001–018 |
@@ -177,7 +177,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -226,7 +226,22 @@ TASK-008-001.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- test/main/tray/service.test.ts
+  test/main/tray/service.integration.test.ts test/main/tray/presentation.test.ts
+  test/main/tray/assets.test.ts test/main/services/timer-service.test.ts
+  test/main/services/timer-service.integration.test.ts` — passed 73 focused
+  tray, presentation, SQLite integration, and existing timer-service tests
+  across 6 files.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npx prettier --write` on changed source, test, and task documents plus
+  `git diff --check` — passed.
+- Added a narrow Electron Tray/Menu adapter and deterministic authoritative tray
+  service with exactly-once initialization, idempotent disposal, at-most-one
+  running ticker, pending-command guards, returned-state publication, fresh-state
+  failure reconciliation, safe native messages, and sanitized technical logging.
+  Renderer subscription and startup composition remain scoped to TASK-008-004
+  and TASK-008-005 respectively.
 
 ---
 
