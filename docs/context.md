@@ -255,3 +255,9 @@ The application should remain:
 - understandable.
 
 Avoid feature expansion until the core tracking workflow has been validated.
+
+After the MVP release-readiness gate, the expected post-MVP sequence begins with
+trusted release signing and notarization, followed by data export, local backup
+and restore, Task archiving, global keyboard shortcuts, and opt-in automatic OS
+startup. These are roadmap expectations only until each has an explicit
+implementation-ready specification under `docs/specs/`.

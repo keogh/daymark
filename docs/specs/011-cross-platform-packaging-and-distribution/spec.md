@@ -162,10 +162,10 @@ an unsigned application. Acceptance must not require globally disabling platform
 security, disabling antivirus, changing machine-wide execution policy, or running
 an undocumented bypass command.
 
-Signing and notarization are mandatory future work before the project describes
-its downloads as general-public production releases. The packaging structure must
-not intentionally prevent later secret-driven signing, but no placeholder secret,
-certificate, password, or private key may be committed.
+Signing and notarization are mandatory work planned for SPEC-013 before the
+project describes its downloads as general-public production releases. The
+packaging structure must not intentionally prevent later secret-driven signing,
+but no placeholder secret, certificate, password, or private key may be committed.
 
 ---
 

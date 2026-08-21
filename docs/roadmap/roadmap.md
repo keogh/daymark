@@ -44,6 +44,12 @@ M7  Analytics
 M8  Settings and UX Polish
 M9  Cross-Platform Packaging
 M10 MVP QA and Release
+M11 Trusted Release Signing and Notarization
+M12 Data Export
+M13 Local Backup and Restore
+M14 Task Archiving
+M15 Global Keyboard Shortcuts
+M16 Automatic OS Startup
 ```
 
 ---
@@ -428,32 +434,111 @@ Some specs may be split further if implementation size becomes too large.
 
 ---
 
-# 4. Deferred Roadmap
+# 4. Expected Post-MVP Specification Sequence
 
-Do not implement these during MVP unless a validated requirement changes scope.
+The following specifications are expected after SPEC-012 is Verified. They are
+roadmap commitments, not implementation-ready specifications: each still requires
+a complete `spec.md`, companion `tasks.md`, product decisions, and acceptance
+criteria before implementation may begin.
 
-## Potential V1.1
+```text
+013 Trusted Release Signing and Notarization
+014 Data Export
+015 Local Backup and Restore
+016 Task Archiving
+017 Global Keyboard Shortcuts
+018 Automatic OS Startup
+```
 
-- automatic OS startup;
-- CSV export;
-- JSON export;
-- keyboard shortcuts;
-- archived tasks.
+Unless a later validated requirement changes priority, define and implement them
+in that order. SPEC-013 is the gate between the unsigned personal-testing MVP and
+any claim of trusted general-public production distribution. Product enhancements
+remain behind that release-hardening work.
 
-## Potential V1.2
+## SPEC-013 — Trusted Release Signing and Notarization
+
+Expected scope:
+
+- macOS Developer ID signing, hardened runtime, notarization, and stapling;
+- Windows code signing using an explicitly selected and documented provider;
+- protected CI credential handling and trusted release-trigger boundaries;
+- post-package and post-download signature verification;
+- clean-machine Gatekeeper and Windows trust acceptance;
+- publisher, homepage, and support metadata required for public distribution;
+- an explicit decision on whether standalone Linux `.deb` signing is useful
+  without operating a signed package repository.
+
+Automatic updates, store publication, certificate procurement automation, and
+Linux package-repository operation are not implied by this roadmap entry.
+
+## SPEC-014 — Data Export
+
+Expected scope:
+
+- CSV and JSON export from authoritative Task and TimeInterval data;
+- documented, versioned export schemas;
+- UTC timestamp representation and deterministic ordering;
+- local save-file selection through a narrow privileged boundary;
+- export verification without mutating application data.
+
+Import is not implied by export and requires a separate future specification.
+
+## SPEC-015 — Local Backup and Restore
+
+Expected scope:
+
+- user-initiated local backup of the complete durable profile;
+- backup format/version identification and integrity validation;
+- safe restore confirmation, compatibility checks, and atomic replacement;
+- rollback or non-mutation behavior when restore validation fails;
+- preservation of timer and database invariants across backup and restore.
+
+Encrypted, scheduled, and remote backup remain separate future work.
+
+## SPEC-016 — Task Archiving
+
+Expected scope:
+
+- archive and unarchive without deleting a Task or its intervals;
+- defined visibility in search, suggestions, history, and analytics;
+- protection for the active running or paused Task;
+- migrations and data-preservation behavior for existing Tasks.
+
+## SPEC-017 — Global Keyboard Shortcuts
+
+Expected scope:
+
+- a minimal set of cross-platform timer commands while the window is hidden;
+- platform-appropriate defaults and conflict/registration failure behavior;
+- authoritative timer transitions through existing application services;
+- discoverability, accessibility, and lifecycle cleanup.
+
+Custom shortcut configuration is not implied unless the specification validates
+that requirement.
+
+## SPEC-018 — Automatic OS Startup
+
+Expected scope:
+
+- an opt-in, default-off setting;
+- isolated platform-specific launch-at-login integration;
+- startup registration failure and stale-registration handling;
+- interaction with hidden-window launch, tray availability, and timer recovery;
+- packaged acceptance on macOS, Windows, and the supported Linux environment.
+
+## Later Candidates
+
+Do not implement these during the MVP or the expected sequence above unless a
+validated requirement changes scope:
 
 - idle detection;
 - optional reminders;
-- local backup.
-
-## Future Exploration
-
 - projects;
 - tags;
 - calendar integrations;
 - cloud synchronization;
 - mobile companion;
-- encrypted sync.
+- encrypted backup or synchronization.
 
 ---
 

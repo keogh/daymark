@@ -755,19 +755,28 @@ The user must also be able to repair mistakes manually.
 
 ---
 
-# 21. Future Considerations
+# 21. Post-MVP Direction
 
-Potential future features include:
+After the unsigned personal-testing MVP is verified, the expected specification
+sequence is:
 
-- automatic startup;
-- global keyboard shortcuts;
+1. trusted release signing and notarization;
+2. CSV and JSON data export;
+3. local backup and restore;
+4. task archiving;
+5. global keyboard shortcuts;
+6. opt-in automatic operating-system startup.
+
+This ordering prioritizes a trusted public-distribution path and local data
+ownership before convenience enhancements. These items are expected roadmap work,
+not current requirements; each requires an implementation-ready specification and
+companion task breakdown.
+
+Potential later features include:
+
 - idle detection;
-- task archiving;
 - projects;
 - tags;
-- export to CSV;
-- export to JSON;
-- local backup;
 - optional encrypted backup;
 - Pomodoro mode;
 - calendar integration;

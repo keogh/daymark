@@ -60,7 +60,7 @@ must not claim that the owner personally tested unavailable environments.
 
 DEC-035 defines the candidate as unsigned and intended for personal installation
 and testing. Signing, notarization, and a general-public production claim remain
-future work.
+planned SPEC-013 work.
 
 ---
 
@@ -630,7 +630,7 @@ that artifacts are unsigned, intended for personal testing, may trigger operatin
 system warnings, have no automatic updater, and are not general-public production
 binaries.
 
-Signing and notarization require a later specification and owner-provided
+Signing and notarization require planned SPEC-013 and owner-provided
 credentials before the product can claim trusted general-public distribution.
 
 ---

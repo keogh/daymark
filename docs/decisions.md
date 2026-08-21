@@ -674,7 +674,8 @@ prerelease until a person completes and reviews fresh-install acceptance.
 The initial artifacts are unsigned and intended for personal installation and
 testing. Documentation must identify expected Gatekeeper/SmartScreen warnings and
 must not present checksums as publisher authentication. General-public production
-distribution requires a later signing/notarization decision and credentials.
+distribution requires the signing/notarization decision planned for SPEC-013 and
+owner-provided credentials.
 
 Uninstall preserves the per-user application database and settings. Replacement,
 reinstall, and—beginning with the second published version—forward upgrade must
@@ -747,7 +748,7 @@ matrix.
 - CI may recommend a result but cannot approve or publish a release.
 - Failed evidence is retained and linked to reruns rather than overwritten.
 - No acceptance criterion may be reclassified as a cosmetic issue.
-- A later specification and owner-provided credentials are required before the
-  project claims signed general-public production distribution.
+- Planned SPEC-013 and owner-provided credentials are required before the project
+  claims signed general-public production distribution.
 - SPEC-012 defines the evidence ledger, defect policy, integrated regression,
   owner acceptance, and final decision contract.

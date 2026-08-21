@@ -206,6 +206,23 @@ renderer console.
 4. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
    behind SPEC-011)
 
+## Expected Post-MVP Specifications
+
+These roadmap entries are not yet designed or implementation-ready. They must not
+be implemented until SPEC-012 is Verified and each entry has a complete
+specification and companion task breakdown.
+
+1. SPEC-013 — Trusted Release Signing and Notarization
+2. SPEC-014 — Data Export
+3. SPEC-015 — Local Backup and Restore
+4. SPEC-016 — Task Archiving
+5. SPEC-017 — Global Keyboard Shortcuts
+6. SPEC-018 — Automatic OS Startup
+
+SPEC-013 is expected to gate any claim of trusted general-public production
+distribution. The product enhancements remain sequenced behind that
+release-hardening work.
+
 ---
 
 # Known Blockers
@@ -283,14 +300,16 @@ keeps publication as a separate manual owner action; requires direct owner testi
 only on available macOS Apple Silicon while retaining the full identified
 SPEC-011 platform-evidence requirement; permits only bounded fixes for already
 specified release blockers; and leaves signing/notarization and trusted public
-distribution to later work. No schema, product API, product UI, or runtime
+distribution to planned SPEC-013. No schema, product API, product UI, or runtime
 dependency change is planned.
 
 ---
 
 # Last Updated
 
-2026-08-21 — Designed SPEC-012 and created its implementation task breakdown.
-SPEC-012 is Ready for Implementation but queued behind verification of SPEC-011
-and every preceding specification. SPEC-008 remains the active implementation
-specification and SPEC-007 remains the latest verified implementation milestone.
+2026-08-21 — Added the expected post-MVP sequence, SPEC-013 through SPEC-018, to
+the roadmap. These entries remain undefined and must receive complete
+specifications and task breakdowns before implementation. SPEC-012 remains Ready
+for Implementation but queued behind verification of SPEC-011 and every preceding
+specification. SPEC-008 remains the active implementation specification and
+SPEC-007 remains the latest verified implementation milestone.
