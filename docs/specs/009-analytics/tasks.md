@@ -31,7 +31,7 @@ external prerequisite does not change the internal dependency order in this file
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-009-001 | Define Analytics Contracts, Validation, and Calendar Projections | Pending | None | AC-009-001–007, AC-009-017 |
+| TASK-009-001 | Define Analytics Contracts, Validation, and Calendar Projections | Complete | None | AC-009-001–007, AC-009-017 |
 | TASK-009-002 | Implement Bounded Analytics Queries | Pending | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
 | TASK-009-003 | Implement the Authoritative Analytics Service | Pending | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Pending | TASK-009-003 | AC-009-016–018 |
@@ -48,7 +48,7 @@ external prerequisite does not change the internal dependency order in this file
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -107,6 +107,23 @@ prerequisite.
 - Specification sections: 7, 9–13, 16, 25, 27.
 
 ### Completion Evidence
+
+- Added exact shared 7-day/30-day request and complete summary contracts plus the
+  controlled `INVALID_ANALYTICS_RANGE` error code.
+- Added exact-own-property runtime validation covering supported, missing,
+  malformed, primitive, array, inherited-only, and unknown-property inputs.
+- Added pure projections for DST-safe oldest-first local days, Monday weeks,
+  local months, snapshot-capped overlaps, zero-filled day totals, floored
+  averages, deterministic top-five ranking, and the separate open Task.
+- Reused the established timestamp-based `TimeInterval` domain entity while
+  keeping Analytics calendar/projection logic independent of persistence and
+  Electron.
+- Focused Analytics and shared error tests — passed, 4 files and 37 tests.
+- `npm run typecheck`, `npm run lint`, and `npm run format:check` — passed.
+- `npm test` — passed, 67 files and 552 tests. One pre-existing renderer focus
+  test timed out during the first concurrent full run; it passed alone and the
+  immediately repeated full suite passed without source changes.
+- `git diff --check` — passed.
 
 Record focused commands, passing test counts, and any justified helper reuse when
 complete.

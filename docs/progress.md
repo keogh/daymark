@@ -2,24 +2,17 @@
 
 ## Current Phase
 
-System Tray specification ready for implementation
+Analytics implementation
 
 ## Current Specification
 
-SPEC-008 — System Tray and Window Lifecycle (Ready for Implementation)
+SPEC-009 — Analytics (Ready for Implementation)
 
 ## Current Status
 
-SPEC-008 is designed and implementation-ready. It defines native idle, running,
-and paused tray presentation; authoritative Pause/Resume/Stop controls; a
-one-second presentation-only duration ticker; close-to-hide and single-window
-restore behavior; immediate renderer/tray synchronization; explicit Quit without
-timer mutation; safe failure handling; lifecycle cleanup; and packaged macOS
-acceptance while preserving later Windows/Linux release validation.
-
-SPEC-009 is also designed and queued as Ready for Implementation, but its task
-breakdown explicitly requires SPEC-008 to be Verified before Analytics
-implementation begins.
+SPEC-008 is Verified. SPEC-009 implementation is active. TASK-009-001 completed
+the Analytics contracts, strict input validation, and deterministic pure local
+calendar projections; TASK-009-002 bounded Analytics queries is next.
 
 SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
@@ -42,6 +35,7 @@ earlier specification are Verified.
 - SPEC-005 — Manual Time Entry (Verified 2026-08-15)
 - SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
 - SPEC-007 — Task Management (Verified 2026-08-21)
+- SPEC-008 — System Tray and Window Lifecycle (Verified 2026-08-21)
 
 SPEC-001 delivered:
 

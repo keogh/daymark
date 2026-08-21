@@ -36,7 +36,7 @@ breakdown to match the specification.
 | TASK-008-003 | Implement authoritative tray service and timer commands | Complete | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Complete | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Complete | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
-| TASK-008-006 | Verify System Tray and update documentation | In Progress | TASK-008-005 | AC-008-001–018 |
+| TASK-008-006 | Verify System Tray and update documentation | Complete | TASK-008-005 | AC-008-001–018 |
 
 ---
 
@@ -401,7 +401,7 @@ in a safe order with complete failure cleanup and restart reconstruction.
 
 ### Status
 
-In Progress
+Complete
 
 ### Outcome
 
@@ -449,6 +449,23 @@ TASK-008-005.
 - Specification sections: 16–27
 
 ### Completion Evidence
+
+- `npm run format:check`, `npm run typecheck`, and `npm run lint` — passed.
+- `npm test` — passed, 64 files and 528 tests.
+- `npm run package` — passed for the macOS arm64 Electron package; packaged
+  source-owned tray assets were included.
+- Packaged macOS verification used the isolated
+  `/tmp/timetracker-spec008-verification` profile. It covered idle launch,
+  local-only renderer resources, Start, close-to-hide, an advancing native tray,
+  tray Pause/Open/Resume/Stop, and repeated Open/restore behavior.
+- Quit from the tray left the active interval open and `AppState` running in the
+  isolated SQLite database. Relaunch reconstructed the same running Task in both
+  renderer and tray without modifying the real application profile.
+- Automated platform-adapter, lifecycle, startup-cleanup, synchronization,
+  preload, renderer, repository, and restart coverage provides AC-008-001–018
+  evidence. Physical Windows/Linux installer verification remains assigned to
+  SPEC-011 as specified.
+- No HTTP(S) renderer resources or unexpected process errors were observed.
 
 Record commands run, results, and relevant implementation notes when complete.
 

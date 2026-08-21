@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready for Implementation
+Verified
 
 ## Milestone
 
@@ -866,4 +866,3 @@ renderer revision-based history reconciliation.
 
 Do not implement SPEC-009 Analytics, SPEC-010 Settings, SPEC-011 Packaging and
 Release, or any deferred roadmap behavior while completing this specification.
-
