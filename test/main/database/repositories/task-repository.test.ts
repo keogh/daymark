@@ -179,7 +179,82 @@ describe('TaskRepository', () => {
         .get(),
     ).toBe(0);
   });
+
+  it('deletes exactly one task and cascades only its intervals', () => {
+    const target = createTask();
+    const other = {
+      ...createTask(),
+      id: 'task-2',
+      description: 'Other task',
+      normalizedDescription: 'other task',
+    };
+    repository.insert(target);
+    repository.insert(other);
+    insertInterval(context, 'target-1', target.id, 100, 200);
+    insertInterval(context, 'target-2', target.id, 300, 500);
+    insertInterval(context, 'other-1', other.id, 600, 900);
+
+    expect(repository.delete(target.id)).toEqual(target);
+    expect(repository.findById(target.id)).toBeUndefined();
+    expect(repository.findById(other.id)).toEqual(other);
+    expect(intervalIds(context)).toEqual(['other-1']);
+  });
+
+  it('returns undefined when deleting a missing task without affecting persisted data', () => {
+    const task = createTask();
+    repository.insert(task);
+
+    expect(repository.delete('missing-task')).toBeUndefined();
+    expect(repository.findById(task.id)).toEqual(task);
+  });
+
+  it('computes deletion summary interval count and lifetime duration, including an open interval through now', () => {
+    const task = createTask();
+    repository.insert(task);
+    insertInterval(context, 'closed', task.id, 100, 250);
+    insertInterval(context, 'open', task.id, 400, null);
+
+    expect(repository.findDeletionSummary(task.id, 1_000)).toEqual({
+      task,
+      intervalCount: 2,
+      lifetimeDurationMs: 750,
+    });
+    expect(repository.findById(task.id)).toEqual(task);
+    expect(intervalIds(context)).toEqual(['closed', 'open']);
+  });
+
+  it('returns a zeroed deletion summary for a task without intervals and undefined for a missing task', () => {
+    const task = createTask();
+    repository.insert(task);
+
+    expect(repository.findDeletionSummary(task.id, 1_000)).toEqual({
+      task,
+      intervalCount: 0,
+      lifetimeDurationMs: 0,
+    });
+    expect(repository.findDeletionSummary('missing-task', 1_000)).toBeUndefined();
+  });
 });
+
+const insertInterval = (
+  context: DatabaseContext,
+  id: string,
+  taskId: string,
+  startedAt: number,
+  endedAt: number | null,
+): void => {
+  context.sqlite
+    .prepare(
+      'insert into time_intervals (id, task_id, started_at, ended_at, created_at, updated_at) values (?, ?, ?, ?, ?, ?)',
+    )
+    .run(id, taskId, startedAt, endedAt, startedAt, startedAt);
+};
+
+const intervalIds = (context: DatabaseContext): string[] =>
+  context.sqlite
+    .prepare('select id from time_intervals order by id')
+    .pluck()
+    .all() as string[];
 
 const createTask = (): Task => ({
   id: 'task-1',

@@ -32,7 +32,7 @@ breakdown to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-007-001 | Define task management contracts and validation | Complete | None | AC-007-004, AC-007-005, AC-007-010, AC-007-012 |
 | TASK-007-002 | Implement transactional task rename | Complete | TASK-007-001 | AC-007-003–005, AC-007-009–011 |
-| TASK-007-003 | Implement transactional task deletion and deletion summary | Pending | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
+| TASK-007-003 | Implement transactional task deletion and deletion summary | Complete | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
 | TASK-007-004 | Expose validated task management APIs | Pending | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
 | TASK-007-005 | Add task actions and rename workflow | Pending | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
 | TASK-007-006 | Add task deletion workflow with informative confirmation | Pending | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
@@ -210,7 +210,7 @@ TASK-007-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -254,6 +254,29 @@ TASK-007-001.
 
 - Acceptance criteria: AC-007-006–008, AC-007-010–011
 - Specification sections: 7–9, 12–14, 17–18
+
+### Completion Evidence
+
+- `npx vitest run --run test/main/database/repositories/task-repository.test.ts test/main/services/task-service.test.ts test/main/services/task-service.integration.test.ts` — passed, 3 files and 36 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 53 files and 466 tests.
+- Added `TaskRepository.delete(...)`, relying on the existing SQLite
+  `ON DELETE CASCADE`, and `findDeletionSummary(...)`, a bounded aggregate read
+  that reports Task identity, complete interval count, and lifetime duration
+  with open intervals projected through the supplied Clock snapshot.
+- Added transactional `TaskService.delete(...)`: validates before persistence,
+  loads the target and `AppState` inside one transaction, rejects missing and
+  running/paused active targets without mutation, deletes exactly one inactive
+  Task, and safely maps/logs unexpected persistence failures.
+- Added read-only `TaskService.getDeletionSummary(...)` with validation,
+  missing-target handling, Clock-based lifetime projection, and safe unexpected
+  failure mapping.
+- Repository, service, and disposable-SQLite integration tests prove cascade
+  isolation, other-Task/interval and `AppState` preservation, accurate summary
+  values, updated authoritative history projections, missing/invalid target
+  safety, running and paused active-task rejection, invalid persisted-state
+  handling, and transaction rollback.
 
 ---
 

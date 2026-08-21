@@ -86,6 +86,7 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const taskService = new TaskService({
+          appState,
           clock,
           suggestionQueries: taskSuggestionQueries,
           tasks,

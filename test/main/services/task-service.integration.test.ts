@@ -46,6 +46,7 @@ describe('TaskService SQLite integration', () => {
       clock,
     });
     service = new TaskService({
+      appState,
       clock,
       suggestionQueries: { findSuggestions: () => [] },
       tasks,
@@ -172,6 +173,99 @@ describe('TaskService SQLite integration', () => {
       sessionStartedAt,
     });
   });
+
+  it('deletes an inactive task with all intervals and refreshes authoritative history projections without affecting other data', () => {
+    tasks.insert({
+      id: 'task-2',
+      description: 'Other task',
+      normalizedDescription: 'other task',
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'target-day-1',
+      taskId: 'task-1',
+      startedAt: localTime(2026, 8, 14, 9),
+      endedAt: localTime(2026, 8, 14, 10),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'target-day-2',
+      taskId: 'task-1',
+      startedAt: localTime(2026, 8, 15, 9),
+      endedAt: localTime(2026, 8, 15, 10),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'other-day-2',
+      taskId: 'task-2',
+      startedAt: localTime(2026, 8, 15, 10),
+      endedAt: localTime(2026, 8, 15, 11),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    const stateBefore = appState.get();
+
+    expect(service.getDeletionSummary({ taskId: 'task-1' })).toEqual({
+      ok: true,
+      value: {
+        task: { id: 'task-1', description: 'Implement authentication' },
+        intervalCount: 2,
+        lifetimeDurationMs: 2 * 60 * 60 * 1_000,
+      },
+    });
+    expect(service.delete({ taskId: 'task-1' })).toEqual({
+      ok: true,
+      value: { taskId: 'task-1' },
+    });
+
+    expect(tasks.findById('task-1')).toBeUndefined();
+    expect(intervals.findByTask('task-1')).toEqual([]);
+    expect(intervals.findByTask('task-2')).toHaveLength(1);
+    expect(appState.get()).toEqual(stateBefore);
+    const page = history.getPage({});
+    expect(
+      page.days.flatMap((day) => day.tasks.map((task) => task.task.id)),
+    ).toEqual(['task-2']);
+    expect(
+      page.days.find((day) => day.totalDurationMs > 0)?.totalDurationMs,
+    ).toBe(60 * 60 * 1_000);
+  });
+
+  it.each(['running', 'paused'] as const)(
+    'rejects deletion of the %s active task without changing Task, intervals, or AppState',
+    (status) => {
+      const sessionStartedAt = localTime(2026, 8, 15, 9);
+      intervals.insert({
+        id: `${status}-session`,
+        taskId: 'task-1',
+        startedAt: sessionStartedAt,
+        endedAt:
+          status === 'running' ? null : localTime(2026, 8, 15, 10),
+        createdAt: 100,
+        updatedAt: 100,
+      });
+      context.sqlite
+        .prepare(
+          'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ? where id = 1',
+        )
+        .run(status, 'task-1', sessionStartedAt, 100);
+      const taskBefore = tasks.findById('task-1');
+      const intervalsBefore = intervals.findByTask('task-1');
+      const stateBefore = appState.get();
+
+      expect(service.delete({ taskId: 'task-1' })).toMatchObject({
+        ok: false,
+        error: { code: 'ACTIVE_TASK_CANNOT_BE_DELETED' },
+      });
+      expect(tasks.findById('task-1')).toEqual(taskBefore);
+      expect(intervals.findByTask('task-1')).toEqual(intervalsBefore);
+      expect(appState.get()).toEqual(stateBefore);
+      expect(reader.getState()).toMatchObject({ status });
+    },
+  );
 });
 
 const localTime = (

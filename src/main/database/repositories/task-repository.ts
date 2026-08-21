@@ -1,8 +1,14 @@
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, ne, sql } from 'drizzle-orm';
 
 import type { ApplicationDatabase } from '@/main/database/database';
-import { tasks } from '@/main/database/schema';
+import { tasks, timeIntervals } from '@/main/database/schema';
 import type { Task } from '@/main/domain/task';
+
+export interface TaskDeletionSummaryRecord {
+  readonly task: Task;
+  readonly intervalCount: number;
+  readonly lifetimeDurationMs: number;
+}
 
 export class TaskRepository {
   readonly #db: ApplicationDatabase;
@@ -50,6 +56,30 @@ export class TaskRepository {
       .set({ description, normalizedDescription, updatedAt })
       .where(eq(tasks.id, id))
       .returning()
+      .get();
+  }
+
+  delete(id: string): Task | undefined {
+    return this.#db.delete(tasks).where(eq(tasks.id, id)).returning().get();
+  }
+
+  findDeletionSummary(
+    id: string,
+    now: number,
+  ): TaskDeletionSummaryRecord | undefined {
+    const intervalCount = sql<number>`count(${timeIntervals.id})`;
+    const effectiveEndedAt = sql<number>`min(coalesce(${timeIntervals.endedAt}, ${now}), ${now})`;
+    const lifetimeDurationMs = sql<number>`coalesce(sum(case
+      when ${timeIntervals.id} is null then 0
+      else max(0, ${effectiveEndedAt} - ${timeIntervals.startedAt})
+    end), 0)`;
+
+    return this.#db
+      .select({ task: tasks, intervalCount, lifetimeDurationMs })
+      .from(tasks)
+      .leftJoin(timeIntervals, eq(timeIntervals.taskId, tasks.id))
+      .where(eq(tasks.id, id))
+      .groupBy(tasks.id)
       .get();
   }
 
