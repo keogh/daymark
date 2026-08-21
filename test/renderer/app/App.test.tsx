@@ -857,6 +857,75 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('deletes an inactive task and refreshes the timer plus every loaded history occurrence', async () => {
+    const firstDay = historyPageWithTask();
+    const secondDay = {
+      ...firstDay.days[0]!,
+      dayStartedAt: firstDay.days[0]!.dayStartedAt - 86_400_000,
+      dayEndedAt: firstDay.days[0]!.dayEndedAt - 86_400_000,
+    };
+    const initialHistory: HistoryPage = {
+      ...firstDay,
+      days: [firstDay.days[0]!, secondDay],
+    };
+    const deletedHistory: HistoryPage = {
+      ...initialHistory,
+      days: initialHistory.days.map((day) => ({
+        ...day,
+        totalDurationMs: 0,
+        tasks: [],
+      })),
+    };
+    const api = setTimerApi({
+      getState: vi.fn().mockResolvedValue({ ok: true, value: idleState }),
+      getHistoryPage: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, value: initialHistory })
+        .mockResolvedValueOnce({ ok: true, value: deletedHistory }),
+      deleteTask: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { taskId: 'task-1' },
+      }),
+      getTaskDeletionSummary: vi.fn().mockResolvedValue({
+        ok: true,
+        value: {
+          task: { id: 'task-1', description: 'Implement authentication' },
+          intervalCount: 2,
+          lifetimeDurationMs: 5_400_000,
+        },
+      }),
+    });
+    render(<App />);
+
+    const actions = (
+      await screen.findAllByRole('button', {
+        name: 'Task actions for Implement authentication',
+      })
+    )[0]!;
+    fireEvent.keyDown(actions, { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+    expect(
+      await screen.findByRole('dialog', {
+        name: 'Delete "Implement authentication"?',
+      }),
+    ).toHaveTextContent('2 recorded time intervals (1h 30m)');
+    expect(api.tasks.delete).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(api.tasks.delete).toHaveBeenCalledWith({ taskId: 'task-1' });
+    await waitFor(() =>
+      expect(
+        screen.queryAllByRole('button', {
+          name: 'Implement authentication',
+        }),
+      ).toHaveLength(0),
+    );
+    expect(api.timer.getState).toHaveBeenCalledTimes(2);
+    expect(api.history.getPage).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('keeps the active view usable when a command promise rejects', async () => {
     const api = setTimerApi({
       getState: vi.fn().mockResolvedValue({ ok: true, value: runningState }),
@@ -980,6 +1049,8 @@ interface TimerApiOverrides {
   readonly createManualInterval?: TimeTrackerAPI['manualTime']['createInterval'];
   readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
   readonly renameTask?: TimeTrackerAPI['tasks']['rename'];
+  readonly deleteTask?: TimeTrackerAPI['tasks']['delete'];
+  readonly getTaskDeletionSummary?: TimeTrackerAPI['tasks']['getDeletionSummary'];
 }
 
 const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
@@ -1049,18 +1120,22 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
           ok: true,
           value: { task: { id: 'task-1', description: 'Renamed task' } },
         }),
-      delete: vi.fn().mockResolvedValue({
-        ok: true,
-        value: { taskId: 'task-1' },
-      }),
-      getDeletionSummary: vi.fn().mockResolvedValue({
-        ok: true,
-        value: {
-          task: { id: 'task-1', description: 'Task' },
-          intervalCount: 0,
-          lifetimeDurationMs: 0,
-        },
-      }),
+      delete:
+        overrides.deleteTask ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: { taskId: 'task-1' },
+        }),
+      getDeletionSummary:
+        overrides.getTaskDeletionSummary ??
+        vi.fn().mockResolvedValue({
+          ok: true,
+          value: {
+            task: { id: 'task-1', description: 'Task' },
+            intervalCount: 0,
+            lifetimeDurationMs: 0,
+          },
+        }),
     },
   };
 

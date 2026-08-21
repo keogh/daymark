@@ -66,6 +66,7 @@ export const App = () => {
         onIntervalSaved={controller.refresh}
         onPlayTask={controller.switchToTask}
         onTaskRenamed={controller.refresh}
+        onTaskDeleted={controller.refresh}
         refreshRevision={controller.authoritativeRevision}
         timer={
           controller.loadState.status === 'ready'

@@ -291,6 +291,127 @@ describe('DailyHistory', () => {
     await waitFor(() => expect(actions).toHaveFocus());
   });
 
+  it('loads deletion details before opening confirmation and returns focus after Cancel', async () => {
+    const summaryResult = createDeferred<AppResult<{
+      task: { id: string; description: string };
+      intervalCount: number;
+      lifetimeDurationMs: number;
+    }>>();
+    const getDeletionSummary = vi.fn(() => summaryResult.promise);
+    const remove = vi.fn();
+    setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
+      { delete: remove, getDeletionSummary },
+    );
+    render(<DailyHistory />);
+
+    const actions = (
+      await screen.findAllByRole('button', {
+        name: 'Task actions for Implement authentication',
+      })
+    )[0]!;
+    fireEvent.keyDown(actions, { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+
+    expect(getDeletionSummary).toHaveBeenCalledWith({ taskId: 'task-1' });
+    expect(remove).not.toHaveBeenCalled();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Loading deletion details…',
+    );
+    summaryResult.resolve({
+      ok: true,
+      value: {
+        task: { id: 'task-1', description: 'Implement authentication' },
+        intervalCount: 17,
+        lifetimeDurationMs: 30_600_000,
+      },
+    });
+    expect(
+      await screen.findByRole('dialog', {
+        name: 'Delete "Implement authentication"?',
+      }),
+    ).toHaveTextContent('17 recorded time intervals (8h 30m)');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(actions).toHaveFocus());
+    expect(remove).not.toHaveBeenCalled();
+  });
+
+  it('communicates deletion-summary failures without opening confirmation or mutating', async () => {
+    const remove = vi.fn();
+    setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
+      {
+        delete: remove,
+        getDeletionSummary: vi.fn().mockResolvedValue({
+          ok: false,
+          error: { code: 'TASK_NOT_FOUND', message: 'Hidden detail' },
+        }),
+      },
+    );
+    render(<DailyHistory />);
+
+    const actions = (
+      await screen.findAllByRole('button', {
+        name: 'Task actions for Implement authentication',
+      })
+    )[0]!;
+    fireEvent.keyDown(actions, { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'This task no longer exists',
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(remove).not.toHaveBeenCalled();
+  });
+
+  it.each(['running', 'paused'] as const)(
+    'disables deletion accessibly for the %s active task',
+    async (status) => {
+      const getDeletionSummary = vi.fn();
+      setHistoryApi(
+        vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
+        { getDeletionSummary },
+      );
+      render(
+        <DailyHistory
+          timer={{
+            status,
+            currentTask: {
+              id: 'task-1',
+              description: 'Implement authentication',
+            },
+            sessionStartedAt: snapshotNow - 60_000,
+            sessionDurationMs: 0,
+            taskTodayDurationMs: 0,
+            taskLifetimeDurationMs: 0,
+            activeIntervalStartedAt:
+              status === 'running' ? snapshotNow - 60_000 : null,
+            now: snapshotNow,
+          }}
+        />,
+      );
+
+      const actions = (
+        await screen.findAllByRole('button', {
+          name: 'Task actions for Implement authentication',
+        })
+      )[0]!;
+      fireEvent.keyDown(actions, { key: 'ArrowDown' });
+      const deleteItem = await screen.findByRole('menuitem', {
+        name: 'Delete task',
+      });
+
+      expect(deleteItem).toHaveAttribute('aria-disabled', 'true');
+      expect(deleteItem).toHaveAccessibleDescription(
+        'Stop this task before deleting it.',
+      );
+      fireEvent.click(deleteItem);
+      expect(getDeletionSummary).not.toHaveBeenCalled();
+    },
+  );
+
   it('keeps a running interval inspectable without correction actions', async () => {
     setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: runningPage }));
     render(<DailyHistory />);
@@ -719,7 +840,13 @@ describe('DailyHistory', () => {
   );
 });
 
-const setHistoryApi = (getPage: ReturnType<typeof vi.fn>) => {
+const setHistoryApi = (
+  getPage: ReturnType<typeof vi.fn>,
+  taskOverrides: {
+    readonly delete?: ReturnType<typeof vi.fn>;
+    readonly getDeletionSummary?: ReturnType<typeof vi.fn>;
+  } = {},
+) => {
   Object.defineProperty(window, 'timeTracker', {
     configurable: true,
     value: {
@@ -729,6 +856,22 @@ const setHistoryApi = (getPage: ReturnType<typeof vi.fn>) => {
           ok: true,
           value: { task: { id: 'task-1', description: 'Renamed task' } },
         }),
+        delete:
+          taskOverrides.delete ??
+          vi.fn().mockResolvedValue({
+            ok: true,
+            value: { taskId: 'task-1' },
+          }),
+        getDeletionSummary:
+          taskOverrides.getDeletionSummary ??
+          vi.fn().mockResolvedValue({
+            ok: true,
+            value: {
+              task: { id: 'task-1', description: 'Implement authentication' },
+              intervalCount: 1,
+              lifetimeDurationMs: 5_400_000,
+            },
+          }),
       },
     },
   });

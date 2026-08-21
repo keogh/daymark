@@ -35,7 +35,7 @@ breakdown to match the specification.
 | TASK-007-003 | Implement transactional task deletion and deletion summary | Complete | TASK-007-001 | AC-007-006–008, AC-007-010–011 |
 | TASK-007-004 | Expose validated task management APIs | Complete | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
 | TASK-007-005 | Add task actions and rename workflow | Complete | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
-| TASK-007-006 | Add task deletion workflow with informative confirmation | Pending | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
+| TASK-007-006 | Add task deletion workflow with informative confirmation | Complete | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
 | TASK-007-007 | Verify task management and update documentation | Pending | TASK-007-005, TASK-007-006 | AC-007-001–013 |
 
 ---
@@ -419,7 +419,7 @@ TASK-007-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -461,6 +461,22 @@ TASK-007-004.
 
 - Acceptance criteria: AC-007-001, AC-007-006–008, AC-007-010–013
 - Specification sections: 4, 7, 10–15, 19, 22, 23
+
+### Completion Evidence
+
+- `npx vitest run --run test/renderer/app/DeleteTaskDialog.test.tsx test/renderer/app/DailyHistory.test.tsx test/renderer/app/App.test.tsx` — passed, 3 files and 62 tests.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 55 files and 488 tests.
+- Added `DeleteTaskDialog` with informative Task description, complete interval
+  count and lifetime duration, Cancel behavior, pending-state duplicate
+  prevention, safe controlled-error messages, and focus management.
+- Daily History now loads the authoritative deletion summary before opening
+  confirmation, communicates loading/read failures without mutation, and
+  disables running/paused active-Task deletion with an accessible reason.
+- Successful deletion reuses the authoritative timer refresh revision to
+  reconcile every currently loaded history day and remove all visible Task
+  occurrences.
 
 ---
 

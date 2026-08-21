@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronDown, Ellipsis, Pencil, Trash2 } from 'lucide-react';
 
 import {
@@ -22,6 +22,7 @@ import type {
   HistoryTask,
 } from '@/shared/contracts/history';
 import type { TimerState } from '@/shared/contracts/timer';
+import type { TaskDeletionSummary } from '@/shared/contracts/tasks';
 import {
   formatHistoryDayLabel,
   formatHistoryDuration,
@@ -36,6 +37,7 @@ import { formatLocalDateInput } from './local-date-format';
 import { EditIntervalDialog } from './EditIntervalDialog';
 import { DeleteIntervalDialog } from './DeleteIntervalDialog';
 import { RenameTaskDialog } from './RenameTaskDialog';
+import { DeleteTaskDialog } from './DeleteTaskDialog';
 
 export const DailyHistory = ({
   onAddTime = () => undefined,
@@ -51,6 +53,7 @@ export const DailyHistory = ({
   timer = null,
   onIntervalSaved = () => Promise.resolve(),
   onTaskRenamed = () => Promise.resolve(),
+  onTaskDeleted = () => Promise.resolve(),
 }: {
   readonly onAddTime?: (date: string) => void;
   readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
@@ -58,6 +61,7 @@ export const DailyHistory = ({
   readonly timer?: TimerState | null;
   readonly onIntervalSaved?: () => Promise<void>;
   readonly onTaskRenamed?: () => Promise<void>;
+  readonly onTaskDeleted?: () => Promise<void>;
 }) => {
   const controller = useHistoryController(refreshRevision);
   const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
@@ -105,6 +109,7 @@ export const DailyHistory = ({
         timer={timer}
         onIntervalSaved={onIntervalSaved}
         onTaskRenamed={onTaskRenamed}
+        onTaskDeleted={onTaskDeleted}
       />
     </section>
   );
@@ -119,6 +124,7 @@ const HistoryContent = ({
   timer,
   onIntervalSaved,
   onTaskRenamed,
+  onTaskDeleted,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -128,6 +134,7 @@ const HistoryContent = ({
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
   onTaskRenamed: () => Promise<void>;
+  onTaskDeleted: () => Promise<void>;
 }) => {
   if (controller.loadState.status === 'loading') {
     return (
@@ -161,6 +168,7 @@ const HistoryContent = ({
       timer={timer}
       onIntervalSaved={onIntervalSaved}
       onTaskRenamed={onTaskRenamed}
+      onTaskDeleted={onTaskDeleted}
     />
   );
 };
@@ -175,6 +183,7 @@ const HistoryDays = ({
   timer,
   onIntervalSaved,
   onTaskRenamed,
+  onTaskDeleted,
 }: {
   controller: HistoryController;
   historyActionMessage: string | null;
@@ -185,6 +194,7 @@ const HistoryDays = ({
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
   onTaskRenamed: () => Promise<void>;
+  onTaskDeleted: () => Promise<void>;
 }) => {
   const page = useLiveHistoryPage(state.page);
   const hasTrackedTime = page.days.some((day) => day.totalDurationMs > 0);
@@ -207,6 +217,7 @@ const HistoryDays = ({
           timer={timer}
           onIntervalSaved={onIntervalSaved}
           onTaskRenamed={onTaskRenamed}
+          onTaskDeleted={onTaskDeleted}
         />
       ))}
       {!hasTrackedTime && (
@@ -308,6 +319,7 @@ const HistoryDaySection = ({
   timer,
   onIntervalSaved,
   onTaskRenamed,
+  onTaskDeleted,
 }: {
   day: HistoryDay;
   now: number;
@@ -317,6 +329,7 @@ const HistoryDaySection = ({
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
   onTaskRenamed: () => Promise<void>;
+  onTaskDeleted: () => Promise<void>;
 }) => (
   <section
     aria-labelledby={`history-day-${day.dayStartedAt}`}
@@ -349,6 +362,7 @@ const HistoryDaySection = ({
         timer={timer}
         onIntervalSaved={onIntervalSaved}
         onTaskRenamed={onTaskRenamed}
+        onTaskDeleted={onTaskDeleted}
       />
     ))}
   </section>
@@ -362,6 +376,7 @@ const HistoryTaskRow = ({
   timer,
   onIntervalSaved,
   onTaskRenamed,
+  onTaskDeleted,
 }: {
   day: HistoryDay;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
@@ -370,6 +385,7 @@ const HistoryTaskRow = ({
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
   onTaskRenamed: () => Promise<void>;
+  onTaskDeleted: () => Promise<void>;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [editInterval, setEditInterval] = useState<HistoryInterval | null>(
@@ -379,14 +395,49 @@ const HistoryTaskRow = ({
     null,
   );
   const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [deletionSummary, setDeletionSummary] =
+    useState<TaskDeletionSummary | null>(null);
+  const [isDeletionSummaryPending, setIsDeletionSummaryPending] =
+    useState(false);
+  const [deletionSummaryError, setDeletionSummaryError] = useState<
+    string | null
+  >(null);
   const editReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const deleteReturnFocusRef = useRef<HTMLButtonElement | null>(null);
   const taskActionsRef = useRef<HTMLButtonElement | null>(null);
+  const activeDeleteReasonId = useId();
   const intervalListId = `history-intervals-${day.dayStartedAt}-${task.task.id}`;
   const rowId = `${day.dayStartedAt}:${task.task.id}`;
   const isPending = pendingRows[rowId] === true;
   const isSameTask = timer?.currentTask?.id === task.task.id;
   const isAlreadyRunning = timer?.status === 'running' && isSameTask;
+  const isActiveTask = timer !== null && timer.status !== 'idle' && isSameTask;
+  const loadDeletionSummary = async () => {
+    if (isActiveTask || isDeletionSummaryPending) return;
+
+    setIsDeletionSummaryPending(true);
+    setDeletionSummaryError(null);
+    try {
+      const result = await window.timeTracker.tasks.getDeletionSummary({
+        taskId: task.task.id,
+      });
+      if (!result.ok) {
+        setDeletionSummaryError(
+          result.error.code === 'TASK_NOT_FOUND'
+            ? 'This task no longer exists. Refresh history and try again.'
+            : 'Deletion details could not be loaded. Please try again.',
+        );
+        return;
+      }
+      setDeletionSummary(result.value);
+    } catch {
+      setDeletionSummaryError(
+        'Deletion details could not be loaded. Please try again.',
+      );
+    } finally {
+      setIsDeletionSummaryPending(false);
+    }
+  };
   const actionLabel = isAlreadyRunning
     ? 'Already running'
     : isPending
@@ -449,7 +500,21 @@ const HistoryTaskRow = ({
                 <Pencil data-icon="inline-start" />
                 Rename
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                aria-describedby={
+                  isActiveTask ? activeDeleteReasonId : undefined
+                }
+                aria-disabled={isActiveTask}
+                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
+                onSelect={(event) => {
+                  if (isActiveTask) {
+                    event.preventDefault();
+                    return;
+                  }
+                  void loadDeletionSummary();
+                }}
+                variant="destructive"
+              >
                 <Trash2 data-icon="inline-start" />
                 Delete task
               </DropdownMenuItem>
@@ -457,6 +522,25 @@ const HistoryTaskRow = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {isActiveTask && (
+        <span className="visually-hidden" id={activeDeleteReasonId}>
+          Stop this task before deleting it.
+        </span>
+      )}
+      {isDeletionSummaryPending && (
+        <p
+          aria-live="polite"
+          className="history-action-status"
+          role="status"
+        >
+          Loading deletion details…
+        </p>
+      )}
+      {deletionSummaryError !== null && (
+        <p className="history-action-status" role="alert">
+          {deletionSummaryError}
+        </p>
+      )}
       {isExpanded && (
         <ul className="history-intervals" id={intervalListId}>
           {task.intervals.map((interval) => (
@@ -516,6 +600,19 @@ const HistoryTaskRow = ({
           onRenamed={onTaskRenamed}
           open
           task={task.task}
+        />
+      )}
+      {deletionSummary !== null && (
+        <DeleteTaskDialog
+          onDeleted={onTaskDeleted}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDeletionSummary(null);
+              window.setTimeout(() => taskActionsRef.current?.focus(), 0);
+            }
+          }}
+          open
+          summary={deletionSummary}
         />
       )}
     </div>

@@ -492,6 +492,10 @@ input {
   font-weight: 620;
 }
 
+.delete-task-summary p {
+  margin: 0;
+}
+
 .history-empty {
   padding: 0.5rem 0.25rem 0;
   color: var(--muted-foreground);
