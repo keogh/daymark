@@ -196,7 +196,8 @@ renderer console.
 1. SPEC-009 — Analytics (Ready for Implementation; queued behind SPEC-008)
 2. SPEC-010 — Settings and UX Polish (Ready for Implementation; queued behind
    SPEC-009)
-3. SPEC-011 — Packaging and Release
+3. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
+   Implementation; queued behind SPEC-010)
 
 ---
 
@@ -219,6 +220,15 @@ but it remains pending until SPEC-008 is Verified.
 SPEC-010 — Settings and UX Polish has a complete companion task breakdown. Its
 first task is TASK-010-001 — Add Settings Persistence and Contracts, but all
 SPEC-010 implementation remains pending until SPEC-009 is Verified.
+
+SPEC-011 — Cross-Platform Packaging and Distribution is designed and queued as
+Ready for Implementation. It defines unsigned personal-install DMG, Squirrel, and
+Debian artifacts; native GitHub Actions builds; exact package-version/tag matching;
+checksummed draft GitHub prereleases; fresh-machine installation acceptance; and
+data-preserving reinstall, uninstall/reinstall, and later forward-upgrade behavior.
+Its first task is TASK-011-001 — Establish Distribution Metadata and Release
+Contracts. Implementation remains pending until SPEC-010 and every preceding
+specification are Verified.
 
 ---
 

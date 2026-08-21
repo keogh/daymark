@@ -420,7 +420,8 @@ Suggested sequence:
 008 System Tray
 009 Analytics
 010 Settings and UX Polish
-011 Packaging and Release
+011 Cross-Platform Packaging and Distribution
+012 MVP QA and Release Readiness
 ```
 
 Some specs may be split further if implementation size becomes too large.

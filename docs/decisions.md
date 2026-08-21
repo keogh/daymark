@@ -648,3 +648,54 @@ avoids forcing the application into a generic dashboard design.
 - Runtime network access is not introduced.
 - Completed specifications are not rewritten merely because their controls are
   later migrated without behavioral change.
+
+---
+
+# DEC-035 — Initial Cross-Platform Distribution
+
+## Status
+
+Accepted
+
+## Decision
+
+Use Electron Forge to produce these initial MVP distribution artifacts on native
+GitHub-hosted runners:
+
+- separate macOS arm64 and x64 DMGs;
+- a Windows x64 Squirrel Setup executable;
+- a Linux x64 Debian package for representative Ubuntu GNOME environments.
+
+`package.json` is the authoritative semantic version. A release tag must match it
+exactly as `v${version}`. Successful native builds are assembled with SHA-256
+checksums into one public-repository GitHub Release that remains both draft and
+prerelease until a person completes and reviews fresh-install acceptance.
+
+The initial artifacts are unsigned and intended for personal installation and
+testing. Documentation must identify expected Gatekeeper/SmartScreen warnings and
+must not present checksums as publisher authentication. General-public production
+distribution requires a later signing/notarization decision and credentials.
+
+Uninstall preserves the per-user application database and settings. Replacement,
+reinstall, and—beginning with the second published version—forward upgrade must
+preserve that profile. Downgrades and automatic updates are outside the initial
+distribution scope.
+
+## Context
+
+The repository has no Apple or Windows signing certificates yet. The project owner
+wants personally installable cross-platform artifacts now and intends to make the
+application public later. Native builds avoid unsupported cross-compilation and
+ensure `better-sqlite3` is rebuilt for the target Electron platform and
+architecture.
+
+## Consequences
+
+- Unsigned artifacts may require a documented, per-application operating-system
+  override and are not described as general-public production builds.
+- CI build success does not substitute for installation acceptance on physical or
+  virtual clean systems.
+- Only the release-assembly job receives repository contents-write permission.
+- No signing secret, certificate placeholder, auto-updater, telemetry, or runtime
+  networking is introduced.
+- SPEC-011 defines the exact artifact, CI, release, and acceptance contracts.
