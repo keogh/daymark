@@ -2,18 +2,20 @@
 
 ## Current Phase
 
-Task Management verified
+System Tray specification ready for implementation
 
 ## Current Specification
 
-SPEC-007 — Task Management (Verified 2026-08-21)
+SPEC-008 — System Tray and Window Lifecycle (Ready for Implementation)
 
 ## Current Status
 
-SPEC-007 is verified. Daily History now supports accessible Task rename and
-confirmed Task deletion while preserving interval identity during rename,
-cascading all associated intervals during deletion, protecting the active Task,
-and authoritatively refreshing every loaded occurrence and timer state.
+SPEC-008 is designed and implementation-ready. It defines native idle, running,
+and paused tray presentation; authoritative Pause/Resume/Stop controls; a
+one-second presentation-only duration ticker; close-to-hide and single-window
+restore behavior; immediate renderer/tray synchronization; explicit Quit without
+timer mutation; safe failure handling; lifecycle cleanup; and packaged macOS
+acceptance while preserving later Windows/Linux release validation.
 
 ---
 
@@ -183,10 +185,9 @@ renderer console.
 
 # Upcoming Specifications
 
-1. SPEC-008 — System Tray
-2. SPEC-009 — Analytics
-3. SPEC-010 — Settings
-4. SPEC-011 — Packaging and Release
+1. SPEC-009 — Analytics
+2. SPEC-010 — Settings
+3. SPEC-011 — Packaging and Release
 
 ---
 
@@ -198,24 +199,28 @@ None.
 
 # Active Work
 
-SPEC-007 — Task Management is complete and verified. The next planned
-specification is SPEC-008 — System Tray.
+SPEC-008 — System Tray and Window Lifecycle is ready for implementation. Its
+companion task breakdown begins with TASK-008-001 — Define Tray Presentation and
+Platform Asset Selection. No implementation task is currently in progress.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-007 remains within the established typed preload
-API, main-process SQLite ownership, SQLite cascade, timestamp-based interval
-source of truth, injected Clock, local-calendar projection, and npm decisions.
-No schema migration, dependency, decision, or architectural deviation was
-required.
+See `docs/decisions.md`. SPEC-008 applies DEC-021 through DEC-025 without an
+architectural reversal: normal Close hides, explicit Quit does not mutate timer
+state, sleep remains wall-clock time, tray integration is included, and automatic
+OS startup remains deferred. Design choices fixed for implementation are a live
+one-second session-duration display derived locally from an authoritative
+snapshot, native-menu Open behavior plus supported platform activation gestures,
+immediate no-confirmation Quit, 80-code-point one-line Task presentation, and a
+safe native dialog after tray command failure. No schema migration or new runtime
+dependency is planned.
 
 ---
 
 # Last Updated
 
-2026-08-21 — Verified SPEC-007. Task rename and confirmed cascading deletion now
-preserve timer/history integrity and protect the active Task. Full validation,
-488 tests in 55 files, macOS arm64 packaging, and isolated packaged acceptance
-passed.
+2026-08-21 — Designed SPEC-008 and created its implementation task breakdown.
+The specification is Ready for Implementation; SPEC-007 remains the latest
+verified implementation milestone.
