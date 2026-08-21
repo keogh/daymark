@@ -70,6 +70,7 @@ describe('tasks IPC handlers', () => {
     expect(operations.tasks.getDeletionSummary).toHaveBeenCalledWith({
       taskId: 'task-1',
     });
+    expect(operations.synchronize?.refreshAfter).toHaveBeenCalledOnce();
   });
 
   it.each([
@@ -208,6 +209,9 @@ const createOperations = (): TasksIpcOperations => ({
       ok: true as const,
       value: deletionSummary,
     })),
+  },
+  synchronize: {
+    refreshAfter: vi.fn((result: AppResult<TaskMutationResult>) => result),
   },
 });
 

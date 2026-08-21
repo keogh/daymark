@@ -6,17 +6,17 @@ SPEC-008 — System Tray and Window Lifecycle
 
 ## Active Task
 
-None. TASK-008-003 is complete; TASK-008-004 is the next unblocked task.
+None. TASK-008-004 is complete; TASK-008-005 is the next unblocked task.
 
 ## Status
 
-TASK-008-003 complete
+TASK-008-004 complete
 
 ---
 
 # Immediate Plan
 
-1. Select TASK-008-004 — Synchronize Tray and Renderer Timer Presentation.
+1. Select TASK-008-005 — Compose startup, assets, lifecycle, and recovery.
 2. Mark only that task In Progress and replace this list with its immediate
    implementation steps and focused checks.
 3. Continue in dependency order using the SPEC-008 task breakdown.

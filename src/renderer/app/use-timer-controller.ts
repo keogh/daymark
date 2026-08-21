@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AppError, AppResult } from '@/shared/contracts/app-result';
 import type { TimerState } from '@/shared/contracts/timer';
 import { validateStartTaskInput } from '@/shared/validation/task-description';
+import { isTimerState } from '@/shared/validation/timer-state';
 
 type TimerLoadState =
   | { readonly status: 'loading' }
@@ -42,13 +43,22 @@ export const useTimerController = (): TimerController => {
   const [authoritativeRevision, setAuthoritativeRevision] = useState(0);
   const requestVersion = useRef(0);
 
+  const acceptAuthoritativeState = useCallback((state: TimerState) => {
+    requestVersion.current += 1;
+    setLoadState({ status: 'ready', timer: state });
+    setCommandError(null);
+    setActiveCommand(null);
+    setAuthoritativeRevision((revision) => revision + 1);
+  }, []);
+
   useEffect(() => {
     let isActive = true;
+    const version = ++requestVersion.current;
 
     const loadTimer = async () => {
       try {
         const result = await window.timeTracker.timer.getState();
-        if (!isActive) {
+        if (!isActive || version !== requestVersion.current) {
           return;
         }
 
@@ -58,7 +68,7 @@ export const useTimerController = (): TimerController => {
             : { status: 'error' },
         );
       } catch {
-        if (isActive) {
+        if (isActive && version === requestVersion.current) {
           setLoadState({ status: 'error' });
         }
       }
@@ -70,6 +80,15 @@ export const useTimerController = (): TimerController => {
       isActive = false;
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = window.timeTracker.timer.onStateChanged((state) => {
+      if (isTimerState(state)) {
+        acceptAuthoritativeState(state);
+      }
+    });
+    return unsubscribe;
+  }, [acceptAuthoritativeState]);
 
   const runCommand = useCallback(
     async (
@@ -210,6 +229,12 @@ export const useTimerController = (): TimerController => {
       setAuthoritativeRevision((revision) => revision + 1);
     }
   }, []);
+
+  useEffect(() => {
+    const handleFocus = () => void refresh();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refresh]);
 
   return {
     loadState,

@@ -20,6 +20,7 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_STATE_CHANGED_CHANNEL,
   TIMER_SWITCH_TO_TASK_CHANNEL,
 } from '@/shared/contracts/timer';
 
@@ -31,11 +32,17 @@ const electronMocks = vi.hoisted(() => ({
     }
   }),
   invoke: vi.fn<() => Promise<unknown>>(),
+  on: vi.fn(),
+  removeListener: vi.fn(),
 }));
 
 vi.mock('electron', () => ({
   contextBridge: { exposeInMainWorld: electronMocks.exposeInMainWorld },
-  ipcRenderer: { invoke: electronMocks.invoke },
+  ipcRenderer: {
+    invoke: electronMocks.invoke,
+    on: electronMocks.on,
+    removeListener: electronMocks.removeListener,
+  },
 }));
 
 describe('preload API', () => {
@@ -50,6 +57,8 @@ describe('preload API', () => {
       },
     );
     electronMocks.invoke.mockReset();
+    electronMocks.on.mockReset();
+    electronMocks.removeListener.mockReset();
     electronMocks.exposedApi = undefined;
   });
 
@@ -80,6 +89,7 @@ describe('preload API', () => {
       'pause',
       'resume',
       'stop',
+      'onStateChanged',
     ]);
     expect(Object.keys(api.history)).toEqual(['getPage']);
     expect(Object.keys(api.intervals)).toEqual(['update', 'delete']);
@@ -98,6 +108,24 @@ describe('preload API', () => {
     await api.timer.pause();
     await api.timer.resume();
     await api.timer.stop();
+    const stateListener = vi.fn();
+    const unsubscribe = api.timer.onStateChanged(stateListener);
+    expect(electronMocks.on).toHaveBeenCalledOnce();
+    expect(electronMocks.on.mock.calls[0]?.[0]).toBe(
+      TIMER_STATE_CHANGED_CHANNEL,
+    );
+    const registeredListener = electronMocks.on.mock.calls[0]?.[1] as (
+      event: unknown,
+      state: unknown,
+    ) => void;
+    const state = { status: 'idle' };
+    registeredListener({ sender: 'must not escape preload' }, state);
+    expect(stateListener).toHaveBeenCalledWith(state);
+    unsubscribe();
+    expect(electronMocks.removeListener).toHaveBeenCalledWith(
+      TIMER_STATE_CHANGED_CHANNEL,
+      registeredListener,
+    );
     await api.history.getPage({ beforeDayStartedAt: 0 });
     await api.intervals.update({
       intervalId: 'interval-1',

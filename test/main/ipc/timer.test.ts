@@ -4,6 +4,7 @@ import {
   registerTimerHandlers,
   type TimerIpcOperations,
 } from '@/main/ipc/timer';
+import type { AppResult } from '@/shared/contracts/app-result';
 import {
   TIMER_GET_STATE_CHANNEL,
   TIMER_PAUSE_CHANNEL,
@@ -98,6 +99,9 @@ describe('timer IPC handlers', () => {
       ok: true,
       value: idleState,
     });
+    expect(
+      operations.synchronize?.synchronizeTimerResult,
+    ).toHaveBeenCalledTimes(5);
     expect(handlers.get(TIMER_STOP_CHANNEL)?.({})).toEqual({
       ok: true,
       value: idleState,
@@ -224,5 +228,8 @@ const createOperations = (): TimerIpcOperations => ({
     pause: vi.fn(() => ({ ok: true as const, value: idleState })),
     resume: vi.fn(() => ({ ok: true as const, value: idleState })),
     stop: vi.fn(() => ({ ok: true as const, value: idleState })),
+  },
+  synchronize: {
+    synchronizeTimerResult: vi.fn((result: AppResult<TimerState>) => result),
   },
 });

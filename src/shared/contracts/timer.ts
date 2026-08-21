@@ -6,6 +6,7 @@ export const TIMER_SWITCH_TO_TASK_CHANNEL = 'timer:switch-to-task';
 export const TIMER_PAUSE_CHANNEL = 'timer:pause';
 export const TIMER_RESUME_CHANNEL = 'timer:resume';
 export const TIMER_STOP_CHANNEL = 'timer:stop';
+export const TIMER_STATE_CHANGED_CHANNEL = 'timer:state-changed';
 
 export type TimerStatus = 'idle' | 'running' | 'paused';
 
@@ -49,4 +50,5 @@ export interface TimerAPI {
   pause(this: void): Promise<AppResult<TimerState>>;
   resume(this: void): Promise<AppResult<TimerState>>;
   stop(this: void): Promise<AppResult<TimerState>>;
+  onStateChanged(this: void, listener: (state: TimerState) => void): () => void;
 }

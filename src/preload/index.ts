@@ -22,6 +22,7 @@ import {
   TIMER_RESUME_CHANNEL,
   TIMER_START_CHANNEL,
   TIMER_STOP_CHANNEL,
+  TIMER_STATE_CHANGED_CHANNEL,
   TIMER_SWITCH_TO_TASK_CHANNEL,
 } from '@/shared/contracts/timer';
 
@@ -37,6 +38,18 @@ const timeTrackerApi: TimeTrackerAPI = {
     pause: () => ipcRenderer.invoke(TIMER_PAUSE_CHANNEL),
     resume: () => ipcRenderer.invoke(TIMER_RESUME_CHANNEL),
     stop: () => ipcRenderer.invoke(TIMER_STOP_CHANNEL),
+    onStateChanged: (listener) => {
+      const wrappedListener = (_event: unknown, state: unknown) => {
+        listener(state as Parameters<typeof listener>[0]);
+      };
+      ipcRenderer.on(TIMER_STATE_CHANGED_CHANNEL, wrappedListener);
+      return () => {
+        ipcRenderer.removeListener(
+          TIMER_STATE_CHANGED_CHANNEL,
+          wrappedListener,
+        );
+      };
+    },
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),

@@ -985,6 +985,61 @@ describe('App', () => {
     expect(getState).toHaveBeenCalledTimes(2);
   });
 
+  it('reconciles published state, rejects stale requests, refreshes history, and unsubscribes', async () => {
+    const initial = deferred<AppResult<TimerState>>();
+    let publish: ((state: TimerState) => void) | undefined;
+    const unsubscribe = vi.fn();
+    const onStateChanged = vi.fn((listener: (state: TimerState) => void) => {
+      publish = listener;
+      return unsubscribe;
+    });
+    const api = setTimerApi({
+      getState: vi.fn(() => initial.promise),
+      onStateChanged,
+    });
+
+    const renderer = render(<App />);
+    expect(onStateChanged).toHaveBeenCalledOnce();
+    await waitFor(() => expect(api.history.getPage).toHaveBeenCalledOnce());
+
+    act(() => publish?.(pausedState));
+    expect(screen.getByRole('region', { name: 'paused timer' })).toBeVisible();
+    expect(api.timer.pause).not.toHaveBeenCalled();
+
+    initial.resolve({ ok: true, value: idleState });
+    await act(async () => Promise.resolve());
+    expect(screen.getByRole('region', { name: 'paused timer' })).toBeVisible();
+    await waitFor(() => expect(api.history.getPage).toHaveBeenCalledTimes(2));
+
+    act(() =>
+      publish?.({
+        ...pausedState,
+        status: 'invalid',
+      } as unknown as TimerState),
+    );
+    expect(screen.getByRole('region', { name: 'paused timer' })).toBeVisible();
+
+    renderer.unmount();
+    expect(unsubscribe).toHaveBeenCalledOnce();
+  });
+
+  it('refreshes the authoritative timer snapshot when the window regains focus', async () => {
+    const getState = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: idleState })
+      .mockResolvedValueOnce({ ok: true, value: pausedState });
+    setTimerApi({ getState });
+    render(<App />);
+    await screen.findByRole('combobox', { name: 'Task description' });
+
+    fireEvent.focus(window);
+
+    expect(
+      await screen.findByRole('region', { name: 'paused timer' }),
+    ).toBeVisible();
+    expect(getState).toHaveBeenCalledTimes(2);
+  });
+
   it('periodically refreshes an active snapshot without issuing commands', async () => {
     vi.useFakeTimers();
     const api = setTimerApi({
@@ -1047,6 +1102,7 @@ interface TimerApiOverrides {
   readonly pause?: TimeTrackerAPI['timer']['pause'];
   readonly resume?: TimeTrackerAPI['timer']['resume'];
   readonly stop?: TimeTrackerAPI['timer']['stop'];
+  readonly onStateChanged?: TimeTrackerAPI['timer']['onStateChanged'];
   readonly getHistoryPage?: TimeTrackerAPI['history']['getPage'];
   readonly createManualInterval?: TimeTrackerAPI['manualTime']['createInterval'];
   readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
@@ -1071,6 +1127,7 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       pause: overrides.pause ?? vi.fn(),
       resume: overrides.resume ?? vi.fn(),
       stop: overrides.stop ?? vi.fn(),
+      onStateChanged: overrides.onStateChanged ?? vi.fn(() => () => undefined),
     },
     history: {
       getPage:

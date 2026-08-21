@@ -43,6 +43,7 @@ describe('interval mutation IPC handlers', () => {
     expect(operations.commands.delete).toHaveBeenCalledWith({
       intervalId: 'interval-2',
     });
+    expect(operations.synchronize?.refreshAfter).toHaveBeenCalledTimes(2);
   });
 
   it.each([
@@ -156,6 +157,9 @@ const createOperations = (): IntervalsIpcOperations => ({
       ok: true as const,
       value: { intervalId: input.intervalId },
     })),
+  },
+  synchronize: {
+    refreshAfter: vi.fn((result: AppResult<IntervalMutationResult>) => result),
   },
 });
 

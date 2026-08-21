@@ -32,6 +32,12 @@ export interface TimerIpcOperations {
     TimerService,
     'start' | 'switchToTask' | 'pause' | 'resume' | 'stop'
   >;
+  readonly synchronize?: {
+    synchronizeTimerResult(
+      this: void,
+      result: AppResult<TimerState>,
+    ): AppResult<TimerState>;
+  };
 }
 
 export const registerTimerHandlers = (
@@ -53,16 +59,19 @@ export const registerTimerHandlers = (
       if (!validation.ok) {
         return validation;
       }
-      return operations.commands.start(
-        validation.value.source === 'description'
-          ? {
-              source: 'description',
-              description: validation.value.description,
-            }
-          : {
-              source: 'existing-task',
-              taskId: validation.value.taskId,
-            },
+      return synchronize(
+        operations,
+        operations.commands.start(
+          validation.value.source === 'description'
+            ? {
+                source: 'description',
+                description: validation.value.description,
+              }
+            : {
+                source: 'existing-task',
+                taskId: validation.value.taskId,
+              },
+        ),
       );
     }),
   );
@@ -74,22 +83,37 @@ export const registerTimerHandlers = (
         return validation;
       }
 
-      return operations.commands.switchToTask(validation.value);
+      return synchronize(
+        operations,
+        operations.commands.switchToTask(validation.value),
+      );
     }),
   );
   ipc.handle(
     TIMER_PAUSE_CHANNEL,
-    safeHandler(logger, () => operations.commands.pause()),
+    safeHandler(logger, () =>
+      synchronize(operations, operations.commands.pause()),
+    ),
   );
   ipc.handle(
     TIMER_RESUME_CHANNEL,
-    safeHandler(logger, () => operations.commands.resume()),
+    safeHandler(logger, () =>
+      synchronize(operations, operations.commands.resume()),
+    ),
   );
   ipc.handle(
     TIMER_STOP_CHANNEL,
-    safeHandler(logger, () => operations.commands.stop()),
+    safeHandler(logger, () =>
+      synchronize(operations, operations.commands.stop()),
+    ),
   );
 };
+
+const synchronize = (
+  operations: TimerIpcOperations,
+  result: AppResult<TimerState>,
+): AppResult<TimerState> =>
+  operations.synchronize?.synchronizeTimerResult(result) ?? result;
 
 const safeHandler =
   (logger: TimerIpcLogger, operation: TimerHandler): TimerHandler =>

@@ -41,6 +41,12 @@ export interface TasksIpcOperations {
     TaskService,
     'getSuggestions' | 'rename' | 'delete' | 'getDeletionSummary'
   >;
+  readonly synchronize?: {
+    refreshAfter(
+      this: void,
+      result: AppResult<TaskMutationResult>,
+    ): AppResult<TaskMutationResult>;
+  };
 }
 
 export const registerTasksHandler = (
@@ -73,10 +79,13 @@ export const registerTasksHandler = (
       }
 
       return sanitizeResult(
-        operations.tasks.rename({
-          taskId: validation.value.taskId,
-          description: validation.value.description,
-        }),
+        refreshAfter(
+          operations,
+          operations.tasks.rename({
+            taskId: validation.value.taskId,
+            description: validation.value.description,
+          }),
+        ),
       );
     } catch (error: unknown) {
       logger.error('Unexpected task rename IPC failure.', error);
@@ -117,3 +126,9 @@ export const registerTasksHandler = (
 
 const sanitizeResult = <T>(result: AppResult<T>): AppResult<T> =>
   result.ok ? result : { ok: false, error: toRendererSafeError(result.error) };
+
+const refreshAfter = (
+  operations: TasksIpcOperations,
+  result: AppResult<TaskMutationResult>,
+): AppResult<TaskMutationResult> =>
+  operations.synchronize?.refreshAfter(result) ?? result;

@@ -34,7 +34,7 @@ breakdown to match the specification.
 | TASK-008-001 | Define tray presentation and platform asset selection | Complete | None | AC-008-001–004, AC-008-017 |
 | TASK-008-002 | Implement owned close, restore, and quit lifecycle | Complete | None | AC-008-009–011, AC-008-013, AC-008-015 |
 | TASK-008-003 | Implement authoritative tray service and timer commands | Complete | TASK-008-001 | AC-008-001–008, AC-008-015–017 |
-| TASK-008-004 | Synchronize tray and renderer timer presentation | Pending | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
+| TASK-008-004 | Synchronize tray and renderer timer presentation | Complete | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Pending | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
 | TASK-008-006 | Verify System Tray and update documentation | Pending | TASK-008-005 | AC-008-001–018 |
 
@@ -249,7 +249,7 @@ TASK-008-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -299,7 +299,22 @@ TASK-008-003.
 
 ### Completion Evidence
 
-Record commands run, results, and relevant implementation notes when complete.
+- `npm test -- test/main/timer/state-synchronization.test.ts
+  test/main/timer/state-publisher.test.ts test/preload/index.test.ts
+  test/main/ipc/timer.test.ts test/main/ipc/tasks.test.ts
+  test/main/ipc/intervals.test.ts test/renderer/app/App.test.tsx
+  test/renderer/app/DailyHistory.test.tsx` — passed 90 focused synchronization,
+  boundary, IPC, renderer, and history tests across 8 files.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed all 525 tests across 63 files.
+- Added the fixed `timer:state-changed` contract, precise preload listener
+  cleanup, live-window publication, and a narrow synchronization coordinator.
+  Successful renderer timer commands use returned authoritative state; Task
+  rename and interval correction seams reread state before tray/publication.
+  The renderer now accepts validated publication snapshots, invalidates stale
+  requests, advances history revision, refreshes on focus, and cleans up its
+  one subscription. Startup composition remains scoped to TASK-008-005.
 
 ---
 

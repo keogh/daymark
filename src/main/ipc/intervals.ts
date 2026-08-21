@@ -30,6 +30,12 @@ export interface IntervalsIpcLogger {
 
 export interface IntervalsIpcOperations {
   readonly commands: Pick<IntervalService, 'update' | 'delete'>;
+  readonly synchronize?: {
+    refreshAfter(
+      this: void,
+      result: AppResult<IntervalMutationResult>,
+    ): AppResult<IntervalMutationResult>;
+  };
 }
 
 export const registerIntervalsHandlers = (
@@ -44,7 +50,10 @@ export const registerIntervalsHandlers = (
         return validation;
       }
 
-      return operations.commands.update(toUpdateInput(validation.value));
+      return refreshAfter(
+        operations,
+        operations.commands.update(toUpdateInput(validation.value)),
+      );
     } catch (error: unknown) {
       logger.error('Unexpected interval update IPC failure.', error);
       return { ok: false, error: toRendererSafeError(undefined) };
@@ -58,13 +67,22 @@ export const registerIntervalsHandlers = (
         return validation;
       }
 
-      return operations.commands.delete(toDeleteInput(validation.value));
+      return refreshAfter(
+        operations,
+        operations.commands.delete(toDeleteInput(validation.value)),
+      );
     } catch (error: unknown) {
       logger.error('Unexpected interval delete IPC failure.', error);
       return { ok: false, error: toRendererSafeError(undefined) };
     }
   });
 };
+
+const refreshAfter = (
+  operations: IntervalsIpcOperations,
+  result: AppResult<IntervalMutationResult>,
+): AppResult<IntervalMutationResult> =>
+  operations.synchronize?.refreshAfter(result) ?? result;
 
 const toUpdateInput = (input: UpdateIntervalInput): UpdateIntervalInput => ({
   intervalId: input.intervalId,
