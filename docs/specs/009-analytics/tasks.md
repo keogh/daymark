@@ -32,7 +32,7 @@ external prerequisite does not change the internal dependency order in this file
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-009-001 | Define Analytics Contracts, Validation, and Calendar Projections | Complete | None | AC-009-001–007, AC-009-017 |
-| TASK-009-002 | Implement Bounded Analytics Queries | Pending | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
+| TASK-009-002 | Implement Bounded Analytics Queries | Complete | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
 | TASK-009-003 | Implement the Authoritative Analytics Service | Pending | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Pending | TASK-009-003 | AC-009-016–018 |
 | TASK-009-005 | Introduce Timer and Analytics Navigation | Pending | TASK-009-004 | AC-009-015 |
@@ -134,7 +134,7 @@ complete.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -189,6 +189,25 @@ count does not grow with days or Tasks.
 - Specification sections: 8, 11, 14, 25, 28, 34.
 
 ### Completion Evidence
+
+- Added a dedicated `AnalyticsQueries` contract and SQLite/Drizzle repository
+  using one joined, set-based read from the earliest selected-range, current-week,
+  or current-month start through the exclusive authoritative snapshot.
+- Disposable SQLite coverage proves exclusion at the lower overlap boundary,
+  inclusion across it, future-start exclusion, open-interval selection, current
+  Task identity/description joins, stable start/ID ordering, and byte-for-byte
+  read-only database state.
+- The implementation performs one query per Analytics read; its query count does
+  not vary with the number of days, Tasks, or returned intervals.
+- `EXPLAIN QUERY PLAN` uses `time_intervals_started_at_idx` for the bounded
+  interval search and the Tasks primary-key autoindex for the join. The existing
+  indexes are appropriate for this bounded recent-period query, so no schema
+  change or migration was added.
+- Focused Analytics, History-query, and database-invariant tests — passed, 3 files
+  and 14 tests.
+- `npm run typecheck`, `npm run lint`, and `npm run format:check` — passed.
+- `npm test` — passed, 68 files and 556 tests.
+- `git diff --check` — passed.
 
 Record commands, test counts, observed query count, query-plan conclusion, and the
 absence or justification of a migration when complete.

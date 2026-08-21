@@ -12,7 +12,9 @@ SPEC-009 — Analytics (Ready for Implementation)
 
 SPEC-008 is Verified. SPEC-009 implementation is active. TASK-009-001 completed
 the Analytics contracts, strict input validation, and deterministic pure local
-calendar projections; TASK-009-002 bounded Analytics queries is next.
+calendar projections. TASK-009-002 completed the fixed-count, bounded, read-only
+Analytics query with disposable-SQLite and query-plan evidence; TASK-009-003
+authoritative service composition is next.
 
 SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
