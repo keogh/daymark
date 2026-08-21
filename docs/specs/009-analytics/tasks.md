@@ -33,7 +33,7 @@ external prerequisite does not change the internal dependency order in this file
 | --- | --- | --- | --- | --- |
 | TASK-009-001 | Define Analytics Contracts, Validation, and Calendar Projections | Complete | None | AC-009-001–007, AC-009-017 |
 | TASK-009-002 | Implement Bounded Analytics Queries | Complete | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
-| TASK-009-003 | Implement the Authoritative Analytics Service | Pending | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
+| TASK-009-003 | Implement the Authoritative Analytics Service | Complete | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Pending | TASK-009-003 | AC-009-016–018 |
 | TASK-009-005 | Introduce Timer and Analytics Navigation | Pending | TASK-009-004 | AC-009-015 |
 | TASK-009-006 | Render Static Analytics States and Accessible Chart | Pending | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
@@ -218,7 +218,7 @@ absence or justification of a migration when complete.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -271,8 +271,26 @@ mutating application state.
 
 ### Completion Evidence
 
-Record commands, passing test counts, representative snapshot assertions, and
-read-only verification when complete.
+- Added `AnalyticsService` as the read-only composition of the injected Clock,
+  local selected/week/month boundaries, the one bounded Analytics query, grouped
+  Task records, and the established pure projection implementation.
+- Wired the Analytics query repository and service into the main-process
+  application composition root without adding the TASK-009-004 IPC boundary.
+- Unit coverage proves exactly one Clock read and one bounded query per request,
+  shared-snapshot open-interval values, exact 7/30-day output, zero filling,
+  grouping, totals, averages, current periods, ranking, and source-record
+  preservation.
+- Disposable-SQLite integration coverage proves authoritative reprojection after
+  Timer start/stop, application restart with an open interval, manual creation,
+  Task rename, and cascade deletion. Byte-for-byte serialization before and after
+  repeated 7/30-day reads proves the service path is read-only.
+- Focused Analytics service, projection, and query tests — passed, 4 files and 18
+  tests.
+- Affected Timer, manual-time, interval, Task, History, and database regressions —
+  passed, 12 files and 131 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check` — passed.
+- `npm test` — passed, 70 files and 559 tests.
 
 ---
 

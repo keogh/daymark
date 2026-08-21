@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { randomUUID } from 'node:crypto';
 
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
+import { AnalyticsQueryRepository } from '@/main/database/repositories/analytics-query-repository';
 import { HistoryQueryRepository } from '@/main/database/repositories/history-query-repository';
 import { TaskRepository } from '@/main/database/repositories/task-repository';
 import { TaskSuggestionQueryRepository } from '@/main/database/repositories/task-suggestion-query-repository';
@@ -20,6 +21,7 @@ import { registerManualTimeHandler } from '@/main/ipc/manual-time';
 import { registerTimerHandlers } from '@/main/ipc/timer';
 import { registerTasksHandler } from '@/main/ipc/tasks';
 import { DurationProjector } from '@/main/services/duration-projections';
+import { AnalyticsService } from '@/main/services/analytics-service';
 import { SystemHealthService } from '@/main/services/system-health';
 import { HistoryService } from '@/main/services/history-service';
 import { IntervalService } from '@/main/services/interval-service';
@@ -68,6 +70,7 @@ export const registerApplicationLifecycle = (): void => {
         const appState = new AppStateRepository(context.db);
         const tasks = new TaskRepository(context.db);
         const intervals = new TimeIntervalRepository(context.db);
+        const analyticsQueries = new AnalyticsQueryRepository(context.db);
         const historyQueries = new HistoryQueryRepository(context.db);
         const taskSuggestionQueries = new TaskSuggestionQueryRepository(
           context.db,
@@ -90,6 +93,13 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const historyService = new HistoryService({ clock, historyQueries });
+        // Constructed at the application composition root now; the narrow IPC
+        // boundary is introduced by TASK-009-004.
+        const analyticsService = new AnalyticsService({
+          clock,
+          analyticsQueries,
+        });
+        void analyticsService;
         const intervalService = new IntervalService({
           appState,
           intervals,
