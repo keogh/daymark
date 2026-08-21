@@ -17,6 +17,10 @@ restore behavior; immediate renderer/tray synchronization; explicit Quit without
 timer mutation; safe failure handling; lifecycle cleanup; and packaged macOS
 acceptance while preserving later Windows/Linux release validation.
 
+SPEC-009 is also designed and queued as Ready for Implementation, but its task
+breakdown explicitly requires SPEC-008 to be Verified before Analytics
+implementation begins.
+
 ---
 
 # Completed Specifications
@@ -185,7 +189,7 @@ renderer console.
 
 # Upcoming Specifications
 
-1. SPEC-009 — Analytics
+1. SPEC-009 — Analytics (Ready for Implementation; queued behind SPEC-008)
 2. SPEC-010 — Settings
 3. SPEC-011 — Packaging and Release
 
@@ -203,6 +207,10 @@ SPEC-008 — System Tray and Window Lifecycle is ready for implementation. Its
 companion task breakdown begins with TASK-008-001 — Define Tray Presentation and
 Platform Asset Selection. No implementation task is currently in progress.
 
+SPEC-009 — Analytics has a complete companion task breakdown. Its first task is
+TASK-009-001 — Define Analytics Contracts, Validation, and Calendar Projections,
+but it remains pending until SPEC-008 is Verified.
+
 ---
 
 # Important Decisions
@@ -217,10 +225,18 @@ immediate no-confirmation Quit, 80-code-point one-line Task presentation, and a
 safe native dialog after tray command failure. No schema migration or new runtime
 dependency is planned.
 
+SPEC-009 applies DEC-010 through DEC-015 and DEC-028. It fixes Analytics ranges to
+Today plus the prior 6 or 29 local calendar days, uses Monday as the interim current
+week boundary until SPEC-010, divides daily average by all 7 or 30 selected days,
+shows five deterministically ranked Tasks, uses an accessible noninteractive chart,
+and advances open-interval presentation locally without per-second IPC or database
+reads. No schema migration or new runtime dependency is planned.
+
 ---
 
 # Last Updated
 
-2026-08-21 — Designed SPEC-008 and created its implementation task breakdown.
-The specification is Ready for Implementation; SPEC-007 remains the latest
-verified implementation milestone.
+2026-08-21 — Designed SPEC-009 and created its implementation task breakdown.
+SPEC-009 is Ready for Implementation but queued behind verification of SPEC-008;
+SPEC-008 remains the active implementation specification and SPEC-007 remains the
+latest verified implementation milestone.
