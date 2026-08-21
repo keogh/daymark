@@ -232,7 +232,9 @@ describe('TaskRepository', () => {
       intervalCount: 0,
       lifetimeDurationMs: 0,
     });
-    expect(repository.findDeletionSummary('missing-task', 1_000)).toBeUndefined();
+    expect(
+      repository.findDeletionSummary('missing-task', 1_000),
+    ).toBeUndefined();
   });
 });
 

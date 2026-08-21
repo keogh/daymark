@@ -235,10 +235,7 @@ describe('TaskService', () => {
       findSuggestions: vi.fn(() => []),
     };
 
-    const seedTask = (
-      id: string,
-      description = 'Implement authentication',
-    ) => {
+    const seedTask = (id: string, description = 'Implement authentication') => {
       const task = {
         id,
         description,
@@ -327,7 +324,10 @@ describe('TaskService', () => {
       });
       expect(tasks.findById('target')).toEqual(target);
       expect(
-        context.sqlite.prepare('select count(*) from time_intervals').pluck().get(),
+        context.sqlite
+          .prepare('select count(*) from time_intervals')
+          .pluck()
+          .get(),
       ).toBe(1);
       expect(appState.get()).toEqual(stateBefore);
     });
@@ -347,25 +347,26 @@ describe('TaskService', () => {
           lifetimeDurationMs: 800,
         },
       });
-      expect(
-        service().getDeletionSummary({ taskId: 'missing' }),
-      ).toMatchObject({
-        ok: false,
-        error: { code: 'TASK_NOT_FOUND' },
-      });
+      expect(service().getDeletionSummary({ taskId: 'missing' })).toMatchObject(
+        {
+          ok: false,
+          error: { code: 'TASK_NOT_FOUND' },
+        },
+      );
       expect(tasks.findById('target')).toEqual(target);
       expect(appState.get()).toEqual(stateBefore);
       expect(
-        context.sqlite.prepare('select count(*) from time_intervals').pluck().get(),
+        context.sqlite
+          .prepare('select count(*) from time_intervals')
+          .pluck()
+          .get(),
       ).toBe(2);
     });
 
     it('rejects invalid deletion-summary input before reading the Clock', () => {
       const nowSpy = vi.spyOn(clock, 'now');
 
-      expect(
-        service().getDeletionSummary({ taskId: '' }),
-      ).toMatchObject({
+      expect(service().getDeletionSummary({ taskId: '' })).toMatchObject({
         ok: false,
         error: { code: 'INVALID_TASK_DELETE' },
       });
@@ -393,7 +394,10 @@ describe('TaskService', () => {
       });
       expect(tasks.findById('target')).toEqual(target);
       expect(
-        context.sqlite.prepare('select count(*) from time_intervals').pluck().get(),
+        context.sqlite
+          .prepare('select count(*) from time_intervals')
+          .pluck()
+          .get(),
       ).toBe(1);
       expect(consoleError).toHaveBeenCalledOnce();
     });

@@ -396,7 +396,7 @@ Deletion is destructive and requires confirmation.
 Delete "Implement authentication"?
 
 This will permanently delete the task and
-its 17 recorded time intervals.
+its 17 recorded time intervals (8h 30m).
 
 Cancel       Delete
 ```

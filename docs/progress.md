@@ -2,18 +2,18 @@
 
 ## Current Phase
 
-Interval Management verified
+Task Management verified
 
 ## Current Specification
 
-SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
+SPEC-007 — Task Management (Verified 2026-08-21)
 
 ## Current Status
 
-SPEC-006 is verified. Daily History now supports accessible editing and confirmed
-deletion of closed intervals while preserving interval identity, Task association,
-timer state, global non-overlap, complete cross-day values, and authoritative
-projections across every loaded affected day.
+SPEC-007 is verified. Daily History now supports accessible Task rename and
+confirmed Task deletion while preserving interval identity during rename,
+cascading all associated intervals during deletion, protecting the active Task,
+and authoritatively refreshing every loaded occurrence and timer state.
 
 ---
 
@@ -26,6 +26,7 @@ projections across every loaded affected day.
 - SPEC-004 — One-Click Task Switching (Verified 2026-08-15)
 - SPEC-005 — Manual Time Entry (Verified 2026-08-15)
 - SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
+- SPEC-007 — Task Management (Verified 2026-08-21)
 
 SPEC-001 delivered:
 
@@ -154,15 +155,38 @@ and display, running-overlap rejection, cancellation, informative confirmed
 deletion, all-day projection refresh, unchanged running state, and a clean renderer
 console.
 
+SPEC-007 delivered:
+
+- accessible per-row Task actions in Daily History, with keyboard-operable Rename
+  and Delete workflows, managed dialog focus, pending states, and controlled
+  errors;
+- transactional Task rename that preserves Task identity, intervals, and
+  `AppState`, supports self-normalizing changes, rejects collisions, and updates
+  active timer/history projections authoritatively;
+- informative Task deletion confirmation with complete interval count and
+  lifetime duration, SQLite-cascaded interval deletion, and isolation of every
+  other Task, interval, and `AppState` value;
+- renderer and independently enforced service/boundary protection against
+  deleting the running or paused active Task;
+- narrow typed preload APIs, exact runtime-validated IPC commands, and unit,
+  repository, disposable-SQLite integration, boundary, and renderer coverage.
+
+Final acceptance covered AC-007-001 through AC-007-013 and the project Definition
+of Done. Formatting, typecheck, lint, all 488 tests in 55 files, and macOS arm64
+packaging passed on 2026-08-21. An isolated packaged run at 1040×688 verified
+rename, normalized collision rejection, informative deletion of a two-interval
+Task with database-confirmed cascade and zero orphans, accessible active-Task
+delete disablement, forged-command rejection, authoritative refresh, and a clean
+renderer console.
+
 ---
 
 # Upcoming Specifications
 
-1. SPEC-007 — Task Management
-2. SPEC-008 — System Tray
-3. SPEC-009 — Analytics
-4. SPEC-010 — Settings
-5. SPEC-011 — Packaging and Release
+1. SPEC-008 — System Tray
+2. SPEC-009 — Analytics
+3. SPEC-010 — Settings
+4. SPEC-011 — Packaging and Release
 
 ---
 
@@ -174,23 +198,24 @@ None.
 
 # Active Work
 
-SPEC-006 — Edit and Delete Intervals is complete and verified. The next planned
-specification is SPEC-007 — Task Management.
+SPEC-007 — Task Management is complete and verified. The next planned
+specification is SPEC-008 — System Tray.
 
 ---
 
 # Important Decisions
 
-See `docs/decisions.md`. SPEC-006 remains within the established typed preload
-API, main-process SQLite ownership, timestamp-based interval source of truth,
-injected Clock, local-calendar projection, and npm decisions. No schema
-migration, dependency, decision, or architectural deviation was required.
+See `docs/decisions.md`. SPEC-007 remains within the established typed preload
+API, main-process SQLite ownership, SQLite cascade, timestamp-based interval
+source of truth, injected Clock, local-calendar projection, and npm decisions.
+No schema migration, dependency, decision, or architectural deviation was
+required.
 
 ---
 
 # Last Updated
 
-2026-08-15 — Verified SPEC-006. Edit and confirmed-delete workflows now preserve
-timer state and refresh all affected loaded history days authoritatively. Full
-validation, 394 tests in 51 files, macOS arm64 packaging, and isolated packaged
-acceptance passed.
+2026-08-21 — Verified SPEC-007. Task rename and confirmed cascading deletion now
+preserve timer/history integrity and protect the active Task. Full validation,
+488 tests in 55 files, macOS arm64 packaging, and isolated packaged acceptance
+passed.

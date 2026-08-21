@@ -292,17 +292,19 @@ describe('DailyHistory', () => {
   });
 
   it('loads deletion details before opening confirmation and returns focus after Cancel', async () => {
-    const summaryResult = createDeferred<AppResult<{
-      task: { id: string; description: string };
-      intervalCount: number;
-      lifetimeDurationMs: number;
-    }>>();
+    const summaryResult = createDeferred<
+      AppResult<{
+        task: { id: string; description: string };
+        intervalCount: number;
+        lifetimeDurationMs: number;
+      }>
+    >();
     const getDeletionSummary = vi.fn(() => summaryResult.promise);
     const remove = vi.fn();
-    setHistoryApi(
-      vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
-      { delete: remove, getDeletionSummary },
-    );
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }), {
+      delete: remove,
+      getDeletionSummary,
+    });
     render(<DailyHistory />);
 
     const actions = (
@@ -311,7 +313,9 @@ describe('DailyHistory', () => {
       })
     )[0]!;
     fireEvent.keyDown(actions, { key: 'ArrowDown' });
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+    fireEvent.click(
+      await screen.findByRole('menuitem', { name: 'Delete task' }),
+    );
 
     expect(getDeletionSummary).toHaveBeenCalledWith({ taskId: 'task-1' });
     expect(remove).not.toHaveBeenCalled();
@@ -339,16 +343,13 @@ describe('DailyHistory', () => {
 
   it('communicates deletion-summary failures without opening confirmation or mutating', async () => {
     const remove = vi.fn();
-    setHistoryApi(
-      vi.fn().mockResolvedValue({ ok: true, value: loadedPage }),
-      {
-        delete: remove,
-        getDeletionSummary: vi.fn().mockResolvedValue({
-          ok: false,
-          error: { code: 'TASK_NOT_FOUND', message: 'Hidden detail' },
-        }),
-      },
-    );
+    setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }), {
+      delete: remove,
+      getDeletionSummary: vi.fn().mockResolvedValue({
+        ok: false,
+        error: { code: 'TASK_NOT_FOUND', message: 'Hidden detail' },
+      }),
+    });
     render(<DailyHistory />);
 
     const actions = (
@@ -357,7 +358,9 @@ describe('DailyHistory', () => {
       })
     )[0]!;
     fireEvent.keyDown(actions, { key: 'ArrowDown' });
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+    fireEvent.click(
+      await screen.findByRole('menuitem', { name: 'Delete task' }),
+    );
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'This task no longer exists',

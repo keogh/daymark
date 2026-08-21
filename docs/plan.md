@@ -6,7 +6,7 @@ SPEC-007 — Task Management
 
 ## Active Task
 
-TASK-007-006 — Add Task Deletion Workflow With Informative Confirmation
+TASK-007-007 — Verify Task Management and Update Documentation
 
 ## Status
 
@@ -16,28 +16,28 @@ Complete
 
 # Immediate Plan
 
-1. Load an authoritative deletion summary from an inactive Task's actions menu
-   and communicate summary-loading failures without mutation.
-2. Add an informative confirmation dialog with cancellation, pending-state
-   duplicate prevention, controlled errors, and focus management.
-3. Disable active-Task deletion with a programmatically associated reason and
-   wire successful deletion to authoritative timer and loaded-history refreshes.
-4. Add focused dialog, Daily History, and App tests for summary content,
-   cancellation, failures, active state, keyboard/focus behavior, and refresh.
-5. Run focused renderer regressions, then `npm run typecheck` and `npm run lint`.
+1. Verify AC-007-001 through AC-007-013 against automated coverage and the
+   implemented renderer, boundary, service, repository, and integration flows.
+2. Run formatting, typecheck, lint, the complete test suite, and packaging.
+3. Smoke-test the packaged app for rename, collision rejection, inactive-Task
+   cascading deletion, and disabled/server-rejected active-Task deletion.
+4. Record acceptance and validation evidence, then update the specification,
+   task breakdown, progress, and any behavior documentation that is inaccurate.
+5. Review the final diff and reconcile statuses only if every required check
+   passes.
 
 ---
 
 # Scope Guard
 
-No rename behavior, service/repository changes, or final specification-wide
-verification/documentation work is included in this task.
+No SPEC-008 System Tray work, later roadmap features, or unrelated product
+changes are included in this task.
 
 ---
 
 # Completion
 
-Completion is reached when deletion requires the specified informative
-confirmation, active-Task deletion is disabled accessibly, success refreshes all
-authoritative surfaces, focused tests and static checks pass, and the task
-breakdown records TASK-007-006 as Complete with evidence.
+Completion is reached when AC-007-001 through AC-007-013 and the Definition of
+Done are evidenced, all required validation and packaged smoke scenarios pass,
+documentation reflects the result, and SPEC-007/TASK-007-007 are reconciled to
+Verified/Complete.

@@ -242,8 +242,7 @@ describe('TaskService SQLite integration', () => {
         id: `${status}-session`,
         taskId: 'task-1',
         startedAt: sessionStartedAt,
-        endedAt:
-          status === 'running' ? null : localTime(2026, 8, 15, 10),
+        endedAt: status === 'running' ? null : localTime(2026, 8, 15, 10),
         createdAt: 100,
         updatedAt: 100,
       });

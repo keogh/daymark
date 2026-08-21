@@ -3,8 +3,8 @@
 ## Source
 
 - Specification: `docs/specs/007-task-management/spec.md`
-- Specification status: Draft
-- Last reviewed against specification: 2026-08-16
+- Specification status: Verified
+- Last reviewed against specification: 2026-08-21
 
 The specification is the source of truth for behavior. This file only decomposes
 that behavior into implementation work. If the two conflict, update this
@@ -36,7 +36,7 @@ breakdown to match the specification.
 | TASK-007-004 | Expose validated task management APIs | Complete | TASK-007-002, TASK-007-003 | AC-007-010, AC-007-012 |
 | TASK-007-005 | Add task actions and rename workflow | Complete | TASK-007-004 | AC-007-001–005, AC-007-009–013 |
 | TASK-007-006 | Add task deletion workflow with informative confirmation | Complete | TASK-007-004 | AC-007-001, AC-007-006–008, AC-007-010–013 |
-| TASK-007-007 | Verify task management and update documentation | Pending | TASK-007-005, TASK-007-006 | AC-007-001–013 |
+| TASK-007-007 | Verify task management and update documentation | Complete | TASK-007-005, TASK-007-006 | AC-007-001–013 |
 
 ---
 
@@ -484,7 +484,7 @@ TASK-007-004.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -525,6 +525,54 @@ and documentation reflects the completed Task management workflow.
 
 - Acceptance criteria: AC-007-001–013
 - Specification sections: 15–25
+
+### Completion Evidence
+
+- `npm run format:check` — passed after applying the repository formatter to
+  seven SPEC-007 implementation/test files found by the initial check.
+- `npm run typecheck` — passed.
+- `npm run lint` — passed.
+- `npm test` — passed, 55 files and 488 tests.
+- `npm run package` — passed for the macOS arm64 Electron package.
+- Automated unit, repository, integration, preload/IPC, and renderer coverage
+  directly verifies AC-007-001 through AC-007-013, including exact boundary
+  validation, transactional no-mutation failures, cross-day refresh, focus,
+  labels, and active-Task protection.
+- AC-007-001–002 and AC-007-013 are evidenced by Daily History/Rename dialog
+  renderer tests plus packaged keyboard menu activation, labels, prefill, and
+  focus checks.
+- AC-007-003–005 and AC-007-009 are evidenced by repository/service/integration
+  and App tests for identity/interval/AppState preservation, self-normalizing
+  rename, collision isolation, and active-timer refresh; packaged rename and
+  collision scenarios also passed.
+- AC-007-006–008 are evidenced by deletion-summary, transactional delete,
+  cascade, dialog, and active-state tests plus packaged confirmation, SQLite,
+  accessible-disablement, and forged-command checks.
+- AC-007-010–011 are evidenced by service/dialog missing-target tests and App
+  refresh tests covering every loaded day and timer state after both mutation
+  types.
+- AC-007-012 is evidenced by exact-shape shared-validation, preload, and IPC
+  tests proving malformed and extra-property inputs are rejected before service
+  execution.
+- Packaged-app smoke verification used an isolated profile at 1040×688 and
+  proved complete rename prefill with managed focus, successful authoritative
+  rename refresh, normalized collision rejection with the entered value
+  preserved, informative confirmation for two complete intervals, confirmed
+  deletion, and removal from loaded history.
+- Direct inspection of the isolated SQLite database after packaged deletion
+  proved that the deleted Task and both associated intervals were absent, the
+  other Tasks and intervals remained, and the orphan interval count was zero.
+- Packaged verification also proved the active Task's Delete action exposed
+  `aria-disabled="true"` with the reason “Stop this task before deleting it.”;
+  a forged preload command independently returned
+  `ACTIVE_TASK_CANNOT_BE_DELETED`, while the running timer and persisted
+  `AppState` remained active.
+- Page identity, meaningful rendered content, absence of a framework error
+  overlay, screenshot evidence, and target interactions passed. No relevant
+  renderer console warnings, errors, or uncaught exceptions were captured.
+- Architecture, persistence, security, performance, scope, and documentation
+  were reviewed against the project Definition of Done. No migration,
+  dependency, architectural decision, or unrelated product change was needed.
 
 ---
 

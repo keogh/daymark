@@ -903,7 +903,9 @@ describe('App', () => {
       })
     )[0]!;
     fireEvent.keyDown(actions, { key: 'ArrowDown' });
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete task' }));
+    fireEvent.click(
+      await screen.findByRole('menuitem', { name: 'Delete task' }),
+    );
     expect(
       await screen.findByRole('dialog', {
         name: 'Delete "Implement authentication"?',

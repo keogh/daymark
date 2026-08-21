@@ -528,11 +528,7 @@ const HistoryTaskRow = ({
         </span>
       )}
       {isDeletionSummaryPending && (
-        <p
-          aria-live="polite"
-          className="history-action-status"
-          role="status"
-        >
+        <p aria-live="polite" className="history-action-status" role="status">
           Loading deletion details…
         </p>
       )}
