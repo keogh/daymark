@@ -36,7 +36,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-010-001 | Add Settings Persistence and Contracts | Pending | None | AC-010-001–003, AC-010-008, AC-010-016–017 |
 | TASK-010-002 | Implement the Settings Service and Narrow Boundary | Complete | TASK-010-001 | AC-010-002–003, AC-010-005, AC-010-008–009, AC-010-016–017 |
 | TASK-010-003 | Integrate Persisted Week Start with Analytics | Pending | TASK-010-002 | AC-010-004, AC-010-017 |
-| TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Pending | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
+| TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Complete | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
 | TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Pending | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
 | TASK-010-006 | Complete the Bounded Whole-App UX Audit | Pending | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
 | TASK-010-007 | Add and Package the Application Icon | Pending | TASK-010-005 | AC-010-018 |
@@ -296,7 +296,7 @@ Task, and Timer semantics remain unchanged.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -356,8 +356,28 @@ predictably without interrupting Timer behavior.
 
 ### Completion Evidence
 
-Record commands, test counts, keyboard/semantic evidence, serialization behavior,
-load fallback, rollback, and no-Timer-mutation evidence when complete.
+- Added the third semantic Settings destination while preserving Timer as the
+  fresh-renderer default and keeping the shell-owned Timer controller active
+  across navigation. Native buttons retain ordinary keyboard activation,
+  `aria-current="page"`, and visible focus; navigation and settings regressions
+  issue no Timer transition command.
+- Added a shell-owned settings controller with initial bootstrap gating,
+  authoritative loading/ready/error states, System in-memory fallback, Retry,
+  stale-request rejection, and synchronous serialization protection. It writes no
+  guessed defaults and disables both preference groups during the one allowed
+  mutation.
+- Added semantic Calendar and Appearance fieldsets with native radio behavior,
+  visible selected/pending/error states, System explanation, and explicit
+  automatic-application copy without Save/Apply/Cancel controls. Appearance is
+  applied optimistically, rolled back to the last confirmed value on failure, and
+  follows live system changes only while System is confirmed.
+- Successful week-start updates consume the returned complete settings row and
+  advance the existing Analytics invalidation revision before Analytics is next
+  presented.
+- Verification passed on 2026-08-22: focused App suite (42 tests), focused
+  App/Analytics/renderer-boundary suite (56 tests before the final live-system
+  case was added), full regression suite (671 tests in 80 files), `npm run
+  typecheck`, `npm run lint`, `npm run format:check`, and `git diff --check`.
 
 ---
 

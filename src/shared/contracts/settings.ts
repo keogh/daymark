@@ -25,9 +25,13 @@ export interface SetThemeInput {
 }
 
 export interface SettingsAPI {
-  get(): Promise<AppResult<ApplicationSettings>>;
+  get(this: void): Promise<AppResult<ApplicationSettings>>;
   setWeekStartsOn(
+    this: void,
     input: SetWeekStartsOnInput,
   ): Promise<AppResult<ApplicationSettings>>;
-  setTheme(input: SetThemeInput): Promise<AppResult<ApplicationSettings>>;
+  setTheme(
+    this: void,
+    input: SetThemeInput,
+  ): Promise<AppResult<ApplicationSettings>>;
 }

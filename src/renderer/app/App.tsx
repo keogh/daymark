@@ -20,6 +20,7 @@ import type { TimerState } from '@/shared/contracts/timer';
 import { Analytics } from './Analytics';
 import { DailyHistory } from './DailyHistory';
 import { ManualTimeEntryDialog } from './ManualTimeEntryDialog';
+import { Settings } from './Settings';
 import { formatLocalDateInput } from './local-date-format';
 import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
 import { useDisplayDuration } from './use-display-duration';
@@ -28,11 +29,17 @@ import {
   useTimerController,
   type TimerController,
 } from './use-timer-controller';
+import { useSettingsController } from './use-settings-controller';
+
+type Destination = 'timer' | 'analytics' | 'settings';
 
 export const App = () => {
   const controller = useTimerController();
-  const [destination, setDestination] = useState<'timer' | 'analytics'>(
-    'timer',
+  const [destination, setDestination] = useState<Destination>('timer');
+  const [analyticsInvalidationRevision, setAnalyticsInvalidationRevision] =
+    useState(0);
+  const settingsController = useSettingsController(() =>
+    setAnalyticsInvalidationRevision((revision) => revision + 1),
   );
   const [manualEntryDate, setManualEntryDate] = useState<string | null>(null);
 
@@ -60,62 +67,87 @@ export const App = () => {
           >
             Analytics
           </button>
+          <button
+            aria-current={destination === 'settings' ? 'page' : undefined}
+            className="app-navigation__destination"
+            onClick={() => setDestination('settings')}
+            type="button"
+          >
+            Settings
+          </button>
         </nav>
       </header>
 
-      {destination === 'timer' ? (
-        <>
-          <section aria-label="Timer" className="timer-view">
-            {controller.loadState.status === 'loading' && <LoadingTimer />}
-            {controller.loadState.status === 'error' && <LoadError />}
-            {controller.loadState.status === 'ready' &&
-              controller.loadState.timer.status === 'idle' && (
-                <IdleTimer controller={controller} />
-              )}
-            {controller.loadState.status === 'ready' &&
-              controller.loadState.timer.status !== 'idle' && (
-                <ActiveTimer
-                  controller={controller}
-                  timer={controller.loadState.timer}
-                />
-              )}
-          </section>
-          <div className="global-manual-entry">
-            <Button
-              onClick={openGlobalManualEntry}
-              type="button"
-              variant="outline"
-            >
-              Add time
-            </Button>
-          </div>
-          <DailyHistory
-            onAddTime={(date) => setManualEntryDate(date)}
-            onIntervalSaved={controller.refresh}
-            onPlayTask={controller.switchToTask}
-            onTaskRenamed={controller.refresh}
-            onTaskDeleted={controller.refresh}
-            refreshRevision={controller.authoritativeRevision}
-            timer={
-              controller.loadState.status === 'ready'
-                ? controller.loadState.timer
-                : null
-            }
-          />
-          {manualEntryDate !== null && (
-            <ManualTimeEntryDialog
-              initialDate={manualEntryDate}
-              onOpenChange={(open) => {
-                if (!open) setManualEntryDate(null);
-              }}
-              onSaved={controller.refresh}
-              open
-            />
-          )}
-        </>
-      ) : (
-        <Analytics refreshRevision={controller.authoritativeRevision} />
+      {settingsController.loadState.status === 'loading' && (
+        <div className="application-loading" role="status">
+          <Spinner aria-hidden="true" />
+          <p>Loading Time Tracker…</p>
+        </div>
       )}
+
+      {settingsController.loadState.status !== 'loading' &&
+        destination === 'timer' && (
+          <>
+            <section aria-label="Timer" className="timer-view">
+              {controller.loadState.status === 'loading' && <LoadingTimer />}
+              {controller.loadState.status === 'error' && <LoadError />}
+              {controller.loadState.status === 'ready' &&
+                controller.loadState.timer.status === 'idle' && (
+                  <IdleTimer controller={controller} />
+                )}
+              {controller.loadState.status === 'ready' &&
+                controller.loadState.timer.status !== 'idle' && (
+                  <ActiveTimer
+                    controller={controller}
+                    timer={controller.loadState.timer}
+                  />
+                )}
+            </section>
+            <div className="global-manual-entry">
+              <Button
+                onClick={openGlobalManualEntry}
+                type="button"
+                variant="outline"
+              >
+                Add time
+              </Button>
+            </div>
+            <DailyHistory
+              onAddTime={(date) => setManualEntryDate(date)}
+              onIntervalSaved={controller.refresh}
+              onPlayTask={controller.switchToTask}
+              onTaskRenamed={controller.refresh}
+              onTaskDeleted={controller.refresh}
+              refreshRevision={controller.authoritativeRevision}
+              timer={
+                controller.loadState.status === 'ready'
+                  ? controller.loadState.timer
+                  : null
+              }
+            />
+            {manualEntryDate !== null && (
+              <ManualTimeEntryDialog
+                initialDate={manualEntryDate}
+                onOpenChange={(open) => {
+                  if (!open) setManualEntryDate(null);
+                }}
+                onSaved={controller.refresh}
+                open
+              />
+            )}
+          </>
+        )}
+      {settingsController.loadState.status !== 'loading' &&
+        destination === 'analytics' && (
+          <Analytics
+            invalidationRevision={analyticsInvalidationRevision}
+            refreshRevision={controller.authoritativeRevision}
+          />
+        )}
+      {settingsController.loadState.status !== 'loading' &&
+        destination === 'settings' && (
+          <Settings controller={settingsController} />
+        )}
     </main>
   );
 };

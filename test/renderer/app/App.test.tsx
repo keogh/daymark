@@ -12,6 +12,7 @@ import { App } from '@/renderer/app/App';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { HistoryPage } from '@/shared/contracts/history';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import type { ApplicationSettings } from '@/shared/contracts/settings';
 import type { TaskSuggestionPage } from '@/shared/contracts/tasks';
 import type { TimerState } from '@/shared/contracts/timer';
 
@@ -44,6 +45,12 @@ const pausedState: TimerState = {
   taskTodayDurationMs: 7_500_000,
   taskLifetimeDurationMs: 18_900_000,
   activeIntervalStartedAt: null,
+};
+
+const defaultSettings: ApplicationSettings = {
+  weekStartsOn: 'monday',
+  theme: 'system',
+  updatedAt: 0,
 };
 
 const historyPageWithTask = (
@@ -83,20 +90,23 @@ describe('App', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
-  it('opens on Timer with semantic, focusable Timer and Analytics navigation', async () => {
+  it('opens on Timer with semantic, focusable three-destination navigation', async () => {
     setTimerApi();
     render(<App />);
 
     const navigation = screen.getByRole('navigation', { name: 'Primary' });
     const timer = screen.getByRole('button', { name: 'Timer' });
     const analytics = screen.getByRole('button', { name: 'Analytics' });
+    const settings = screen.getByRole('button', { name: 'Settings' });
 
     expect(navigation).toContainElement(timer);
     expect(navigation).toContainElement(analytics);
-    expect(navigation.querySelectorAll('button')).toHaveLength(2);
+    expect(navigation).toContainElement(settings);
+    expect(navigation.querySelectorAll('button')).toHaveLength(3);
     expect(timer).toHaveAttribute('aria-current', 'page');
     expect(analytics).not.toHaveAttribute('aria-current');
     expect(await screen.findByRole('region', { name: 'Timer' })).toBeVisible();
@@ -113,12 +123,154 @@ describe('App', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows semantic Settings preferences with no Save action', async () => {
+    setTimerApi();
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Settings' }),
+    ).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Calendar' })).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Appearance' })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'Monday' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'System' })).toBeChecked();
+    expect(screen.getByText(/follow.*computer.*appearance/i)).toBeVisible();
+    expect(screen.getByText(/apply automatically/i)).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: /save/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('serializes immediate preference updates and invalidates Analytics after week-start success', async () => {
+    const weekStart = deferred<AppResult<ApplicationSettings>>();
+    const api = setTimerApi({
+      setWeekStartsOn: vi.fn(() => weekStart.promise),
+    });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await screen.findByRole('radio', { name: 'Sunday' });
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Sunday' }));
+
+    expect(api.settings.setWeekStartsOn).toHaveBeenCalledOnce();
+    expect(api.settings.setWeekStartsOn).toHaveBeenCalledWith({
+      weekStartsOn: 'sunday',
+    });
+    expect(screen.getByText('Saving preference…')).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'Dark' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('radio', { name: 'Dark' }));
+    expect(api.settings.setTheme).not.toHaveBeenCalled();
+
+    weekStart.resolve({
+      ok: true,
+      value: { ...defaultSettings, weekStartsOn: 'sunday', updatedAt: 1 },
+    });
+    expect(await screen.findByRole('radio', { name: 'Sunday' })).toBeChecked();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Analytics' }));
+    await waitFor(() => expect(api.analytics.getSummary).toHaveBeenCalled());
+  });
+
+  it('applies appearance optimistically and restores the confirmed appearance after failure', async () => {
+    const theme = deferred<AppResult<ApplicationSettings>>();
+    const api = setTimerApi({ setTheme: vi.fn(() => theme.promise) });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await screen.findByRole('radio', { name: 'Dark' });
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Dark' }));
+    expect(document.documentElement).toHaveClass('dark');
+
+    theme.resolve({
+      ok: false,
+      error: { code: 'INTERNAL_ERROR', message: 'sensitive detail' },
+    });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('not saved');
+    expect(screen.getByRole('radio', { name: 'System' })).toBeChecked();
+    expect(document.documentElement).not.toHaveClass('dark');
+    expect(api.settings.setTheme).toHaveBeenCalledOnce();
+  });
+
+  it('uses System fallback after load failure and retries without writing defaults', async () => {
+    const retry = deferred<AppResult<ApplicationSettings>>();
+    const get = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        error: { code: 'INTERNAL_ERROR', message: 'sensitive detail' },
+      })
+      .mockImplementationOnce(() => retry.promise);
+    const api = setTimerApi({ getSettings: get });
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Settings could not be loaded',
+    );
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(api.settings.setTheme).not.toHaveBeenCalled();
+    expect(api.settings.setWeekStartsOn).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    retry.resolve({ ok: true, value: defaultSettings });
+    expect(await screen.findByRole('radio', { name: 'Monday' })).toBeChecked();
+  });
+
+  it('follows live system appearance only while System is confirmed', async () => {
+    let systemIsDark = false;
+    let notifyAppearanceChange: (() => void) | undefined;
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({
+        get matches() {
+          return systemIsDark;
+        },
+        media: '(prefers-color-scheme: dark)',
+        onchange: null,
+        addEventListener: (_event: string, listener: () => void) => {
+          notifyAppearanceChange = listener;
+        },
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    );
+    const api = setTimerApi({
+      setTheme: vi.fn().mockResolvedValue({
+        ok: true,
+        value: { ...defaultSettings, theme: 'light', updatedAt: 1 },
+      }),
+    });
+    render(<App />);
+    await screen.findByRole('region', { name: 'Timer' });
+
+    systemIsDark = true;
+    act(() => notifyAppearanceChange?.());
+    expect(document.documentElement).toHaveClass('dark');
+    expect(api.settings.setTheme).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    fireEvent.click(await screen.findByRole('radio', { name: 'Light' }));
+    expect(await screen.findByRole('radio', { name: 'Light' })).toBeChecked();
+    expect(document.documentElement).not.toHaveClass('dark');
+
+    systemIsDark = false;
+    act(() => notifyAppearanceChange?.());
+    expect(document.documentElement).not.toHaveClass('dark');
+    expect(api.settings.setTheme).toHaveBeenCalledOnce();
+  });
+
   it('does not issue a Timer command while navigating in either direction', async () => {
     const api = setTimerApi();
     render(<App />);
     await screen.findByRole('combobox', { name: 'Task description' });
 
     fireEvent.click(screen.getByRole('button', { name: 'Analytics' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
     fireEvent.click(screen.getByRole('button', { name: 'Timer' }));
 
     expect(api.timer.start).not.toHaveBeenCalled();
@@ -167,7 +319,7 @@ describe('App', () => {
     render(<App />);
 
     expect(api.timer.getState).toHaveBeenCalledOnce();
-    expect(screen.getByText('Loading timer…')).toBeVisible();
+    expect(await screen.findByText('Loading timer…')).toBeVisible();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
 
     state.resolve({ ok: true, value: idleState });
@@ -1183,6 +1335,9 @@ interface TimerApiOverrides {
   readonly renameTask?: TimeTrackerAPI['tasks']['rename'];
   readonly deleteTask?: TimeTrackerAPI['tasks']['delete'];
   readonly getTaskDeletionSummary?: TimeTrackerAPI['tasks']['getDeletionSummary'];
+  readonly getSettings?: TimeTrackerAPI['settings']['get'];
+  readonly setWeekStartsOn?: TimeTrackerAPI['settings']['setWeekStartsOn'];
+  readonly setTheme?: TimeTrackerAPI['settings']['setTheme'];
 }
 
 const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
@@ -1207,9 +1362,15 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
       getSummary: vi.fn(),
     },
     settings: {
-      get: vi.fn(),
-      setWeekStartsOn: vi.fn(),
-      setTheme: vi.fn(),
+      get:
+        overrides.getSettings ??
+        vi.fn().mockResolvedValue({ ok: true, value: defaultSettings }),
+      setWeekStartsOn:
+        overrides.setWeekStartsOn ??
+        vi.fn().mockResolvedValue({ ok: true, value: defaultSettings }),
+      setTheme:
+        overrides.setTheme ??
+        vi.fn().mockResolvedValue({ ok: true, value: defaultSettings }),
     },
     history: {
       getPage:
