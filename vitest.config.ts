@@ -13,7 +13,7 @@ export default defineConfig({
         test: {
           name: 'node',
           environment: 'node',
-          include: ['test/{main,preload,shared}/**/*.test.ts'],
+          include: ['test/{main,preload,shared,scripts}/**/*.test.ts'],
         },
       },
       {

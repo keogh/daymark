@@ -36,7 +36,7 @@ dependency order in this file.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-011-001 | Establish Distribution Metadata and Release Contracts | Pending | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
+| TASK-011-001 | Establish Distribution Metadata and Release Contracts | Complete | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
 | TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
 | TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
 | TASK-011-004 | Build the Linux x64 Debian Package | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
@@ -53,7 +53,7 @@ dependency order in this file.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -119,8 +119,25 @@ External prerequisite: SPEC-010 and every preceding specification are Verified.
 
 ### Completion Evidence
 
-Record commands, validator fixture results, selected stable identifiers, and the
-final temporary metadata values here when complete.
+Completed 2026-08-22. `scripts/distribution-contract.ts` is the single packaging
+contract. Stable identifiers are `com.isaaczepeda.timetracker` for the macOS bundle
+and Windows App User Model identity, and `time-tracker` for the Linux package.
+Approved identity remains Time Tracker / Isaac Zepeda / version `0.1.0`; Linux uses
+temporary maintainer email `isaaczepeda@users.noreply.github.com` with homepage
+omitted. `docs/release.md` retains the required contact/homepage follow-up and
+unsigned/checksum/no-auto-update limitations.
+
+Verification:
+
+- `npm test -- test/scripts/release-contract.test.ts` — 14 tests passed;
+- matching tag `v0.1.0` — accepted;
+- missing-`v` tag `0.1.0`, mismatched tag `v0.1.1`, malformed/suffixed tag
+  `v0.1.0-beta.1`, and absent tag — rejected;
+- `npm run release:validate -- --tag v0.1.0` — passed;
+- `npm run typecheck` — passed;
+- `npm run lint` — passed;
+- `npm run format:check` — passed;
+- `git diff --check` — passed.
 
 ---
 

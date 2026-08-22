@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Cross-Platform Packaging and Distribution queued
+Cross-Platform Packaging and Distribution active
 
 ## Current Specification
 
@@ -10,18 +10,16 @@ SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation
 
 ## Current Status
 
-SPEC-010 is Verified. Settings use authoritative singleton persistence and a
-narrow validated boundary; Analytics honors persisted Monday/Sunday week starts;
-System, Light, and Dark appearances apply immediately; and the bounded whole-app
-UX audit retains the targeted duration, keyboard, focus-restoration, dialog, and
-minimum-window repairs. The source-owned application icon is packaged locally.
+TASK-011-001 is complete. Distribution now has one validated source-controlled
+contract for package metadata, stable macOS/Windows/Linux identity, exact stable
+SemVer tag agreement, and four collision-free primary artifact descriptors. Local
+package, make, and validation commands are explicit, and release documentation
+records unsigned personal-testing limitations, temporary Linux contact metadata,
+checksum trust boundaries, and the absence of automatic updates.
 
-All SPEC-010 checks and 681 tests in 81 files passed on 2026-08-22. Isolated
-packaged macOS arm64 acceptance verified settings defaults and reload/restart
-persistence, live System and explicit appearance behavior, 3h Sunday versus 1h
-Monday current-week totals, running/paused Timer continuity, keyboard/dialog
-focus, 640x480 usability, icon identity, zero renderer warning/error console
-events, and zero HTTP(S) resources. SPEC-011 is now unblocked. SPEC-012 remains
+The focused 14-test release-contract suite, tag fixtures, typecheck, lint,
+formatting, and diff checks passed on 2026-08-22. Platform makers and native
+artifacts remain intentionally deferred; TASK-011-002 is next. SPEC-012 remains
 the final MVP release gate after SPEC-011 is Verified.
 
 ---

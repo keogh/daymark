@@ -1,6 +1,7 @@
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { VitePlugin } from '@electron-forge/plugin-vite';
+import { distributionContract } from './scripts/distribution-contract.ts';
 
 const packageDirectories = ['/.vite', '/node_modules'];
 const migrationsDirectory = '/src/main/database/migrations';
@@ -10,6 +11,7 @@ const trayAssetParentDirectories = ['/assets'];
 
 const config: ForgeConfig = {
   packagerConfig: {
+    appBundleId: distributionContract.identity.identifiers.macosBundleId,
     asar: true,
     icon: 'assets/icon/time-tracker',
     extraResource: ['assets'],

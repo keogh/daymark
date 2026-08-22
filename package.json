@@ -3,6 +3,7 @@
   "productName": "Time Tracker",
   "version": "0.1.0",
   "description": "A local-first desktop time tracker.",
+  "author": "Isaac Zepeda",
   "type": "module",
   "main": ".vite/build/main.cjs",
   "private": true,
@@ -14,7 +15,9 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "package": "electron-forge package"
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "release:validate": "node --experimental-strip-types scripts/release-contract.ts"
   },
   "dependencies": {
     "better-sqlite3": "13.0.3",
