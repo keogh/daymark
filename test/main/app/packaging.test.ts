@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { describe, expect, it } from 'vitest';
 
@@ -92,6 +93,32 @@ describe('application packaged resources', () => {
     });
     await expect(maker?.prepareConfig('arm64')).rejects.toThrow(
       'unsupported Windows Squirrel architecture',
+    );
+  });
+
+  it('configures a Linux-only x64 Debian package', async () => {
+    const debMakers = forgeConfig.makers?.filter(
+      (maker) => maker instanceof MakerDeb,
+    );
+
+    expect(debMakers).toHaveLength(1);
+    const maker = debMakers?.[0];
+    expect(maker?.platforms).toEqual(['linux']);
+    await maker?.prepareConfig('x64');
+    expect(maker?.config).toEqual({
+      options: {
+        bin: 'Time Tracker',
+        categories: ['Utility'],
+        description: 'A local-first desktop time tracker.',
+        icon: 'assets/icon/time-tracker.png',
+        maintainer: 'Isaac Zepeda <isaaczepeda@users.noreply.github.com>',
+        name: 'time-tracker',
+        productName: 'Time Tracker',
+      },
+    });
+    expect(maker?.config.options).not.toHaveProperty('homepage');
+    await expect(maker?.prepareConfig('arm64')).rejects.toThrow(
+      'unsupported Linux Debian architecture',
     );
   });
 });

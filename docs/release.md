@@ -85,6 +85,26 @@ database, tray, timer, or window initialization. Normal installed launch uses th
 stable Squirrel identity above and a single-instance lock; a second launch brings
 the existing Time Tracker window forward.
 
+## Linux x64 Debian package
+
+Run `npm run make:linux:x64` on a native Ubuntu x64 host with `dpkg`, `fakeroot`,
+and the lockfile-installed Node dependencies. The Linux-only Forge maker produces
+`Time-Tracker-{version}-linux-x64.deb`. Run `npm run inspect:linux:x64` to verify
+the artifact filename, `amd64` control metadata, generated dependencies, launcher,
+icon, application executable, x64 `better-sqlite3` module, migrations, renderer,
+and tray assets. The package intentionally omits homepage metadata and retains the
+temporary maintainer-contact follow-up above.
+
+Install the package using Ubuntu's standard package tooling with normal
+administrator authorization, then launch **Time Tracker** from the Ubuntu GNOME
+application launcher as the disposable ordinary desktop user. Do not launch the
+application with `sudo`. Confirm its profile beneath that user's configuration
+directory is owned by the ordinary user. Removal may use normal administrator
+authorization; after removal, confirm `/usr/bin/time-tracker`, the desktop entry,
+installed application files, and installed icon are gone while the disposable
+user's profile and representative data remain. Reinstall and launch as that same
+ordinary user to confirm the data remains available.
+
 ## Trust and update limitations
 
 Artifacts are unsigned. macOS Gatekeeper and Windows SmartScreen may warn or block

@@ -6,39 +6,39 @@ SPEC-011 — Cross-Platform Packaging and Distribution
 
 ## Active Task
 
-TASK-011-003 — Build the Windows x64 Squirrel Installer
+TASK-011-004 — Build the Linux x64 Debian Package
 
 ## Status
 
-In Progress — implementation and local verification complete; native Windows
-maker and installation acceptance pending
+In Progress — implementation and structural package verification complete; native
+Ubuntu x64 installation acceptance pending
 
 ---
 
 # Immediate Plan
 
-1. Add the Windows x64-restricted Squirrel maker, source-owned ICO generation,
-   stable Squirrel identity, and collision-free Setup executable name.
-2. Short-circuit all Squirrel lifecycle arguments before normal initialization,
-   and preserve one reachable normal installed instance.
-3. Add focused configuration/startup tests and document unsigned SmartScreen
-   expectations and ordinary per-user installation.
-4. Run local project validation; retain native Windows maker/install verification
-   for a Windows x64 host.
+1. Add the Linux x64-restricted Debian maker with approved maintainer metadata,
+   launcher identity, source-owned icons, and collision-free artifact naming.
+2. Add focused Forge configuration and Debian artifact/content inspection checks.
+3. Document Ubuntu installation, ordinary-user launch/profile ownership, and
+   removal behavior.
+4. Build and inspect the package in a disposable native Ubuntu x64 environment,
+   then run relevant project validation.
 
 ---
 
 # Scope Guard
 
-Only TASK-011-003 Windows x64 Squirrel packaging is included. Linux makers, CI
-workflows, release publication, checksums, signing, automatic updates, MSI/MSIX,
-machine-wide installation, application features, and database changes remain
-deferred.
+Only TASK-011-004 Linux x64 Debian packaging is included. CI workflows, release
+publication, checksums, signing, repositories, RPM/AppImage/Snap/Flatpak, arm64,
+application features, and database changes remain deferred.
 
 ---
 
 # Completion
 
-Implementation and local verification are complete. Native Windows x64 making,
-artifact inspection, ordinary-user installation, SmartScreen observation, and
-installed-profile launch remain pending because the current host is macOS.
+Implementation, focused checks, a disposable emulated linux/amd64 maker run, and
+structural Debian inspection are complete. Native Ubuntu x64 making, Ubuntu GNOME
+launcher/runtime acceptance as an ordinary disposable user, profile ownership,
+removal, and profile-preservation evidence remain pending because the available
+Docker daemon is Linux arm64 and the current physical host is macOS arm64.

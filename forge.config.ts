@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
@@ -9,6 +10,7 @@ import { distributionContract } from './scripts/distribution-contract.ts';
 import { macosDmgBaseName } from './scripts/distribution-contract.ts';
 import { primaryArtifactName } from './scripts/distribution-contract.ts';
 import { windowsSquirrelPackageName } from './scripts/distribution-contract.ts';
+import { normalizeLinuxDebArtifacts } from './scripts/linux-deb-artifact.ts';
 
 const packageMetadata = JSON.parse(
   fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
@@ -48,6 +50,10 @@ const config: ForgeConfig = {
     },
   },
   rebuildConfig: {},
+  hooks: {
+    postMake: async (_forgeConfig, makeResults) =>
+      normalizeLinuxDebArtifacts(makeResults),
+  },
   makers: [
     new MakerDMG(
       (architecture) => ({
@@ -82,6 +88,28 @@ const config: ForgeConfig = {
         };
       },
       ['win32'],
+    ),
+    new MakerDeb(
+      (architecture) => {
+        if (architecture !== 'x64') {
+          throw new Error(
+            `unsupported Linux Debian architecture: ${architecture}`,
+          );
+        }
+
+        return {
+          options: {
+            bin: distributionContract.identity.productName,
+            categories: ['Utility'],
+            description: distributionContract.identity.description,
+            icon: 'assets/icon/time-tracker.png',
+            maintainer: `${distributionContract.linux.maintainerName} <${distributionContract.linux.maintainerEmail}>`,
+            name: distributionContract.identity.identifiers.linuxPackageName,
+            productName: distributionContract.identity.productName,
+          },
+        };
+      },
+      ['linux'],
     ),
   ],
   plugins: [

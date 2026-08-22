@@ -38,8 +38,8 @@ dependency order in this file.
 | --- | --- | --- | --- | --- |
 | TASK-011-001 | Establish Distribution Metadata and Release Contracts | Complete | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
 | TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-003 | Build the Windows x64 Squirrel Installer | In Progress | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
-| TASK-011-004 | Build the Linux x64 Debian Package | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
+| TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
+| TASK-011-004 | Build the Linux x64 Debian Package | In Progress | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
 | TASK-011-005 | Add Native CI Builds and Artifact Validation | Pending | TASK-011-002, TASK-011-003, TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
 | TASK-011-006 | Assemble a Checksummed Draft GitHub Prerelease | Pending | TASK-011-005 | AC-011-008, AC-011-009, AC-011-010, AC-011-012, AC-011-017 |
 | TASK-011-007 | Define Repeatable Installation and Data-Preservation Acceptance | Pending | TASK-011-006 | AC-011-011, AC-011-012, AC-011-013, AC-011-014, AC-011-015, AC-011-016, AC-011-017 |
@@ -237,7 +237,7 @@ Verification:
 
 ### Status
 
-In Progress
+Pending — implementation is locally complete; native Windows acceptance remains
 
 ### Outcome
 
@@ -322,7 +322,7 @@ x64 host. The task stays In Progress until that evidence is recorded.
 
 ### Status
 
-Pending
+In Progress
 
 ### Outcome
 
@@ -380,9 +380,30 @@ assets and per-user data ownership.
 
 ### Completion Evidence
 
-Record Ubuntu version, maker command, artifact metadata, installed paths, launcher,
-icon, runtime user/profile ownership, removal, and temporary-contact inspection
-here.
+Implementation and local verification completed 2026-08-22 on macOS 26.3.1 arm64.
+The Linux-only Forge maker is restricted to x64 and configures the stable
+`time-tracker` package/launcher identity, the visible `Time Tracker` product name,
+the source-owned PNG icon, Utility category, approved description, and temporary
+`Isaac Zepeda <isaaczepeda@users.noreply.github.com>` maintainer while omitting a
+homepage. A post-make hook converts the maker's Debian-style filename to the
+contracted `Time-Tracker-0.1.0-linux-x64.deb` name.
+
+An emulated linux/amd64 `node:24-bookworm` container ran `npm ci`,
+`npm run make:linux:x64`, and `npm run inspect:linux:x64`. Inspection passed for
+the artifact filename, `amd64` control metadata, generated dependencies, omitted
+homepage, desktop entry, executable, PNG launcher icon, x64 Electron and
+`better-sqlite3` binaries, renderer, all migrations, and tray assets. The exported
+106 MB artifact had SHA-256
+`52c9ae3add758bc8b54885b572c9b309559286b33b96340c4b3f439cfb7575bc`.
+All 707 tests in 84 files, release validation, typecheck, lint, formatting,
+macOS arm64 host packaging, and diff checks passed.
+
+Native Ubuntu x64 maker confirmation, Ubuntu GNOME launcher/runtime acceptance as
+a disposable ordinary user, profile-ownership inspection, package removal, and
+profile-preservation evidence remain pending. The current Docker daemon is Linux
+arm64, so the emulated Debian build is useful structural evidence but does not
+satisfy those native Ubuntu requirements. TASK-011-004 remains In Progress until
+that evidence is recorded.
 
 ---
 

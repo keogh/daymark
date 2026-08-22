@@ -17,10 +17,12 @@ package, make, and validation commands are explicit, and release documentation
 records unsigned personal-testing limitations, temporary Linux contact metadata,
 checksum trust boundaries, and the absence of automatic updates.
 
-The focused 14-test release-contract suite, tag fixtures, typecheck, lint,
-formatting, and diff checks passed on 2026-08-22. Platform makers and native
-artifacts remain intentionally deferred; TASK-011-002 is next. SPEC-012 remains
-the final MVP release gate after SPEC-011 is Verified.
+TASK-011-004 implementation now adds the Linux x64-only Debian maker, stable
+package and launcher metadata, source-owned icon, collision-free final artifact
+name, focused configuration/rename tests, structural package inspection, and
+Ubuntu installation/removal guidance. An emulated linux/amd64 Debian container
+successfully built and inspected the 106 MB artifact. Native Ubuntu x64 GNOME
+installation and ordinary-user profile/removal evidence remains pending.
 
 ---
 
@@ -278,8 +280,11 @@ profile. Native Intel-host confirmation remains assigned to TASK-011-005.
 TASK-011-003 implementation now adds the Windows x64-only Squirrel maker,
 source-owned ICO generation, stable Squirrel identity, early installer-event
 isolation, single-instance normal launch, and bounded SmartScreen guidance. Native
-Windows maker and installation evidence is still pending, so TASK-011-003 remains
-In Progress.
+Windows maker and installation evidence is still pending, so TASK-011-003 is
+deferred pending native-host acceptance. TASK-011-004 is active: its implementation
+and emulated x64 structural build/inspection pass, while native Ubuntu x64 maker,
+GNOME launcher/runtime, ordinary-user profile ownership, removal, and preserved
+profile evidence remain required.
 
 SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
 Implementation. It defines one exact candidate and acceptance-evidence ledger;
@@ -334,8 +339,10 @@ dependency change is planned.
 
 # Last Updated
 
-2026-08-22 — Implemented and locally verified SPEC-011 TASK-011-003's Windows x64
-Squirrel configuration, icon derivative, startup-event isolation, stable identity,
-single-instance behavior, and unsigned installation documentation. Native Windows
-x64 maker and ordinary-user installation evidence remains required before the task
-can be marked Complete.
+2026-08-22 — Implemented SPEC-011 TASK-011-004's Linux x64 Debian maker, stable
+metadata/launcher/icon configuration, artifact-name normalization, package
+inspection, tests, and release documentation. An emulated linux/amd64 Debian build
+produced and structurally verified `Time-Tracker-0.1.0-linux-x64.deb`; all 707
+tests and baseline checks passed. Native Ubuntu x64 GNOME installation,
+ordinary-user profile ownership, removal, and preservation evidence remains
+required before the task can be marked Complete.

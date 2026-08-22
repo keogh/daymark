@@ -20,9 +20,11 @@
     "make:macos:arm64": "electron-forge make --platform=darwin --arch=arm64",
     "make:macos:x64": "electron-forge make --platform=darwin --arch=x64",
     "make:windows:x64": "electron-forge make --platform=win32 --arch=x64",
+    "make:linux:x64": "electron-forge make --platform=linux --arch=x64",
     "icon:windows": "node --experimental-strip-types scripts/generate-windows-icon.ts",
     "inspect:macos:arm64": "node --experimental-strip-types scripts/inspect-macos-package.ts --arch arm64",
     "inspect:macos:x64": "node --experimental-strip-types scripts/inspect-macos-package.ts --arch x64",
+    "inspect:linux:x64": "node --experimental-strip-types scripts/inspect-linux-deb.ts",
     "release:validate": "node --experimental-strip-types scripts/release-contract.ts"
   },
   "dependencies": {
@@ -41,6 +43,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "7.11.2",
+    "@electron-forge/maker-deb": "7.11.2",
     "@electron-forge/maker-dmg": "7.11.2",
     "@electron-forge/maker-squirrel": "7.11.2",
     "@electron-forge/plugin-auto-unpack-natives": "7.11.2",
