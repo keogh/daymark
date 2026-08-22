@@ -61,6 +61,24 @@ describe('analytics calendar ranges', () => {
     });
   });
 
+  it('resolves Sunday-based weeks with DST-safe local calendar boundaries', () => {
+    process.env.TZ = 'America/New_York';
+
+    expect(resolveCurrentWeek(localTime(2026, 3, 10, 12), 'sunday')).toEqual({
+      periodStartedAt: localTime(2026, 3, 8),
+      periodEndedAt: localTime(2026, 3, 15),
+    });
+    expect(resolveCurrentWeek(localTime(2026, 3, 8), 'sunday')).toEqual({
+      periodStartedAt: localTime(2026, 3, 8),
+      periodEndedAt: localTime(2026, 3, 15),
+    });
+    expect(
+      resolveCurrentWeek(localTime(2026, 3, 10, 12), 'sunday').periodEndedAt -
+        resolveCurrentWeek(localTime(2026, 3, 10, 12), 'sunday')
+          .periodStartedAt,
+    ).toBe(hours(167));
+  });
+
   it('resolves month boundaries through leap February and year transition', () => {
     expect(resolveCurrentMonth(localTime(2028, 2, 29, 12))).toEqual({
       periodStartedAt: localTime(2028, 2, 1),
@@ -133,6 +151,7 @@ describe('analytics summary projection', () => {
   it('produces day, total, floored average, independent week, and month totals', () => {
     const capturedAt = localTime(2026, 8, 21, 12);
     const summary = projectAnalyticsSummary({
+      weekStartsOn: 'monday',
       range: 'last-7-days',
       capturedAt,
       tasks: [
@@ -175,6 +194,7 @@ describe('analytics summary projection', () => {
         endedAt: localTime(2026, 8, 20, endHour),
       });
     const summary = projectAnalyticsSummary({
+      weekStartsOn: 'monday',
       range: 'last-7-days',
       capturedAt,
       tasks: [
@@ -218,6 +238,7 @@ describe('analytics summary projection', () => {
       }),
     ]);
     const summary = projectAnalyticsSummary({
+      weekStartsOn: 'monday',
       range: 'last-7-days',
       capturedAt,
       tasks: [...closedTasks, running],
@@ -235,6 +256,7 @@ describe('analytics summary projection', () => {
     });
 
     const inside = projectAnalyticsSummary({
+      weekStartsOn: 'monday',
       range: 'last-7-days',
       capturedAt,
       tasks: [running],
@@ -260,7 +282,12 @@ describe('analytics summary projection', () => {
     ];
     const before = structuredClone(tasks);
 
-    projectAnalyticsSummary({ range: 'last-30-days', capturedAt, tasks });
+    projectAnalyticsSummary({
+      range: 'last-30-days',
+      capturedAt,
+      weekStartsOn: 'monday',
+      tasks,
+    });
 
     expect(tasks).toEqual(before);
   });

@@ -34,6 +34,7 @@ describe('AnalyticsService', () => {
     const summary = new AnalyticsService({
       clock,
       analyticsQueries: queries,
+      settings: { get: vi.fn(() => settings('monday')) },
     }).getSummary({ range: 'last-7-days' });
 
     expect(now).toHaveBeenCalledTimes(1);
@@ -106,6 +107,7 @@ describe('AnalyticsService', () => {
     const service = new AnalyticsService({
       clock: { now: () => capturedAt },
       analyticsQueries: { findOverlappingUnion: () => records },
+      settings: { get: () => settings('monday') },
     });
 
     const summary = service.getSummary({ range: 'last-30-days' });
@@ -116,6 +118,33 @@ describe('AnalyticsService', () => {
     expect(summary.topTasks).toEqual([]);
     expect(summary.runningTask).toBeNull();
     expect(records).toEqual(original);
+  });
+
+  it('reads the authoritative week start for every request', () => {
+    const capturedAt = localTime(2026, 8, 19, 12);
+    const get = vi
+      .fn()
+      .mockReturnValueOnce(settings('monday'))
+      .mockReturnValueOnce(settings('sunday'));
+    const findOverlappingUnion = vi.fn(() => []);
+    const service = new AnalyticsService({
+      clock: { now: () => capturedAt },
+      analyticsQueries: { findOverlappingUnion },
+      settings: { get },
+    });
+
+    const monday = service.getSummary({ range: 'last-7-days' });
+    const sunday = service.getSummary({ range: 'last-7-days' });
+
+    expect(get).toHaveBeenCalledTimes(2);
+    expect(monday.currentWeek.periodStartedAt).toBe(localTime(2026, 8, 17));
+    expect(sunday.currentWeek.periodStartedAt).toBe(localTime(2026, 8, 16));
+    expect(findOverlappingUnion).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        currentWeekStartedAt: localTime(2026, 8, 16),
+      }),
+    );
   });
 });
 
@@ -147,3 +176,9 @@ const localTime = (
 
 const minutes = (value: number): number => value * 60_000;
 const hours = (value: number): number => minutes(value * 60);
+
+const settings = (weekStartsOn: 'monday' | 'sunday') => ({
+  weekStartsOn,
+  theme: 'system' as const,
+  updatedAt: 0,
+});

@@ -25,10 +25,15 @@ const RANGE_LABELS: Record<AnalyticsRange, string> = {
 
 export const Analytics = ({
   refreshRevision = 0,
+  invalidationRevision = 0,
 }: {
   refreshRevision?: number;
+  invalidationRevision?: number;
 }) => {
-  const controller = useAnalyticsController(refreshRevision);
+  const controller = useAnalyticsController(
+    refreshRevision,
+    invalidationRevision,
+  );
 
   return (
     <section aria-labelledby="analytics-heading" className="analytics-view">
@@ -140,7 +145,7 @@ const AnalyticsSummaryView = ({
       </dl>
       <dl className="analytics-metrics">
         <Metric
-          label="Current week (Monday to today)"
+          label={`Current week (${formatWeekStart(summary.currentWeek.periodStartedAt)} to today)`}
           value={formatDuration(liveSummary.currentWeek.durationMs)}
         />
         <Metric
@@ -157,6 +162,11 @@ const AnalyticsSummaryView = ({
     </div>
   );
 };
+
+const formatWeekStart = (periodStartedAt: number): string =>
+  new Intl.DateTimeFormat(undefined, { weekday: 'long' }).format(
+    periodStartedAt,
+  );
 
 const useLiveSummary = (summary: AnalyticsSummary): AnalyticsSummary => {
   const [now, setNow] = useState(() => Date.now());

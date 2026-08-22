@@ -215,7 +215,7 @@ safe controlled failures.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -269,8 +269,26 @@ Task, and Timer semantics remain unchanged.
 
 ### Completion Evidence
 
-Record commands, test counts, known-data boundary totals, unchanged projection
-evidence, and stale-Analytics prevention when complete.
+- Generalized the current-week helper for persisted Monday/Sunday selection using
+  local-calendar midnight construction. Focused coverage includes exact selected
+  start-day midnight and a Sunday-based spring-DST week whose elapsed length is
+  167 hours rather than a fixed seven times 24 hours.
+- AnalyticsService now reads the authoritative settings singleton during every
+  summary request, uses the same selected week boundary for the repository union
+  and summary projection, and preserves its single Clock snapshot. The renderer
+  supplies only the selected 7-day/30-day range.
+- Disposable-SQLite integration data produced a one-hour Monday current-week
+  total and a three-hour Sunday current-week total from the same intervals.
+  Selected days, total, average, current month, task ranking, and running-task
+  projection remained byte-for-value equal across the setting change.
+- Added an Analytics invalidation revision seam that removes a loaded stale
+  summary before requesting its authoritative replacement. The visible week label
+  is derived from the returned local week boundary, so it reflects Monday or
+  Sunday without renderer authority over the calculation.
+- Verification passed on 2026-08-22: focused Analytics suite (26 tests in 4
+  files), broader service/Analytics renderer regressions (182 tests in 22 files),
+  full regression suite (666 tests in 80 files), `npm run typecheck`, `npm run
+  lint`, `npm run format:check`, and `git diff --check`.
 
 ---
 

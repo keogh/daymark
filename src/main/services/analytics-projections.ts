@@ -8,6 +8,7 @@ import type {
   AnalyticsTaskSummary,
   AnalyticsTaskTotal,
 } from '@/shared/contracts/analytics';
+import type { WeekStartsOn } from '@/shared/contracts/settings';
 
 export interface AnalyticsCalendarPeriod {
   readonly periodStartedAt: number;
@@ -22,6 +23,7 @@ export interface AnalyticsTaskProjectionInput {
 export interface AnalyticsProjectionInput {
   readonly range: AnalyticsRange;
   readonly capturedAt: number;
+  readonly weekStartsOn: WeekStartsOn;
   readonly tasks: readonly AnalyticsTaskProjectionInput[];
 }
 
@@ -54,13 +56,15 @@ export const resolveAnalyticsDays = (
 
 export const resolveCurrentWeek = (
   capturedAt: number,
+  weekStartsOn: WeekStartsOn = 'monday',
 ): AnalyticsCalendarPeriod => {
   const date = new Date(capturedAt);
-  const daysSinceMonday = (date.getDay() + 6) % 7;
+  const weekStartDay = weekStartsOn === 'monday' ? 1 : 0;
+  const daysSinceWeekStart = (date.getDay() - weekStartDay + 7) % 7;
   const periodStartedAt = new Date(
     date.getFullYear(),
     date.getMonth(),
-    date.getDate() - daysSinceMonday,
+    date.getDate() - daysSinceWeekStart,
   ).getTime();
   const start = new Date(periodStartedAt);
   const periodEndedAt = new Date(
@@ -110,7 +114,7 @@ export const projectAnalyticsSummary = (
     periodStartedAt: rangeStartedAt,
     periodEndedAt: rangeEndedAt,
   };
-  const weekPeriod = resolveCurrentWeek(input.capturedAt);
+  const weekPeriod = resolveCurrentWeek(input.capturedAt, input.weekStartsOn);
   const monthPeriod = resolveCurrentMonth(input.capturedAt);
   const intervals = input.tasks.flatMap((task) => task.intervals);
   const days = emptyDays.map((day) => ({

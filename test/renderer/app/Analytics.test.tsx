@@ -281,6 +281,24 @@ describe('Analytics', () => {
     expect(getSummary).toHaveBeenCalledTimes(4);
   });
 
+  it('clears stale presentation while an invalidated summary is replaced', async () => {
+    const replacement = deferred<AppResult<AnalyticsSummary>>();
+    const getSummary = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, value: summary() })
+      .mockReturnValueOnce(replacement.promise);
+    installAnalyticsApi(getSummary);
+    const view = render(<Analytics invalidationRevision={0} />);
+    expect(await screen.findByText(/Current week/)).toBeVisible();
+
+    view.rerender(<Analytics invalidationRevision={1} />);
+
+    expect(screen.getByText('Loading analytics…')).toBeVisible();
+    expect(screen.queryByText(/Current week/)).not.toBeInTheDocument();
+    replacement.resolve({ ok: true, value: summary() });
+    expect(await screen.findByText(/Current week/)).toBeVisible();
+  });
+
   it('refreshes authoritatively at local midnight', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 21, 23, 59, 59, 500));

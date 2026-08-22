@@ -101,6 +101,7 @@ export const registerApplicationLifecycle = (): void => {
         const analyticsService = new AnalyticsService({
           clock,
           analyticsQueries,
+          settings,
         });
         const settingsService = new SettingsService({
           clock,

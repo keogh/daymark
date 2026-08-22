@@ -23,6 +23,7 @@ const AUTHORITATIVE_SYNC_MS = 60_000;
 
 export const useAnalyticsController = (
   refreshRevision = 0,
+  invalidationRevision = 0,
 ): AnalyticsController => {
   const [loadState, setLoadState] = useState<AnalyticsLoadState>({
     status: 'loading',
@@ -38,6 +39,7 @@ export const useAnalyticsController = (
   const pendingRangeRef = useRef(pendingRange);
   const selectedRangeRef = useRef(selectedRange);
   const initialRefreshRevision = useRef(refreshRevision);
+  const initialInvalidationRevision = useRef(invalidationRevision);
 
   useEffect(() => {
     loadStateRef.current = loadState;
@@ -127,6 +129,15 @@ export const useAnalyticsController = (
     initialRefreshRevision.current = refreshRevision;
     reconcile();
   }, [reconcile, refreshRevision]);
+
+  useEffect(() => {
+    if (invalidationRevision === initialInvalidationRevision.current) return;
+    initialInvalidationRevision.current = invalidationRevision;
+    const nextLoadState = { status: 'loading' } as const;
+    loadStateRef.current = nextLoadState;
+    setLoadState(nextLoadState);
+    reconcile();
+  }, [invalidationRevision, reconcile]);
 
   useEffect(() => {
     const handleFocus = () => reconcile();
