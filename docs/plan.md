@@ -6,39 +6,42 @@ SPEC-011 — Cross-Platform Packaging and Distribution
 
 ## Active Task
 
-TASK-011-004 — Build the Linux x64 Debian Package
+TASK-011-005 — Add Native CI Builds and Artifact Validation
 
 ## Status
 
-In Progress — implementation and structural package verification complete; native
-Ubuntu x64 installation acceptance pending
+In Progress — implementation and local contract verification complete; hosted
+native workflow run pending
 
 ---
 
 # Immediate Plan
 
-1. Add the Linux x64-restricted Debian maker with approved maintainer metadata,
-   launcher identity, source-owned icons, and collision-free artifact naming.
-2. Add focused Forge configuration and Debian artifact/content inspection checks.
-3. Document Ubuntu installation, ordinary-user launch/profile ownership, and
-   removal behavior.
-4. Build and inspect the package in a disposable native Ubuntu x64 environment,
-   then run relevant project validation.
+1. Resolve the task-breakdown dependency cycle so native CI may supply the pending
+   native-host evidence for TASK-011-002 through TASK-011-004.
+2. Add a read-only tag/manual-dry-run workflow with one validation gate and four
+   isolated stable native build jobs.
+3. Add Windows package inspection and cross-job artifact-manifest validation.
+4. Add focused workflow/manifest contract tests and document runner selections.
+5. Run focused and baseline repository validation; leave hosted-run evidence
+   pending until the workflow is pushed and executed.
 
 ---
 
 # Scope Guard
 
-Only TASK-011-004 Linux x64 Debian packaging is included. CI workflows, release
-publication, checksums, signing, repositories, RPM/AppImage/Snap/Flatpak, arm64,
-application features, and database changes remain deferred.
+Only TASK-011-005 native CI building and workflow-artifact validation are included.
+GitHub Release creation, checksums, signing, secrets, manual installation
+acceptance, application features, and database changes remain deferred.
 
 ---
 
 # Completion
 
-Implementation, focused checks, a disposable emulated linux/amd64 maker run, and
-structural Debian inspection are complete. Native Ubuntu x64 making, Ubuntu GNOME
-launcher/runtime acceptance as an ordinary disposable user, profile ownership,
-removal, and profile-preservation evidence remain pending because the available
-Docker daemon is Linux arm64 and the current physical host is macOS arm64.
+Implemented the read-only native workflow, exact tag/SHA gate, four stable native
+jobs, platform package inspection, isolated uploads, and complete-set provenance
+validation. Workflow YAML parsing, 32 focused tests, all 713 project tests,
+release validation, formatting, typecheck, lint, and diff checks pass locally.
+The required GitHub Actions run URL/results and native artifact evidence remain
+pending until this workflow is committed, pushed, and run for an existing valid
+tag.

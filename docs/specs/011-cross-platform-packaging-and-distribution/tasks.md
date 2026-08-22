@@ -37,10 +37,10 @@ dependency order in this file.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-011-001 | Establish Distribution Metadata and Release Contracts | Complete | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
-| TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
-| TASK-011-004 | Build the Linux x64 Debian Package | In Progress | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-005 | Add Native CI Builds and Artifact Validation | Pending | TASK-011-002, TASK-011-003, TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
+| TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Complete | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
+| TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending — native evidence assigned to TASK-011-005 | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
+| TASK-011-004 | Build the Linux x64 Debian Package | Pending — native evidence assigned to TASK-011-005 | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
+| TASK-011-005 | Add Native CI Builds and Artifact Validation | In Progress | TASK-011-002; implementation portions of TASK-011-003 and TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
 | TASK-011-006 | Assemble a Checksummed Draft GitHub Prerelease | Pending | TASK-011-005 | AC-011-008, AC-011-009, AC-011-010, AC-011-012, AC-011-017 |
 | TASK-011-007 | Define Repeatable Installation and Data-Preservation Acceptance | Pending | TASK-011-006 | AC-011-011, AC-011-012, AC-011-013, AC-011-014, AC-011-015, AC-011-016, AC-011-017 |
 | TASK-011-008 | Verify Cross-Platform Distribution and Reconcile Documentation | Pending | TASK-011-007 | AC-011-001 through AC-011-018 |
@@ -422,8 +422,12 @@ runners without granting publication rights to build jobs.
 ### Dependencies
 
 - TASK-011-002 — Build macOS arm64 and x64 DMG Targets.
-- TASK-011-003 — Build the Windows x64 Squirrel Installer.
-- TASK-011-004 — Build the Linux x64 Debian Package.
+- The implementation portions of TASK-011-003 and TASK-011-004.
+
+TASK-011-003 and TASK-011-004 originally required complete native-host evidence
+before this task while assigning that same native evidence to this task's CI
+matrix. With project-owner approval on 2026-08-22, TASK-011-005 supplies that
+evidence; their final statuses are reconciled from the resulting native runs.
 
 ### Included
 
@@ -479,8 +483,34 @@ runners without granting publication rights to build jobs.
 
 ### Completion Evidence
 
-Record workflow URL/run ID, tag SHA, runner labels, job results, artifact names and
-architectures, smoke results, permission inspection, and dry-run evidence here.
+Implementation and local verification completed 2026-08-22. The workflow accepts
+only `v*` tag pushes or an explicit existing-tag manual dry run, validates exact
+stable tag/version/SHA agreement once before fan-out, and checks out that immutable
+SHA in every job. It uses stable native `macos-15` arm64,
+`macos-15-intel` x64, `windows-2025` x64, and `ubuntu-24.04` x64 runner labels,
+with an explicit native-architecture guard in each build job. Every job has only
+`contents: read`; no release or publication operation exists.
+
+All four jobs use `.nvmrc`, `npm ci`, their platform Forge maker, and package
+inspection. Each uploads one collision-free primary artifact plus a manifest
+binding its name, version, platform, architecture, tag, commit, and bytes. The
+final read-only job depends on all four builds, downloads only this run's matching
+workflow artifacts, and rejects an incomplete, renamed, mixed-commit, or changed
+set. Windows inspection newly checks the packaged x64 executable and
+`better-sqlite3` PE architecture plus local renderer, migrations, icons, and tray
+assets.
+
+Local verification:
+
+- workflow YAML parsed successfully;
+- focused packaging/workflow/release tests — 32 passed;
+- full suite — 713 tests in 86 files passed;
+- `npm run release:validate -- --tag v0.1.0`, `npm run typecheck`,
+  `npm run lint`, `npm run format:check`, and `git diff --check` — passed.
+
+The task remains In Progress. Record the workflow URL/run ID, tag SHA, native job
+results, uploaded artifact names/architectures, smoke output, permission inspection,
+and manual dry-run evidence after this workflow is committed, pushed, and run.
 
 ---
 

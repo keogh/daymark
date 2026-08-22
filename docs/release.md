@@ -35,6 +35,30 @@ The normalized `darwin`, `win32`, and `linux` values are explicit packaging
 platform identifiers. The filename, not a CI job label, carries product, version,
 platform, and architecture identity.
 
+## Native CI dry runs
+
+`.github/workflows/native-builds.yml` runs for `v*` tag pushes and supports a
+manual dry run for an existing tag. It validates the exact `vX.Y.Z` tag and commit
+before four isolated jobs check out that immutable commit, use Node from `.nvmrc`,
+install the committed lockfile with `npm ci`, make the target, inspect its native
+module and local packaged resources, and upload a unique workflow artifact. A
+final read-only job accepts the set only when all four jobs produced the expected
+names, metadata, tag, commit, and unchanged bytes.
+
+The stable runner selections verified against GitHub's hosted runner image catalog
+on 2026-08-22 are:
+
+| Target | Runner label | Native architecture |
+| --- | --- | --- |
+| macOS arm64 | `macos-15` | arm64 |
+| macOS x64 | `macos-15-intel` | x64 |
+| Windows x64 | `windows-2025` | x64 |
+| Linux x64 | `ubuntu-24.04` | x64 |
+
+Every job has only `contents: read`. The workflow contains no release-creation or
+publication step, so both tag runs and manual runs are non-publishing during this
+task. Draft prerelease assembly remains separate work.
+
 ## Local commands and version gate
 
 - `npm run package` packages the current host for development acceptance.

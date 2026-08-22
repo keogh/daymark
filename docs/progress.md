@@ -24,6 +24,15 @@ Ubuntu installation/removal guidance. An emulated linux/amd64 Debian container
 successfully built and inspected the 106 MB artifact. Native Ubuntu x64 GNOME
 installation and ordinary-user profile/removal evidence remains pending.
 
+TASK-011-005 implementation now adds a least-privilege native GitHub Actions
+pipeline with exact tag/SHA validation, stable macOS arm64, macOS Intel, Windows
+x64, and Ubuntu x64 jobs, platform package inspection, isolated immutable uploads,
+and final artifact-set/provenance validation. The dependency cycle with the native
+evidence still required by TASK-011-003 and TASK-011-004 was explicitly reconciled:
+the CI matrix supplies that evidence. Local workflow contracts and all 713 tests
+pass. A committed/pushed manual dry run and valid-tag hosted run remain pending,
+so TASK-011-005 is still In Progress and no GitHub Release is created.
+
 ---
 
 # Completed Specifications
