@@ -11,6 +11,7 @@ const trayAssetParentDirectories = ['/assets'];
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: 'assets/icon/time-tracker',
     extraResource: ['assets'],
     ignore: (filePath) => {
       if (filePath.length === 0) {

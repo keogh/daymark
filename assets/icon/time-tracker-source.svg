@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">Time Tracker application icon</title>
+  <desc id="description">A white clock face and blue hands on a deep blue rounded square.</desc>
+  <defs>
+    <linearGradient id="tile" x1="176" y1="112" x2="848" y2="912" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="face" x1="344" y1="276" x2="704" y2="788" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect x="72" y="72" width="880" height="880" rx="208" fill="url(#tile)"/>
+  <circle cx="512" cy="528" r="292" fill="none" stroke="#0f172a" stroke-opacity="0.28" stroke-width="76"/>
+  <circle cx="512" cy="512" r="292" fill="url(#face)"/>
+  <path d="M512 286v52M512 686v52M286 512h52M686 512h52" fill="none" stroke="#1e3a8a" stroke-width="32" stroke-linecap="round"/>
+  <path d="M512 360v170l124 82" fill="none" stroke="#2563eb" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="512" cy="512" r="34" fill="#172554"/>
+</svg>

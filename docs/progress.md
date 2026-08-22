@@ -10,15 +10,17 @@ SPEC-010 — Settings and UX Polish (Ready for Implementation)
 
 ## Current Status
 
-SPEC-010 implementation is active through TASK-010-006. Settings now have
+SPEC-010 implementation is active through TASK-010-007. Settings now have
 authoritative persistence and a narrow validated boundary, Analytics honors the
 persisted week start, and the accessible Settings destination applies immediate
 serialized preferences. Complete Light, Dark, and live System appearances use
 semantic tokens, resolve before primary content is revealed, and preserve Timer
 state without appearance-driven settings writes. The bounded whole-app UX audit
 now retains per-surface evidence and targeted duration, Analytics keyboard-focus,
-Add time focus-restoration, and constrained-dialog repairs. TASK-010-007,
-application icon packaging, is the next unblocked task.
+Add time focus-restoration, and constrained-dialog repairs. A source-owned clock
+icon master is now locally derived and wired into the verified primary-platform
+package without changing the native tray assets. TASK-010-008, packaged settings
+verification and documentation reconciliation, is the next unblocked task.
 
 SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
 SPEC-011 remains dependent on verification of SPEC-010 and all preceding work.

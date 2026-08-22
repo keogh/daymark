@@ -39,7 +39,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Complete | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
 | TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Complete | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
 | TASK-010-006 | Complete the Bounded Whole-App UX Audit | Complete | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
-| TASK-010-007 | Add and Package the Application Icon | Pending | TASK-010-005 | AC-010-018 |
+| TASK-010-007 | Add and Package the Application Icon | Complete | TASK-010-005 | AC-010-018 |
 | TASK-010-008 | Verify Packaged Settings and Reconcile Documentation | Pending | TASK-010-001–007 | AC-010-001–019 |
 
 ---
@@ -556,7 +556,7 @@ clean console, and zero HTTP(S) resources passed. Verification passed on
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -607,8 +607,25 @@ cross-platform installer work or rebranding.
 
 ### Completion Evidence
 
-Record asset sources/ownership, generation or conversion method, commands,
-artifact path, inspected sizes/surfaces, and tray non-regression when complete.
+- Added the project-authored `assets/icon/time-tracker-source.svg` master: a
+  text-free clock on a high-contrast blue rounded tile that is compatible with,
+  but distinct from, the monochrome native tray stopwatch. No third-party or
+  network source was used. Preserved a reusable 1024x1024 RGBA PNG and generated
+  the primary-platform ICNS locally with macOS Quick Look, `sips`, and `iconutil`.
+- Configured Electron Forge's extensionless packager icon path as
+  `assets/icon/time-tracker`. Focused packaging coverage verifies the local
+  relative path, source master, lack of external SVG image links, PNG signature,
+  and ICNS signature without changing tray selection behavior.
+- `npm run package` produced
+  `out/Time Tracker-darwin-arm64/Time Tracker.app`. Its `Info.plist` selects
+  `electron.icns`; the embedded 1024x1024 ICNS SHA-256 matched the source asset
+  exactly. Visual inspection confirmed recognizable 32x32 and 1024x1024
+  representations, and the packaged app launched with isolated data.
+- Packaged `time-trackerTemplate.png` and `time-trackerTemplate@2x.png` hashes
+  matched their unchanged source files. Focused application-packaging and tray
+  coverage passed (14 tests in 3 files), along with `npm run typecheck`, `npm run
+  lint`, `npm run format:check`, `npm run package`, and `git diff --check` on
+  2026-08-22.
 
 ---
 
