@@ -2,36 +2,35 @@
 
 ## Current Specification
 
-SPEC-009 — Analytics
+SPEC-010 — Settings and UX Polish
 
 ## Active Task
 
-None. TASK-009-007 is complete; TASK-009-008 is the next unblocked task.
+None. TASK-009-008 and SPEC-009 are complete.
 
 ## Status
 
-TASK-009-007 complete
+SPEC-009 Verified
 
 ---
 
 # Immediate Plan
 
-1. Select TASK-009-008 — Verify Packaged Analytics and Reconcile Documentation.
-2. Mark only that task In Progress and replace this list with its immediate
-   packaged acceptance and documentation checks.
-3. Continue in dependency order using the SPEC-009 task breakdown.
+1. Select the first unblocked task from SPEC-010 — Settings and UX Polish.
+2. Before implementation, replace this list with that task's immediate steps and
+   mark only that task In Progress.
 
 ---
 
 # Scope Guard
 
-No TASK-009-008 packaged acceptance or specification-verification work has been
-started.
+SPEC-009 is complete. Windows/Linux fresh-machine verification and release work
+remain deferred to their specifications.
 
 ---
 
 # Completion
 
-TASK-009-007 is complete. Running Analytics advances locally without per-second
-IPC, pauses remain fixed, and authoritative revision, focus, 60-second, and local
-midnight triggers reconcile through stale-protected requests.
+TASK-009-008 completed the AC-009-001 through AC-009-019 audit, full validation,
+macOS arm64 packaging, isolated packaged acceptance, platform audit, and final
+documentation reconciliation. SPEC-009 is Verified.

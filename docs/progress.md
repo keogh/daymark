@@ -2,23 +2,18 @@
 
 ## Current Phase
 
-Analytics implementation
+Settings and UX Polish queued
 
 ## Current Specification
 
-SPEC-009 — Analytics (Ready for Implementation)
+SPEC-010 — Settings and UX Polish (Ready for Implementation)
 
 ## Current Status
 
-SPEC-008 is Verified. SPEC-009 implementation is active. TASK-009-001 completed
-the Analytics contracts, strict input validation, and deterministic pure local
-calendar projections. TASK-009-002 completed the fixed-count, bounded, read-only
-Analytics query with disposable-SQLite and query-plan evidence; TASK-009-003
-completed authoritative service composition. TASK-009-004 completed the narrow,
-validated, read-only IPC and preload boundary with safe errors and lifecycle
-cleanup. TASK-009-005 added accessible Timer/Analytics navigation while preserving
-the authoritative Timer controller and verified Timer/History workflows.
-TASK-009-006 static Analytics rendering is next.
+SPEC-009 is Verified. Its final automated suite, macOS arm64 package, isolated
+packaged Analytics workflow, accessibility/layout checks, offline/security audit,
+and documentation reconciliation passed. SPEC-010 is the next implementation-ready
+specification and is now unblocked.
 
 SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
@@ -42,6 +37,29 @@ earlier specification are Verified.
 - SPEC-006 — Edit and Delete Intervals (Verified 2026-08-15)
 - SPEC-007 — Task Management (Verified 2026-08-21)
 - SPEC-008 — System Tray and Window Lifecycle (Verified 2026-08-21)
+- SPEC-009 — Analytics (Verified 2026-08-22)
+
+SPEC-009 delivered:
+
+- exact local-calendar Last 7 days and Last 30 days projections with zero-filled
+  daily buckets, explicit-denominator averages, Monday-based current-week and
+  local-month totals, deterministic top-five Tasks, and open-interval projection;
+- one fixed-count bounded read-only query over Tasks and TimeIntervals, composed
+  through an injected-Clock service and exact runtime-validated IPC/preload API;
+- accessible Timer/Analytics navigation, semantic noninteractive chart data,
+  loading/empty/error/stale states, and responsive normal/narrow layouts;
+- renderer-local open-interval advancement without per-second IPC or database
+  reads, plus stale-protected reconciliation after mutations, timer notifications,
+  focus, local midnight, and a 60-second interval.
+
+Final acceptance covered AC-009-001 through AC-009-019 and the project Definition
+of Done. Formatting, typecheck, lint, all 585 tests in 73 files, macOS arm64
+packaging, and diff checks passed on 2026-08-22. Isolated packaged acceptance with
+eight Tasks and nine intervals verified 7/30-day, week/month, zero-day,
+cross-midnight, top-five, running, paused, mutation, Retry, accessible-chart,
+normal/narrow, authoritative Timer-return, console, and offline behavior. The
+packaged renderer made no HTTP(S) request and emitted no warning/error console
+entry.
 
 SPEC-001 delivered:
 
@@ -198,12 +216,10 @@ renderer console.
 
 # Upcoming Specifications
 
-1. SPEC-009 — Analytics (Ready for Implementation; active)
-2. SPEC-010 — Settings and UX Polish (Ready for Implementation; queued behind
-   SPEC-009)
-3. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
+1. SPEC-010 — Settings and UX Polish (Ready for Implementation)
+2. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
    Implementation; queued behind SPEC-010)
-4. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
+3. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
    behind SPEC-011)
 
 ## Expected Post-MVP Specifications
@@ -233,15 +249,11 @@ None.
 
 # Active Work
 
-SPEC-008 — System Tray and Window Lifecycle is Verified.
-
-SPEC-009 — Analytics implementation is active. TASK-009-001 through TASK-009-004
-are complete; TASK-009-005 — Introduce Timer and Analytics Navigation is the next
-unblocked task.
+SPEC-009 — Analytics is Verified.
 
 SPEC-010 — Settings and UX Polish has a complete companion task breakdown. Its
 first task is TASK-010-001 — Add Settings Persistence and Contracts, but all
-SPEC-010 implementation remains pending until SPEC-009 is Verified.
+SPEC-010 implementation is unblocked now that SPEC-009 is Verified.
 
 SPEC-011 — Cross-Platform Packaging and Distribution is designed and queued as
 Ready for Implementation. It defines unsigned personal-install DMG, Squirrel, and
@@ -305,8 +317,8 @@ dependency change is planned.
 
 # Last Updated
 
-2026-08-21 — Completed TASK-009-004. Analytics now crosses one exact validated,
-read-only IPC/preload method; malformed input cannot execute the service query
-path, unexpected failures remain renderer-safe, and handler cleanup follows the
-application lifecycle. TASK-009-005 is next; SPEC-008 remains the latest verified
-specification milestone.
+2026-08-22 — Verified SPEC-009 after all 585 tests, macOS arm64 packaging, and
+isolated packaged Analytics acceptance passed. The packaged workflow covered
+running/paused navigation, 7/30-day projections, accessibility, Retry, narrow
+layout, authoritative reconciliation, and local-only clean-console rendering.
+SPEC-010 is next.

@@ -135,6 +135,8 @@ describe('App', () => {
   ] as const)(
     'keeps the authoritative %s Timer presentation while Analytics is displayed',
     async (_status, timerState, expectedDuration) => {
+      vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+      vi.setSystemTime(timerState.now);
       setTimerApi({
         getState: vi.fn().mockResolvedValue({ ok: true, value: timerState }),
       });

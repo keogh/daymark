@@ -3,8 +3,8 @@
 ## Source
 
 - Specification: `docs/specs/009-analytics/spec.md`
-- Specification status: Ready for Implementation
-- Last reviewed against specification: 2026-08-21
+- Specification status: Verified
+- Last reviewed against specification: 2026-08-22
 
 The specification is the source of truth for behavior. This file only decomposes
 that behavior into implementation work. If the two conflict, update this breakdown
@@ -37,8 +37,8 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Complete | TASK-009-003 | AC-009-016–018 |
 | TASK-009-005 | Introduce Timer and Analytics Navigation | Complete | TASK-009-004 | AC-009-015 |
 | TASK-009-006 | Render Static Analytics States and Accessible Chart | Complete | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
-| TASK-009-007 | Implement Live Analytics and Authoritative Reconciliation | Pending | TASK-009-003, TASK-009-006 | AC-009-010–014, AC-009-016 |
-| TASK-009-008 | Verify Packaged Analytics and Reconcile Documentation | Pending | TASK-009-001–007 | AC-009-001–019 |
+| TASK-009-007 | Implement Live Analytics and Authoritative Reconciliation | Complete | TASK-009-003, TASK-009-006 | AC-009-010–014, AC-009-016 |
+| TASK-009-008 | Verify Packaged Analytics and Reconcile Documentation | Complete | TASK-009-001–007 | AC-009-001–019 |
 
 ---
 
@@ -632,7 +632,7 @@ per-second IPC, stale rollback, or paused-state drift.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -694,9 +694,43 @@ accurately reflect the completed implementation.
 
 ### Completion Evidence
 
-Record exact commands, versions/platform, complete test counts, artifact path,
-isolated data path, acceptance observations, network/console results, deviations,
-and documentation changes before marking this task Complete.
+- Audited AC-009-001 through AC-009-019 against the focused unit, repository,
+  disposable-SQLite integration, IPC/preload, renderer, and packaged evidence
+  recorded across TASK-009-001 through TASK-009-008. Monday/week, local month,
+  DST, midnight, open-interval, average, ranking, accessibility, bounded-query,
+  read-only, mutation, stale-response, and boundary semantics are covered.
+- `npm run format:check`, `npm run typecheck`, and `npm run lint` passed. The first
+  full test run exposed the previously observed real-clock boundary race in the
+  Timer/Analytics navigation test; that test now freezes its local clock. The
+  focused file passed 37 tests and the final `npm test` passed 73 files and 585
+  tests.
+- `npm run package` passed with Electron Forge 7.11.2 and Electron 43.4.0 on
+  macOS 26.3.1 arm64 using Node 24.18.1 and npm 11.16.0. The packaged artifact is
+  `out/Time Tracker-darwin-arm64/Time Tracker.app` (444 MB).
+- Isolated packaged acceptance used
+  `/tmp/timetracker-spec009-user-data/time-tracker.sqlite` with eight Tasks and
+  nine intervals. Seeded data covered 7-day and 30-day ranges, Monday/current
+  week, current month, zero-duration days, cross-midnight overlap, more than five
+  Tasks, a deterministic top five, an older 30-day-only contribution, and an open
+  interval without touching the normal application profile.
+- Packaged Electron/CDP acceptance verified Timer-to-Analytics navigation while
+  running and paused; 7 and 30 ordered chart entries; explicit denominators;
+  known week/month totals; accessible zero/nonzero date-duration text; five-item
+  ranking; visible local running advancement; authoritative range switching;
+  stale-data retention and Retry after a reversible isolated-database fault;
+  mutation reconciliation; paused non-advancement; and authoritative Timer return.
+- Normal layout visual inspection passed. A 620×700 narrow desktop viewport
+  retained all Analytics content with a 620-pixel document width and no horizontal
+  overflow. The packaged renderer recorded zero warning/error console entries,
+  zero HTTP(S) performance resources, and zero HTTP(S) requests during acceptance.
+- Static inspection found no platform-specific branch or operating-system API in
+  Analytics renderer, service, query, IPC, contract, or validation modules. No
+  architecture or accepted decision changed, so `docs/architecture/architecture.md`
+  and `docs/decisions.md` required no update.
+- `git diff --check` passed. Browser plugin was not available; acceptance used the
+  repository-compatible packaged Electron/CDP fallback. Narrow screenshot capture
+  is unsupported by this Electron CDP runtime, so narrow evidence is DOM/layout
+  measurement; normal packaged screenshot evidence was captured separately.
 
 ---
 
