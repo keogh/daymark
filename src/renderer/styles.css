@@ -353,6 +353,11 @@ input {
   outline-offset: 3px;
 }
 
+.analytics-ranges__option[aria-disabled='true'] {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .analytics-state {
   display: flex;
   width: min(100%, 34rem);
@@ -1023,6 +1028,17 @@ input {
   .history-task__toggle,
   .history-interval {
     align-items: flex-start;
+  }
+}
+
+@media (max-height: 560px) {
+  [data-slot='dialog-content'] {
+    align-content: start;
+    padding: 1.25rem;
+  }
+
+  [data-slot='dialog-footer'] {
+    flex-wrap: wrap;
   }
 }
 

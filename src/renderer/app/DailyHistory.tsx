@@ -55,7 +55,7 @@ export const DailyHistory = ({
   onTaskRenamed = () => Promise.resolve(),
   onTaskDeleted = () => Promise.resolve(),
 }: {
-  readonly onAddTime?: (date: string) => void;
+  readonly onAddTime?: (date: string, returnFocusTo: HTMLButtonElement) => void;
   readonly onPlayTask?: (taskId: string) => Promise<AppResult<TimerState>>;
   readonly refreshRevision?: number;
   readonly timer?: TimerState | null;
@@ -129,7 +129,7 @@ const HistoryContent = ({
   controller: HistoryController;
   historyActionMessage: string | null;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
-  onAddTime: (date: string) => void;
+  onAddTime: (date: string, returnFocusTo: HTMLButtonElement) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
@@ -188,7 +188,7 @@ const HistoryDays = ({
   controller: HistoryController;
   historyActionMessage: string | null;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
-  onAddTime: (date: string) => void;
+  onAddTime: (date: string, returnFocusTo: HTMLButtonElement) => void;
   pendingRows: Record<string, boolean>;
   state: Extract<HistoryController['loadState'], { status: 'ready' }>;
   timer: TimerState | null;
@@ -324,7 +324,7 @@ const HistoryDaySection = ({
   day: HistoryDay;
   now: number;
   onPlayTask: (rowId: string, taskId: string) => Promise<void>;
-  onAddTime: (date: string) => void;
+  onAddTime: (date: string, returnFocusTo: HTMLButtonElement) => void;
   pendingRows: Record<string, boolean>;
   timer: TimerState | null;
   onIntervalSaved: () => Promise<void>;
@@ -344,7 +344,9 @@ const HistoryDaySection = ({
       </div>
       <Button
         aria-label={`Add time for ${formatHistoryDayLabel(day.dayStartedAt, now)}`}
-        onClick={() => onAddTime(formatLocalDateInput(day.dayStartedAt))}
+        onClick={(event) =>
+          onAddTime(formatLocalDateInput(day.dayStartedAt), event.currentTarget)
+        }
         size="sm"
         type="button"
         variant="outline"

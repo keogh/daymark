@@ -389,7 +389,8 @@ describe('App', () => {
     setTimerApi();
     render(<App />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Add time' }));
+    const addTime = await screen.findByRole('button', { name: 'Add time' });
+    fireEvent.click(addTime);
 
     const dialog = screen.getByRole('dialog', { name: 'Add time' });
     expect(dialog).toBeVisible();
@@ -399,6 +400,9 @@ describe('App', () => {
     expect(screen.getByLabelText('End time')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Save time' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    await waitFor(() => expect(addTime).toHaveFocus());
   });
 
   it('prefills a history day and closes with Escape without saving', async () => {
@@ -420,6 +424,7 @@ describe('App', () => {
 
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(dayAction).toHaveFocus());
     expect(api.manualTime.createInterval).not.toHaveBeenCalled();
   });
 
@@ -573,7 +578,7 @@ describe('App', () => {
     expect(api.tasks.getSuggestions).toHaveBeenCalledWith({ query: '' });
     expect(options).toHaveLength(5);
     expect(options[0]).toHaveTextContent('Task 0Today 1h 45m · Total 5h 15m');
-    expect(options[1]).toHaveTextContent('Today 0h 0m · Total 0h 0m');
+    expect(options[1]).toHaveTextContent('Today 0m · Total 0m');
     expect(options[0]).toHaveAttribute('aria-selected', 'true');
     expect(input).toHaveAttribute('aria-expanded', 'true');
     expect(input).toHaveAttribute('aria-controls', listbox.id);
@@ -971,8 +976,8 @@ describe('App', () => {
     expect(screen.getByLabelText('Current session duration')).toHaveTextContent(
       '01:05:00',
     );
-    expect(screen.getByText(/Today 2h 5m/)).toHaveTextContent(
-      'Today 2h 5m · Total 5h 15m',
+    expect(screen.getByText(/Today 2h 05m/)).toHaveTextContent(
+      'Today 2h 05m · Total 5h 15m',
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Resume' }));

@@ -10,13 +10,13 @@ import type {
   AnalyticsRange,
   AnalyticsSummary,
 } from '@/shared/contracts/analytics';
-import { formatHoursAndMinutes } from './duration-format';
+import { formatDuration } from './duration-format';
 import {
   useAnalyticsController,
   type AnalyticsController,
 } from './use-analytics-controller';
 import { projectLiveAnalytics } from './project-live-analytics';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 
 const RANGE_LABELS: Record<AnalyticsRange, string> = {
   'last-7-days': 'Last 7 days',
@@ -57,26 +57,60 @@ export const Analytics = ({
   );
 };
 
-const RangeSelector = ({ controller }: { controller: AnalyticsController }) => (
-  <fieldset className="analytics-ranges">
-    <legend className="visually-hidden">Analytics range</legend>
-    {(['last-7-days', 'last-30-days'] as const).map((range) => (
-      <Button
-        aria-checked={controller.selectedRange === range}
-        aria-label={`${RANGE_LABELS[range]}${controller.pendingRange === range ? ', loading' : ''}`}
-        className="analytics-ranges__option"
-        disabled={controller.pendingRange === range}
-        key={range}
-        onClick={() => controller.selectRange(range)}
-        role="radio"
-        type="button"
-        variant={controller.selectedRange === range ? 'default' : 'outline'}
-      >
-        {RANGE_LABELS[range]}
-      </Button>
-    ))}
-  </fieldset>
-);
+const ANALYTICS_RANGES = ['last-7-days', 'last-30-days'] as const;
+
+const RangeSelector = ({ controller }: { controller: AnalyticsController }) => {
+  const selectAdjacentRange = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    range: AnalyticsRange,
+  ) => {
+    const direction =
+      event.key === 'ArrowRight' || event.key === 'ArrowDown'
+        ? 1
+        : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+          ? -1
+          : 0;
+    if (direction === 0 || controller.pendingRange !== null) return;
+
+    event.preventDefault();
+    const currentIndex = ANALYTICS_RANGES.indexOf(range);
+    const nextIndex =
+      (currentIndex + direction + ANALYTICS_RANGES.length) %
+      ANALYTICS_RANGES.length;
+    const nextRange = ANALYTICS_RANGES[nextIndex]!;
+    controller.selectRange(nextRange);
+    event.currentTarget.parentElement
+      ?.querySelector<HTMLButtonElement>(`[data-range="${nextRange}"]`)
+      ?.focus();
+  };
+
+  return (
+    <fieldset className="analytics-ranges" role="radiogroup">
+      <legend className="visually-hidden">Analytics range</legend>
+      {ANALYTICS_RANGES.map((range) => (
+        <Button
+          aria-checked={controller.selectedRange === range}
+          aria-disabled={controller.pendingRange === range}
+          aria-label={`${RANGE_LABELS[range]}${controller.pendingRange === range ? ', loading' : ''}`}
+          className="analytics-ranges__option"
+          data-range={range}
+          key={range}
+          onClick={() => {
+            if (controller.pendingRange !== range)
+              controller.selectRange(range);
+          }}
+          onKeyDown={(event) => selectAdjacentRange(event, range)}
+          role="radio"
+          tabIndex={controller.selectedRange === range ? 0 : -1}
+          type="button"
+          variant={controller.selectedRange === range ? 'default' : 'outline'}
+        >
+          {RANGE_LABELS[range]}
+        </Button>
+      ))}
+    </fieldset>
+  );
+};
 
 const AnalyticsLoading = () => (
   <div className="analytics-state" role="status">
@@ -136,21 +170,21 @@ const AnalyticsSummaryView = ({
       <dl className="analytics-metrics analytics-metrics--primary">
         <Metric
           label="Total"
-          value={formatDuration(liveSummary.totalDurationMs)}
+          value={formatAnalyticsDuration(liveSummary.totalDurationMs)}
         />
         <Metric
           label={`Daily average · ${denominator} days`}
-          value={formatDuration(liveSummary.dailyAverageDurationMs)}
+          value={formatAnalyticsDuration(liveSummary.dailyAverageDurationMs)}
         />
       </dl>
       <dl className="analytics-metrics">
         <Metric
           label={`Current week (${formatWeekStart(summary.currentWeek.periodStartedAt)} to today)`}
-          value={formatDuration(liveSummary.currentWeek.durationMs)}
+          value={formatAnalyticsDuration(liveSummary.currentWeek.durationMs)}
         />
         <Metric
           label="Current month (to today)"
-          value={formatDuration(liveSummary.currentMonth.durationMs)}
+          value={formatAnalyticsDuration(liveSummary.currentMonth.durationMs)}
         />
       </dl>
 
@@ -227,7 +261,7 @@ const DailyChart = ({
         {days.map((day) => (
           <li key={day.dayStartedAt}>
             {formatAccessibleDate(day.dayStartedAt, capturedAt)}:{' '}
-            {formatDuration(day.durationMs)}
+            {formatAnalyticsDuration(day.durationMs)}
           </li>
         ))}
       </ol>
@@ -245,7 +279,7 @@ const TopTasks = ({ summary }: { summary: AnalyticsSummary }) => (
         {summary.topTasks.slice(0, 5).map((entry) => (
           <li key={entry.task.id}>
             <span>{entry.task.description}</span>
-            <span>{formatDuration(entry.durationMs)}</span>
+            <span>{formatAnalyticsDuration(entry.durationMs)}</span>
           </li>
         ))}
       </ol>
@@ -253,11 +287,8 @@ const TopTasks = ({ summary }: { summary: AnalyticsSummary }) => (
   </section>
 );
 
-const formatDuration = (durationMs: number) => {
-  if (durationMs < 60_000) return durationMs > 0 ? '<1m' : '0m';
-  const formatted = formatHoursAndMinutes(durationMs);
-  return formatted.startsWith('0h ') ? formatted.slice(3) : formatted;
-};
+const formatAnalyticsDuration = (durationMs: number) =>
+  durationMs > 0 && durationMs < 60_000 ? '<1m' : formatDuration(durationMs);
 
 const isToday = (timestamp: number, capturedAt: number) => {
   const date = new Date(timestamp);

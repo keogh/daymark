@@ -619,12 +619,12 @@ describe('DailyHistory', () => {
     await act(async () => Promise.resolve());
 
     fireEvent.click(screen.getByRole('button', { name: 'Live task' }));
-    expect(screen.getByText('1m today · 1h 1m total')).toBeVisible();
+    expect(screen.getByText('1m today · 1h 01m total')).toBeVisible();
     expect(screen.getByRole('listitem')).toHaveAccessibleName(/1m/);
 
     await act(() => vi.advanceTimersByTime(60_000));
 
-    expect(screen.getByText('2m today · 1h 2m total')).toBeVisible();
+    expect(screen.getByText('2m today · 1h 02m total')).toBeVisible();
     expect(screen.getByRole('listitem')).toHaveAccessibleName(/2m/);
     expect(getPage).toHaveBeenCalledOnce();
   });

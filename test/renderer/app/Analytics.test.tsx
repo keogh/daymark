@@ -146,6 +146,36 @@ describe('Analytics', () => {
     }
   });
 
+  it('supports arrow-key selection and roving focus in the range radio group', async () => {
+    installAnalyticsApi(
+      vi
+        .fn()
+        .mockImplementation(({ range }: { range: AnalyticsRange }) =>
+          Promise.resolve({ ok: true, value: summary(range) }),
+        ),
+    );
+    render(<Analytics />);
+
+    const sevenDays = await screen.findByRole('radio', {
+      name: 'Last 7 days',
+    });
+    const thirtyDays = screen.getByRole('radio', { name: 'Last 30 days' });
+    expect(
+      screen.getByRole('radiogroup', { name: 'Analytics range' }),
+    ).toBeVisible();
+    expect(sevenDays).toHaveAttribute('tabindex', '0');
+    expect(thirtyDays).toHaveAttribute('tabindex', '-1');
+
+    sevenDays.focus();
+    fireEvent.keyDown(sevenDays, { key: 'ArrowRight' });
+
+    expect(thirtyDays).toHaveFocus();
+    await waitFor(() => expect(thirtyDays).toBeChecked());
+    expect(thirtyDays).toHaveFocus();
+    expect(thirtyDays).toHaveAttribute('tabindex', '0');
+    expect(sevenDays).toHaveAttribute('tabindex', '-1');
+  });
+
   it('offers Retry after an initial safe error', async () => {
     const getSummary = vi
       .fn()

@@ -38,7 +38,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-010-003 | Integrate Persisted Week Start with Analytics | Pending | TASK-010-002 | AC-010-004, AC-010-017 |
 | TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Complete | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
 | TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Complete | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
-| TASK-010-006 | Complete the Bounded Whole-App UX Audit | Pending | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
+| TASK-010-006 | Complete the Bounded Whole-App UX Audit | Complete | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
 | TASK-010-007 | Add and Package the Application Icon | Pending | TASK-010-005 | AC-010-018 |
 | TASK-010-008 | Verify Packaged Settings and Reconcile Documentation | Pending | TASK-010-001–007 | AC-010-001–019 |
 
@@ -474,7 +474,7 @@ startup resolves appearance before revealing primary content.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -534,9 +534,21 @@ direction.
 
 ### Completion Evidence
 
-Record the checklist, commands, test counts, manual keyboard/focus observations,
-window dimensions, defects found/fixed, and explicitly reviewed no-change surfaces
-when complete.
+Completed checklist and detailed evidence are retained in `ux-audit.md`. The audit
+corrected competing normal-duration formats, missing Analytics radio arrow/roving
+focus behavior, lost Add time trigger focus, and missing constrained-height dialog
+scrolling. Existing navigation, Timer controls, suggestions, History/menu/dialog
+semantics, state text, Light/Dark focus treatment, long-content wrapping, and
+global reduced-motion handling were explicitly reviewed without redesign.
+
+Packaged macOS arm64 verification used isolated profiles and normal 1040×720 plus
+configured-minimum 640×480 viewports. Keyboard Enter navigation, Analytics
+ArrowRight selection, long-description Start/Stop, Add time initial focus/Escape
+restoration, no horizontal overflow, dialog internal scrolling, Settings groups,
+clean console, and zero HTTP(S) resources passed. Verification passed on
+2026-08-22: focused repaired-surface suites, complete renderer suite (118 tests in
+13 files), full regression suite (680 tests in 81 files), `npm run typecheck`,
+`npm run lint`, `npm run format:check`, `git diff --check`, and `npm run package`.
 
 ---
 

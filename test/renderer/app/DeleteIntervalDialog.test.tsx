@@ -32,9 +32,11 @@ describe('DeleteIntervalDialog', () => {
     setDeleteApi(vi.fn());
     renderDialog();
 
-    expect(
-      screen.getByRole('dialog', { name: 'Delete this time entry?' }),
-    ).toBeVisible();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete this time entry?',
+    });
+    expect(dialog).toBeVisible();
+    expect(dialog).toHaveClass('max-h-[calc(100dvh-2rem)]', 'overflow-y-auto');
     expect(
       screen.getByText(/Aug 13, 11:30 PM → Aug 15, 1:15 AM/),
     ).toBeVisible();

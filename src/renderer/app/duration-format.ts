@@ -9,7 +9,12 @@ export const formatClockDuration = (durationMs: number): string => {
     .join(':');
 };
 
-export const formatHoursAndMinutes = (durationMs: number): string => {
+export const formatDuration = (durationMs: number): string => {
   const totalMinutes = Math.floor(Math.max(0, durationMs) / 60_000);
-  return `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${String(minutes).padStart(2, '0')}m`;
 };

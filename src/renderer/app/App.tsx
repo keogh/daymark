@@ -22,7 +22,7 @@ import { DailyHistory } from './DailyHistory';
 import { ManualTimeEntryDialog } from './ManualTimeEntryDialog';
 import { Settings } from './Settings';
 import { formatLocalDateInput } from './local-date-format';
-import { formatClockDuration, formatHoursAndMinutes } from './duration-format';
+import { formatClockDuration, formatDuration } from './duration-format';
 import { useDisplayDuration } from './use-display-duration';
 import { useTaskSuggestions } from './use-task-suggestions';
 import {
@@ -32,6 +32,10 @@ import {
 import { useSettingsController } from './use-settings-controller';
 
 type Destination = 'timer' | 'analytics' | 'settings';
+interface ManualEntryRequest {
+  readonly date: string;
+  readonly returnFocusTo: HTMLButtonElement;
+}
 
 export const App = () => {
   const controller = useTimerController();
@@ -41,10 +45,23 @@ export const App = () => {
   const settingsController = useSettingsController(() =>
     setAnalyticsInvalidationRevision((revision) => revision + 1),
   );
-  const [manualEntryDate, setManualEntryDate] = useState<string | null>(null);
+  const [manualEntryRequest, setManualEntryRequest] =
+    useState<ManualEntryRequest | null>(null);
+  const globalManualEntryRef = useRef<HTMLButtonElement>(null);
 
-  const openGlobalManualEntry = () =>
-    setManualEntryDate(formatLocalDateInput(Date.now()));
+  const openGlobalManualEntry = () => {
+    if (globalManualEntryRef.current === null) return;
+    setManualEntryRequest({
+      date: formatLocalDateInput(Date.now()),
+      returnFocusTo: globalManualEntryRef.current,
+    });
+  };
+
+  const closeManualEntry = () => {
+    const returnFocusTo = manualEntryRequest?.returnFocusTo;
+    setManualEntryRequest(null);
+    window.setTimeout(() => returnFocusTo?.focus(), 0);
+  };
 
   return (
     <main className="app-shell">
@@ -106,6 +123,7 @@ export const App = () => {
             <div className="global-manual-entry">
               <Button
                 onClick={openGlobalManualEntry}
+                ref={globalManualEntryRef}
                 type="button"
                 variant="outline"
               >
@@ -113,7 +131,9 @@ export const App = () => {
               </Button>
             </div>
             <DailyHistory
-              onAddTime={(date) => setManualEntryDate(date)}
+              onAddTime={(date, returnFocusTo) =>
+                setManualEntryRequest({ date, returnFocusTo })
+              }
               onIntervalSaved={controller.refresh}
               onPlayTask={controller.switchToTask}
               onTaskRenamed={controller.refresh}
@@ -125,11 +145,11 @@ export const App = () => {
                   : null
               }
             />
-            {manualEntryDate !== null && (
+            {manualEntryRequest !== null && (
               <ManualTimeEntryDialog
-                initialDate={manualEntryDate}
+                initialDate={manualEntryRequest.date}
                 onOpenChange={(open) => {
-                  if (!open) setManualEntryDate(null);
+                  if (!open) closeManualEntry();
                 }}
                 onSaved={controller.refresh}
                 open
@@ -294,9 +314,8 @@ const IdleTimer = ({ controller }: IdleTimerProps) => {
                       {suggestion.task.description}
                     </span>
                     <span className="task-suggestion__totals">
-                      Today {formatHoursAndMinutes(suggestion.todayDurationMs)}{' '}
-                      · Total{' '}
-                      {formatHoursAndMinutes(suggestion.lifetimeDurationMs)}
+                      Today {formatDuration(suggestion.todayDurationMs)} · Total{' '}
+                      {formatDuration(suggestion.lifetimeDurationMs)}
                     </span>
                   </button>
                 ))}
@@ -365,9 +384,9 @@ const ActiveTimer = ({ controller, timer }: ActiveTimerProps) => {
         {timer.status === 'running' ? 'Current session' : 'Paused'}
       </p>
       <p className="active-timer__totals">
-        Today {formatHoursAndMinutes(timer.taskTodayDurationMs)}
+        Today {formatDuration(timer.taskTodayDurationMs)}
         <span> · </span>
-        Total {formatHoursAndMinutes(timer.taskLifetimeDurationMs)}
+        Total {formatDuration(timer.taskLifetimeDurationMs)}
       </p>
       <div aria-label="Timer controls" className="timer-controls" role="group">
         {timer.status === 'running' && (
