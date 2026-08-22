@@ -1,7 +1,15 @@
+import fs from 'node:fs';
+
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { distributionContract } from './scripts/distribution-contract.ts';
+import { macosDmgBaseName } from './scripts/distribution-contract.ts';
+
+const packageMetadata = JSON.parse(
+  fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+) as { version: string };
 
 const packageDirectories = ['/.vite', '/node_modules'];
 const migrationsDirectory = '/src/main/database/migrations';
@@ -37,7 +45,17 @@ const config: ForgeConfig = {
     },
   },
   rebuildConfig: {},
-  makers: [],
+  makers: [
+    new MakerDMG(
+      (architecture) => ({
+        format: 'ULFO',
+        icon: 'assets/icon/time-tracker.icns',
+        name: macosDmgBaseName(packageMetadata.version, architecture),
+        title: distributionContract.identity.productName,
+      }),
+      ['darwin'],
+    ),
+  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new VitePlugin({

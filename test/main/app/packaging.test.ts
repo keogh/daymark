@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { describe, expect, it } from 'vitest';
 
 import forgeConfig from '../../../forge.config';
@@ -44,4 +45,24 @@ describe('application packaged resources', () => {
     );
     expect(path.isAbsolute(iconBasePath)).toBe(false);
   });
+
+  it.each(['arm64', 'x64'] as const)(
+    'configures a macOS-only %s DMG with an unambiguous name',
+    async (architecture) => {
+      const dmgMakers = forgeConfig.makers?.filter(
+        (maker) => maker instanceof MakerDMG,
+      );
+
+      expect(dmgMakers).toHaveLength(1);
+      const maker = dmgMakers?.[0];
+      expect(maker?.platforms).toEqual(['darwin']);
+      await maker?.prepareConfig(architecture);
+      expect(maker?.config).toMatchObject({
+        format: 'ULFO',
+        icon: 'assets/icon/time-tracker.icns',
+        name: `Time-Tracker-0.1.0-darwin-${architecture}`,
+        title: 'Time Tracker',
+      });
+    },
+  );
 });

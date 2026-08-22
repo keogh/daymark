@@ -46,6 +46,22 @@ platform, and architecture identity.
 `v${package.json.version}` using stable `X.Y.Z` semantic versioning. Missing,
 malformed, suffixed, or mismatched values fail before making or publication.
 
+## macOS DMGs
+
+Run `npm run make:macos:arm64` on a native Apple Silicon host and
+`npm run make:macos:x64` on a native Intel host. The committed Forge
+configuration produces separate `Time-Tracker-{version}-darwin-{architecture}.dmg`
+files. `npm run inspect:macos:arm64` or `npm run inspect:macos:x64` verifies the
+matching packaged application executable, `better-sqlite3` native binary, bundle
+identity, ASAR renderer and migration content, application icon, and tray assets.
+
+The DMGs are unsigned and not notarized, so Gatekeeper may block first launch.
+After confirming the DMG came from this repository's own GitHub Release page,
+macOS testers may use the documented graphical per-application override: try to
+open Time Tracker once, then open System Settings, choose Privacy & Security, and
+choose **Open Anyway** for Time Tracker. Confirm the subsequent macOS prompt.
+Do not disable Gatekeeper globally or change machine-wide security settings.
+
 ## Trust and update limitations
 
 Artifacts are unsigned. macOS Gatekeeper and Windows SmartScreen may warn or block

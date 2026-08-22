@@ -268,13 +268,14 @@ None.
 SPEC-010 — Settings and UX Polish is Verified. All eight implementation tasks and
 AC-010-001 through AC-010-019 are complete.
 
-SPEC-011 — Cross-Platform Packaging and Distribution is designed and queued as
-Ready for Implementation. It defines unsigned personal-install DMG, Squirrel, and
-Debian artifacts; native GitHub Actions builds; exact package-version/tag matching;
-checksummed draft GitHub prereleases; fresh-machine installation acceptance; and
-data-preserving reinstall, uninstall/reinstall, and later forward-upgrade behavior.
-Its first task is TASK-011-001 — Establish Distribution Metadata and Release
-Contracts, which is now unblocked.
+SPEC-011 — Cross-Platform Packaging and Distribution is in progress. TASK-011-001
+established the release contract, and TASK-011-002 now produces distinct unsigned
+macOS arm64/x64 DMGs with stable identity, source-owned icons, native-module
+rebuilds, local migrations/renderer/tray assets, focused inspection commands, and
+documented Gatekeeper expectations. Both targets built and passed structural
+inspection on macOS Apple Silicon; the arm64 app also launched with an isolated
+profile. Native Intel-host confirmation remains assigned to TASK-011-005. The next
+task is TASK-011-003 — Build the Windows x64 Squirrel Installer.
 
 SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
 Implementation. It defines one exact candidate and acceptance-evidence ledger;
@@ -329,8 +330,9 @@ dependency change is planned.
 
 # Last Updated
 
-2026-08-22 — Verified SPEC-009 after all 585 tests, macOS arm64 packaging, and
-isolated packaged Analytics acceptance passed. The packaged workflow covered
-running/paused navigation, 7/30-day projections, accessibility, Retry, narrow
-layout, authoritative reconciliation, and local-only clean-console rendering.
-SPEC-010 is next.
+2026-08-22 — Completed SPEC-011 TASK-011-002. Distinct macOS arm64 and x64 DMGs
+built successfully with architecture-matched application and `better-sqlite3`
+binaries; packaged identity, icons, migrations, renderer and tray assets passed
+inspection, and the arm64 package launched with a disposable profile. All 698
+tests plus formatting, typecheck, lint, and diff validation passed. TASK-011-003 is
+next.

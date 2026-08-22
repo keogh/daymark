@@ -25,6 +25,8 @@ export const distributionContract = {
 export type PrimaryArtifactDescriptor =
   (typeof distributionContract.primaryArtifacts)[number];
 
+export type MacosArchitecture = 'arm64' | 'x64';
+
 export function primaryArtifactName(
   version: string,
   descriptor: PrimaryArtifactDescriptor,
@@ -34,4 +36,20 @@ export function primaryArtifactName(
     '-',
   );
   return `${product}-${version}-${descriptor.platform}-${descriptor.architecture}${descriptor.extension}`;
+}
+
+export function macosDmgBaseName(
+  version: string,
+  architecture: string,
+): string {
+  if (architecture !== 'arm64' && architecture !== 'x64') {
+    throw new Error(`unsupported macOS DMG architecture: ${architecture}`);
+  }
+
+  const artifactName = primaryArtifactName(version, {
+    platform: 'darwin',
+    architecture,
+    extension: '.dmg',
+  });
+  return artifactName.slice(0, -'.dmg'.length);
 }
