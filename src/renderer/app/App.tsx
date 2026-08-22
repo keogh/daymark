@@ -114,7 +114,7 @@ export const App = () => {
           )}
         </>
       ) : (
-        <Analytics />
+        <Analytics refreshRevision={controller.authoritativeRevision} />
       )}
     </main>
   );

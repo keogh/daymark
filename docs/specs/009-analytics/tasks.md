@@ -537,7 +537,7 @@ equivalent accessible daily data representation.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -599,8 +599,32 @@ per-second IPC, stale rollback, or paused-state drift.
 
 ### Completion Evidence
 
-Record commands, test counts, no-per-second-IPC evidence, midnight results, and
-mutation/event reconciliation evidence when complete.
+- Added a pure renderer-local projection that advances only the open interval's
+  Today bucket, selected total and floored average, current week/month, running
+  Task, chart input, and deterministic top-five ranking. Projection stops at the
+  selected range's next local-midnight boundary; paused summaries retain object
+  identity and remain fixed.
+- Passed the application-level authoritative revision into Analytics. Successful
+  renderer Timer/source mutations and validated tray Timer notifications already
+  advance that revision; Analytics reconciles the currently selected range on a
+  revision while mounted, and a newly mounted view always performs a fresh read.
+- Added focus, local-midnight, and 60-second authoritative reconciliation. Every
+  request uses the existing monotonically increasing request sequence, so
+  overlapping mutation, timer-event, focus, periodic, midnight, Retry, and range
+  requests cannot replace a newer response with stale data.
+- The one-second presentation interval only updates renderer wall-clock state.
+  Fake-timer coverage proves a visible running update after one second performs
+  exactly one total Analytics preload call (the initial read), while paused data
+  does not advance.
+- Focused live projection and Analytics renderer tests passed: 2 files and 10
+  tests. Timer controller/event, History reconciliation, manual interval, edit,
+  delete, Task rename/delete, and tray regressions passed: 12 files and 112 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check` passed.
+- `npm test` passed: 73 files and 585 tests. The first concurrent full run had one
+  real-clock Timer assertion cross from zero to one second under suite load; that
+  file passed alone (37 tests) and the immediately repeated full suite passed
+  without source changes.
 
 ---
 

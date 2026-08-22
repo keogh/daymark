@@ -1,4 +1,5 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -90,6 +91,7 @@ const deferred = <T,>() => {
 describe('Analytics', () => {
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -214,5 +216,86 @@ describe('Analytics', () => {
       screen.getByRole('button', { name: 'Retry Last 30 days' }),
     ).toBeVisible();
     expect(screen.queryByText('hidden')).not.toBeInTheDocument();
+  });
+
+  it('advances a running summary locally without per-second Analytics requests', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(CAPTURED_AT);
+    const runningSummary = {
+      ...summary('last-7-days', [0, 0, 0, 0, 0, 0, 59_000]),
+      runningTask: {
+        task: { id: 'running', description: 'Running task' },
+        durationMs: 59_000,
+        mostRecentActivityAt: CAPTURED_AT,
+        intervalStartedAt: CAPTURED_AT - 59_000,
+      },
+      topTasks: [
+        {
+          task: { id: 'running', description: 'Running task' },
+          durationMs: 59_000,
+          mostRecentActivityAt: CAPTURED_AT,
+        },
+      ],
+    } satisfies AnalyticsSummary;
+    const getSummary = vi.fn().mockResolvedValue({
+      ok: true,
+      value: runningSummary,
+    });
+    installAnalyticsApi(getSummary);
+    render(<Analytics />);
+    await act(() => Promise.resolve());
+
+    expect(screen.getAllByText('<1m').length).toBeGreaterThan(0);
+    await act(async () => {
+      vi.advanceTimersByTime(1_000);
+      await Promise.resolve();
+    });
+    expect(screen.getAllByText('1m').length).toBeGreaterThan(0);
+    expect(getSummary).toHaveBeenCalledOnce();
+  });
+
+  it('reconciles on authoritative revision, focus, and the periodic interval', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(CAPTURED_AT);
+    const getSummary = vi.fn().mockResolvedValue({
+      ok: true,
+      value: summary(),
+    });
+    installAnalyticsApi(getSummary);
+    const view = render(<Analytics refreshRevision={0} />);
+    await act(() => Promise.resolve());
+    expect(getSummary).toHaveBeenCalledTimes(1);
+
+    view.rerender(<Analytics refreshRevision={1} />);
+    await act(() => Promise.resolve());
+    expect(getSummary).toHaveBeenCalledTimes(2);
+
+    window.dispatchEvent(new Event('focus'));
+    await act(() => Promise.resolve());
+    expect(getSummary).toHaveBeenCalledTimes(3);
+
+    await act(async () => {
+      vi.advanceTimersByTime(60_000);
+      await Promise.resolve();
+    });
+    expect(getSummary).toHaveBeenCalledTimes(4);
+  });
+
+  it('refreshes authoritatively at local midnight', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 21, 23, 59, 59, 500));
+    const getSummary = vi.fn().mockResolvedValue({
+      ok: true,
+      value: summary(),
+    });
+    installAnalyticsApi(getSummary);
+    render(<Analytics />);
+    await act(() => Promise.resolve());
+
+    await act(async () => {
+      vi.advanceTimersByTime(500);
+      await Promise.resolve();
+    });
+    expect(getSummary).toHaveBeenCalledTimes(2);
   });
 });

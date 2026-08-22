@@ -19,7 +19,11 @@ export interface AnalyticsController {
   readonly retry: () => void;
 }
 
-export const useAnalyticsController = (): AnalyticsController => {
+const AUTHORITATIVE_SYNC_MS = 60_000;
+
+export const useAnalyticsController = (
+  refreshRevision = 0,
+): AnalyticsController => {
   const [loadState, setLoadState] = useState<AnalyticsLoadState>({
     status: 'loading',
   });
@@ -32,10 +36,16 @@ export const useAnalyticsController = (): AnalyticsController => {
   const requestSequence = useRef(0);
   const loadStateRef = useRef(loadState);
   const pendingRangeRef = useRef(pendingRange);
+  const selectedRangeRef = useRef(selectedRange);
+  const initialRefreshRevision = useRef(refreshRevision);
 
   useEffect(() => {
     loadStateRef.current = loadState;
   }, [loadState]);
+
+  useEffect(() => {
+    selectedRangeRef.current = selectedRange;
+  }, [selectedRange]);
 
   const request = useCallback(async (range: AnalyticsRange) => {
     const requestId = ++requestSequence.current;
@@ -50,7 +60,12 @@ export const useAnalyticsController = (): AnalyticsController => {
       pendingRangeRef.current = null;
       setPendingRange(null);
       if (result.ok) {
-        setLoadState({ status: 'ready', summary: result.value });
+        const nextLoadState = {
+          status: 'ready',
+          summary: result.value,
+        } as const;
+        loadStateRef.current = nextLoadState;
+        setLoadState(nextLoadState);
         return;
       }
 
@@ -71,6 +86,10 @@ export const useAnalyticsController = (): AnalyticsController => {
     }
   }, []);
 
+  const reconcile = useCallback(() => {
+    void request(selectedRangeRef.current);
+  }, [request]);
+
   useEffect(() => {
     let isActive = true;
     const requestId = ++requestSequence.current;
@@ -83,11 +102,11 @@ export const useAnalyticsController = (): AnalyticsController => {
         if (!isActive || requestId !== requestSequence.current) return;
         pendingRangeRef.current = null;
         setPendingRange(null);
-        setLoadState(
-          result.ok
-            ? { status: 'ready', summary: result.value }
-            : { status: 'error' },
-        );
+        const nextLoadState = result.ok
+          ? ({ status: 'ready', summary: result.value } as const)
+          : ({ status: 'error' } as const);
+        loadStateRef.current = nextLoadState;
+        setLoadState(nextLoadState);
       } catch {
         if (isActive && requestId === requestSequence.current) {
           pendingRangeRef.current = null;
@@ -103,6 +122,45 @@ export const useAnalyticsController = (): AnalyticsController => {
     };
   }, []);
 
+  useEffect(() => {
+    if (refreshRevision === initialRefreshRevision.current) return;
+    initialRefreshRevision.current = refreshRevision;
+    reconcile();
+  }, [reconcile, refreshRevision]);
+
+  useEffect(() => {
+    const handleFocus = () => reconcile();
+    window.addEventListener('focus', handleFocus);
+    const reconciliationInterval = window.setInterval(
+      reconcile,
+      AUTHORITATIVE_SYNC_MS,
+    );
+
+    let midnightTimeout: number;
+    const scheduleMidnightRefresh = () => {
+      const now = new Date();
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      ).getTime();
+      midnightTimeout = window.setTimeout(
+        () => {
+          reconcile();
+          scheduleMidnightRefresh();
+        },
+        Math.max(0, nextMidnight - now.getTime()),
+      );
+    };
+    scheduleMidnightRefresh();
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.clearInterval(reconciliationInterval);
+      window.clearTimeout(midnightTimeout);
+    };
+  }, [reconcile]);
+
   const selectRange = (range: AnalyticsRange) => {
     if (range === pendingRangeRef.current) return;
     if (
@@ -113,6 +171,7 @@ export const useAnalyticsController = (): AnalyticsController => {
     ) {
       return;
     }
+    selectedRangeRef.current = range;
     setSelectedRange(range);
     void request(range);
   };

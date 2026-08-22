@@ -15,14 +15,20 @@ import {
   useAnalyticsController,
   type AnalyticsController,
 } from './use-analytics-controller';
+import { projectLiveAnalytics } from './project-live-analytics';
+import { useEffect, useState } from 'react';
 
 const RANGE_LABELS: Record<AnalyticsRange, string> = {
   'last-7-days': 'Last 7 days',
   'last-30-days': 'Last 30 days',
 };
 
-export const Analytics = () => {
-  const controller = useAnalyticsController();
+export const Analytics = ({
+  refreshRevision = 0,
+}: {
+  refreshRevision?: number;
+}) => {
+  const controller = useAnalyticsController(refreshRevision);
 
   return (
     <section aria-labelledby="analytics-heading" className="analytics-view">
@@ -93,6 +99,7 @@ const AnalyticsSummaryView = ({
   controller: AnalyticsController;
   summary: AnalyticsSummary;
 }) => {
+  const liveSummary = useLiveSummary(summary);
   const denominator = summary.range === 'last-7-days' ? 7 : 30;
   return (
     <div
@@ -122,30 +129,45 @@ const AnalyticsSummaryView = ({
         Showing {RANGE_LABELS[summary.range]}
       </p>
       <dl className="analytics-metrics analytics-metrics--primary">
-        <Metric label="Total" value={formatDuration(summary.totalDurationMs)} />
+        <Metric
+          label="Total"
+          value={formatDuration(liveSummary.totalDurationMs)}
+        />
         <Metric
           label={`Daily average · ${denominator} days`}
-          value={formatDuration(summary.dailyAverageDurationMs)}
+          value={formatDuration(liveSummary.dailyAverageDurationMs)}
         />
       </dl>
       <dl className="analytics-metrics">
         <Metric
           label="Current week (Monday to today)"
-          value={formatDuration(summary.currentWeek.durationMs)}
+          value={formatDuration(liveSummary.currentWeek.durationMs)}
         />
         <Metric
           label="Current month (to today)"
-          value={formatDuration(summary.currentMonth.durationMs)}
+          value={formatDuration(liveSummary.currentMonth.durationMs)}
         />
       </dl>
 
-      {summary.totalDurationMs === 0 && (
+      {liveSummary.totalDurationMs === 0 && (
         <p className="analytics-empty">No time tracked in this period.</p>
       )}
-      <DailyChart days={summary.days} capturedAt={summary.capturedAt} />
-      <TopTasks summary={summary} />
+      <DailyChart days={liveSummary.days} capturedAt={liveSummary.capturedAt} />
+      <TopTasks summary={liveSummary} />
     </div>
   );
+};
+
+const useLiveSummary = (summary: AnalyticsSummary): AnalyticsSummary => {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (summary.runningTask === null) return;
+    const interval = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(interval);
+  }, [summary]);
+
+  return projectLiveAnalytics(summary, now);
 };
 
 const Metric = ({ label, value }: { label: string; value: string }) => (
