@@ -35,7 +35,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-009-002 | Implement Bounded Analytics Queries | Complete | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
 | TASK-009-003 | Implement the Authoritative Analytics Service | Complete | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Complete | TASK-009-003 | AC-009-016–018 |
-| TASK-009-005 | Introduce Timer and Analytics Navigation | Pending | TASK-009-004 | AC-009-015 |
+| TASK-009-005 | Introduce Timer and Analytics Navigation | Complete | TASK-009-004 | AC-009-015 |
 | TASK-009-006 | Render Static Analytics States and Accessible Chart | Pending | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
 | TASK-009-007 | Implement Live Analytics and Authoritative Reconciliation | Pending | TASK-009-003, TASK-009-006 | AC-009-010–014, AC-009-016 |
 | TASK-009-008 | Verify Packaged Analytics and Reconcile Documentation | Pending | TASK-009-001–007 | AC-009-001–019 |
@@ -375,7 +375,7 @@ and no generic privileged capability.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -426,8 +426,21 @@ verified Timer-view workflow.
 
 ### Completion Evidence
 
-Record commands, test counts, keyboard evidence, and confirmation that navigation
-issued no Timer command when complete.
+- Added semantic Primary navigation with exactly two ordinary-button destinations,
+  visible focus styling, and `aria-current="page"` identification. Fresh renderer
+  loads default to Timer, while Analytics renders only the minimal destination
+  container reserved for TASK-009-006.
+- Kept `useTimerController` at the application-shell level while Timer and Daily
+  History presentation unmounts on Analytics. Returning to running and paused
+  Timer states preserves the authoritative presentation without another state
+  load, false idle state, or zero-duration loading flash.
+- Component coverage confirms both destinations are focusable, the current state
+  changes in both directions, navigation invokes none of Start, Switch, Pause,
+  Resume, or Stop, and the complete Timer/History workflow remains available.
+- Focused App and Daily History renderer tests — passed, 2 files and 62 tests.
+- `npm run typecheck`, `npm run lint`, and `npm run format:check` — passed.
+- `npm test` — passed, 71 files and 575 tests.
+- `git diff --check` — passed.
 
 ---
 

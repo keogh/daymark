@@ -86,6 +86,78 @@ describe('App', () => {
     vi.useRealTimers();
   });
 
+  it('opens on Timer with semantic, focusable Timer and Analytics navigation', async () => {
+    setTimerApi();
+    render(<App />);
+
+    const navigation = screen.getByRole('navigation', { name: 'Primary' });
+    const timer = screen.getByRole('button', { name: 'Timer' });
+    const analytics = screen.getByRole('button', { name: 'Analytics' });
+
+    expect(navigation).toContainElement(timer);
+    expect(navigation).toContainElement(analytics);
+    expect(navigation.querySelectorAll('button')).toHaveLength(2);
+    expect(timer).toHaveAttribute('aria-current', 'page');
+    expect(analytics).not.toHaveAttribute('aria-current');
+    expect(await screen.findByRole('region', { name: 'Timer' })).toBeVisible();
+
+    analytics.focus();
+    expect(analytics).toHaveFocus();
+    fireEvent.click(analytics);
+
+    expect(analytics).toHaveAttribute('aria-current', 'page');
+    expect(timer).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('heading', { name: 'Analytics' })).toBeVisible();
+    expect(
+      screen.queryByRole('region', { name: 'Timer' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not issue a Timer command while navigating in either direction', async () => {
+    const api = setTimerApi();
+    render(<App />);
+    await screen.findByRole('combobox', { name: 'Task description' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Analytics' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Timer' }));
+
+    expect(api.timer.start).not.toHaveBeenCalled();
+    expect(api.timer.switchToTask).not.toHaveBeenCalled();
+    expect(api.timer.pause).not.toHaveBeenCalled();
+    expect(api.timer.resume).not.toHaveBeenCalled();
+    expect(api.timer.stop).not.toHaveBeenCalled();
+    expect(api.timer.getState).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ['running', runningState, '00:00:00'],
+    ['paused', pausedState, '01:05:00'],
+  ] as const)(
+    'keeps the authoritative %s Timer presentation while Analytics is displayed',
+    async (_status, timerState, expectedDuration) => {
+      setTimerApi({
+        getState: vi.fn().mockResolvedValue({ ok: true, value: timerState }),
+      });
+      render(<App />);
+
+      expect(
+        await screen.findByRole('region', {
+          name: `${timerState.status} timer`,
+        }),
+      ).toBeVisible();
+      fireEvent.click(screen.getByRole('button', { name: 'Analytics' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Timer' }));
+
+      expect(
+        screen.getByRole('region', { name: `${timerState.status} timer` }),
+      ).toBeVisible();
+      expect(
+        screen.getByLabelText('Current session duration'),
+      ).toHaveTextContent(expectedDuration);
+      expect(screen.queryByText('Loading timer…')).not.toBeInTheDocument();
+    },
+  );
+
   it('loads authoritative timer state before showing the focused idle form', async () => {
     const state = deferred<AppResult<TimerState>>();
     const api = setTimerApi({ getState: vi.fn(() => state.promise) });

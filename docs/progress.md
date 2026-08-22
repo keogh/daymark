@@ -16,7 +16,9 @@ calendar projections. TASK-009-002 completed the fixed-count, bounded, read-only
 Analytics query with disposable-SQLite and query-plan evidence; TASK-009-003
 completed authoritative service composition. TASK-009-004 completed the narrow,
 validated, read-only IPC and preload boundary with safe errors and lifecycle
-cleanup. TASK-009-005 navigation is next.
+cleanup. TASK-009-005 added accessible Timer/Analytics navigation while preserving
+the authoritative Timer controller and verified Timer/History workflows.
+TASK-009-006 static Analytics rendering is next.
 
 SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
