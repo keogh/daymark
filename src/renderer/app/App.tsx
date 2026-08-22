@@ -17,6 +17,7 @@ import { Field, FieldError, FieldLabel } from '@/renderer/components/ui/field';
 import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import type { TimerState } from '@/shared/contracts/timer';
+import { Analytics } from './Analytics';
 import { DailyHistory } from './DailyHistory';
 import { ManualTimeEntryDialog } from './ManualTimeEntryDialog';
 import { formatLocalDateInput } from './local-date-format';
@@ -113,9 +114,7 @@ export const App = () => {
           )}
         </>
       ) : (
-        <section aria-labelledby="analytics-heading" className="analytics-view">
-          <h2 id="analytics-heading">Analytics</h2>
-        </section>
+        <Analytics />
       )}
     </main>
   );

@@ -36,7 +36,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-009-003 | Implement the Authoritative Analytics Service | Complete | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
 | TASK-009-004 | Expose the Narrow Analytics Boundary | Complete | TASK-009-003 | AC-009-016–018 |
 | TASK-009-005 | Introduce Timer and Analytics Navigation | Complete | TASK-009-004 | AC-009-015 |
-| TASK-009-006 | Render Static Analytics States and Accessible Chart | Pending | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
+| TASK-009-006 | Render Static Analytics States and Accessible Chart | Complete | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
 | TASK-009-007 | Implement Live Analytics and Authoritative Reconciliation | Pending | TASK-009-003, TASK-009-006 | AC-009-010–014, AC-009-016 |
 | TASK-009-008 | Verify Packaged Analytics and Reconcile Documentation | Pending | TASK-009-001–007 | AC-009-001–019 |
 
@@ -448,7 +448,7 @@ verified Timer-view workflow.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -509,8 +509,27 @@ equivalent accessible daily data representation.
 
 ### Completion Evidence
 
-Record commands, test counts, accessible-data evidence, dependency audit, and
-narrow-layout evidence when complete.
+- Added a renderer-local Analytics controller that defaults to Last 7 days,
+  suppresses duplicate requests, atomically replaces successful ranges, ignores
+  out-of-order responses, retries failures, and retains correctly labeled usable
+  data after refresh or range-switch failure.
+- Added the complete static Analytics presentation: explicit selected-range total
+  and 7/30-day average, unambiguous current-week/current-month values, empty and
+  retry states, and at most five wrapping Top Tasks with tabular durations.
+- Added one source-owned proportional CSS bar per oldest-first day, a visible
+  minimum for positive sub-minute values, safe zero-only handling, visible Today
+  labeling, and an equivalent semantic list containing every local date and exact
+  formatted duration once.
+- Added semantic-token responsive styling. At the established 320px minimum,
+  summary cards and range controls stack, Task descriptions wrap independently of
+  durations, and only the compact 30-day chart region may scroll horizontally;
+  reduced-motion preferences disable meaningful transitions/animation.
+- No charting, routing, state-management, font, icon, or other dependency was
+  added; `package.json` and the lockfile are unchanged.
+- Focused Analytics, App, and shared duration tests passed: 3 files and 45 tests.
+- Full `npm test` passed: 72 files and 580 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check` passed.
 
 ---
 

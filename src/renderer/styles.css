@@ -137,15 +137,224 @@ input {
 
 .analytics-view {
   width: min(100%, 68rem);
-  min-height: min(42rem, calc(100vh - 8rem));
-  padding-top: clamp(4rem, 10vw, 8rem);
+  padding: clamp(2.5rem, 6vw, 5rem) 0;
   margin: 0 auto;
 }
 
-.analytics-view h2 {
+.analytics-view__header h2 {
   margin: 0;
   font-size: clamp(2rem, 5vw, 3.4rem);
   letter-spacing: -0.05em;
+}
+
+.analytics-view__header p,
+.analytics-range-label,
+.analytics-section__empty {
+  color: var(--muted-foreground);
+}
+
+.analytics-view__header p {
+  margin: 0.5rem 0 0;
+}
+
+.analytics-ranges {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 2rem 0;
+  border: 0;
+}
+
+.analytics-ranges__option:focus-visible,
+.analytics-state button:focus-visible,
+.analytics-warning button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ring) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.analytics-state {
+  display: flex;
+  width: min(100%, 34rem);
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 3rem;
+}
+
+.analytics-state p {
+  margin: 0;
+}
+
+.analytics-content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.analytics-notice,
+.analytics-warning,
+.analytics-empty {
+  margin: 0;
+  border-radius: var(--radius);
+}
+
+.analytics-notice,
+.analytics-empty {
+  padding: 0.875rem 1rem;
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+.analytics-warning button,
+.analytics-state button {
+  margin-top: 0.75rem;
+}
+
+.analytics-range-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.analytics-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.analytics-metric {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.analytics-metric dt {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.analytics-metric dd {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 680;
+  letter-spacing: -0.035em;
+}
+
+.analytics-metrics--primary .analytics-metric dd {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.analytics-section {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.analytics-section h3 {
+  margin: 0 0 1.25rem;
+  font-size: 1.125rem;
+}
+
+.analytics-chart {
+  display: grid;
+  height: 13rem;
+  grid-template-columns: repeat(var(--analytics-days, 7), minmax(0, 1fr));
+  gap: clamp(0.15rem, 0.8vw, 0.65rem);
+  overflow-x: auto;
+}
+
+.analytics-chart[data-count='30'] {
+  grid-template-columns: repeat(30, minmax(0.75rem, 1fr));
+}
+
+.analytics-chart__datum {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  text-align: center;
+}
+
+.analytics-chart__bar-track {
+  display: flex;
+  min-height: 0;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(to top, var(--muted) 1px, transparent 1px);
+}
+
+.analytics-chart__bar {
+  display: block;
+  width: 100%;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: var(--primary);
+}
+
+.analytics-tasks {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.analytics-tasks li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.analytics-tasks li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.analytics-tasks li span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.analytics-tasks li span:last-child {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+@media (max-width: 34rem) {
+  .app-shell {
+    padding: 1rem;
+  }
+
+  .app-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analytics-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-ranges {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analytics-view *,
+  .analytics-view *::before,
+  .analytics-view *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 .timer-view {
