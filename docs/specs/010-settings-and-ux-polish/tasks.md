@@ -34,7 +34,7 @@ external prerequisite does not change the internal dependency order in this file
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-010-001 | Add Settings Persistence and Contracts | Pending | None | AC-010-001–003, AC-010-008, AC-010-016–017 |
-| TASK-010-002 | Implement the Settings Service and Narrow Boundary | Pending | TASK-010-001 | AC-010-002–003, AC-010-005, AC-010-008–009, AC-010-016–017 |
+| TASK-010-002 | Implement the Settings Service and Narrow Boundary | Complete | TASK-010-001 | AC-010-002–003, AC-010-005, AC-010-008–009, AC-010-016–017 |
 | TASK-010-003 | Integrate Persisted Week Start with Analytics | Pending | TASK-010-002 | AC-010-004, AC-010-017 |
 | TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Pending | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
 | TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Pending | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
@@ -132,7 +132,7 @@ prerequisite.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -189,8 +189,25 @@ safe controlled failures.
 
 ### Completion Evidence
 
-Record commands, test counts, no-op write evidence, malformed-input no-call
-evidence, rollback results, and boundary audit when complete.
+- Added an injected-Clock `SettingsService` whose authoritative reads do not
+  mutate, whose changed updates write only one requested field with one Clock
+  timestamp, and whose same-value updates neither call the Clock nor execute a
+  repository update. Missing-singleton and injected SQLite trigger failures return
+  safe `INTERNAL_ERROR` results; disposable integration tests confirm no
+  replacement row or partial preference update is produced.
+- Added exactly `settings:get`, `settings:set-week-start`, and
+  `settings:set-theme` handlers. Exact validators reject malformed, extra,
+  unsupported, and inherited inputs before service execution; expected failures
+  stay controlled, unexpected exceptions are logged locally and sanitized, and
+  application shutdown removes exactly those three handlers once.
+- Composed the repository/service/handlers through the established main-process
+  startup lifecycle and exposed only `settings.get`, `settings.setWeekStartsOn`,
+  and `settings.setTheme` through the typed preload API. Existing renderer API
+  mocks were extended without adding raw Electron or generic persistence access.
+- Verification passed on 2026-08-22: focused service, disposable-SQLite, IPC,
+  preload, renderer-contract, startup, and shutdown suite (82 tests in 8 files),
+  full regression suite (662 tests in 80 files), `npm run typecheck`,
+  `npm run lint`, `npm run format:check`, and `git diff --check`.
 
 ---
 

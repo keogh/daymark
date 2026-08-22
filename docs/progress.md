@@ -10,11 +10,11 @@ SPEC-010 — Settings and UX Polish (Ready for Implementation)
 
 ## Current Status
 
-SPEC-010 implementation is active. TASK-010-001 is complete: shared settings
-contracts and exact validators, the constrained singleton settings schema and
-forward migration, and the field-isolated settings repository are implemented.
-Migration coverage proves existing Task, TimeInterval, and AppState rows remain
-unchanged while Monday/System defaults are seeded exactly once. TASK-010-002 is
+SPEC-010 implementation is active. TASK-010-001 and TASK-010-002 are complete:
+settings now have shared exact contracts, constrained singleton persistence, an
+injected-Clock service with same-value no-op semantics, three runtime-validated IPC
+handlers, lifecycle cleanup, and three narrow typed preload methods. Safe failure,
+rollback, reconstruction, no-write, and boundary coverage passes. TASK-010-003 is
 the next unblocked task.
 
 SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
@@ -249,9 +249,9 @@ None.
 
 SPEC-009 — Analytics is Verified.
 
-SPEC-010 — Settings and UX Polish has a complete companion task breakdown. Its
-first task is TASK-010-001 — Add Settings Persistence and Contracts, but all
-SPEC-010 implementation is unblocked now that SPEC-009 is Verified.
+SPEC-010 — Settings and UX Polish has a complete companion task breakdown.
+TASK-010-001 and TASK-010-002 are complete. TASK-010-003 — Integrate Persisted
+Week Start with Analytics is next and remains unblocked.
 
 SPEC-011 — Cross-Platform Packaging and Distribution is designed and queued as
 Ready for Implementation. It defines unsigned personal-install DMG, Squirrel, and

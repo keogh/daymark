@@ -1,3 +1,9 @@
+import type { AppResult } from './app-result';
+
+export const SETTINGS_GET_CHANNEL = 'settings:get';
+export const SETTINGS_SET_WEEK_START_CHANNEL = 'settings:set-week-start';
+export const SETTINGS_SET_THEME_CHANNEL = 'settings:set-theme';
+
 export const WEEK_STARTS_ON_VALUES = ['monday', 'sunday'] as const;
 export type WeekStartsOn = (typeof WEEK_STARTS_ON_VALUES)[number];
 
@@ -16,4 +22,12 @@ export interface SetWeekStartsOnInput {
 
 export interface SetThemeInput {
   readonly theme: ThemePreference;
+}
+
+export interface SettingsAPI {
+  get(): Promise<AppResult<ApplicationSettings>>;
+  setWeekStartsOn(
+    input: SetWeekStartsOnInput,
+  ): Promise<AppResult<ApplicationSettings>>;
+  setTheme(input: SetThemeInput): Promise<AppResult<ApplicationSettings>>;
 }

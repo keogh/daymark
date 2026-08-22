@@ -8,6 +8,11 @@ import {
 } from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import {
+  SETTINGS_GET_CHANNEL,
+  SETTINGS_SET_THEME_CHANNEL,
+  SETTINGS_SET_WEEK_START_CHANNEL,
+} from '@/shared/contracts/settings';
+import {
   TASKS_DELETE_CHANNEL,
   TASKS_GET_DELETION_SUMMARY_CHANNEL,
   TASKS_GET_SUGGESTIONS_CHANNEL,
@@ -55,6 +60,12 @@ const timeTrackerApi: TimeTrackerAPI = {
   analytics: {
     getSummary: (input) =>
       ipcRenderer.invoke(ANALYTICS_GET_SUMMARY_CHANNEL, input),
+  },
+  settings: {
+    get: () => ipcRenderer.invoke(SETTINGS_GET_CHANNEL),
+    setWeekStartsOn: (input) =>
+      ipcRenderer.invoke(SETTINGS_SET_WEEK_START_CHANNEL, input),
+    setTheme: (input) => ipcRenderer.invoke(SETTINGS_SET_THEME_CHANNEL, input),
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),

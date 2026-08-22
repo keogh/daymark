@@ -1206,6 +1206,11 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
     analytics: {
       getSummary: vi.fn(),
     },
+    settings: {
+      get: vi.fn(),
+      setWeekStartsOn: vi.fn(),
+      setTheme: vi.fn(),
+    },
     history: {
       getPage:
         overrides.getHistoryPage ??

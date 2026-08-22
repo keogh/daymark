@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
 import { AnalyticsQueryRepository } from '@/main/database/repositories/analytics-query-repository';
 import { HistoryQueryRepository } from '@/main/database/repositories/history-query-repository';
+import { SettingsRepository } from '@/main/database/repositories/settings-repository';
 import { TaskRepository } from '@/main/database/repositories/task-repository';
 import { TaskSuggestionQueryRepository } from '@/main/database/repositories/task-suggestion-query-repository';
 import { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
@@ -19,6 +20,7 @@ import { registerAnalyticsHandler } from '@/main/ipc/analytics';
 import { registerHistoryHandler } from '@/main/ipc/history';
 import { registerIntervalsHandlers } from '@/main/ipc/intervals';
 import { registerManualTimeHandler } from '@/main/ipc/manual-time';
+import { registerSettingsHandlers } from '@/main/ipc/settings';
 import { registerTimerHandlers } from '@/main/ipc/timer';
 import { registerTasksHandler } from '@/main/ipc/tasks';
 import { DurationProjector } from '@/main/services/duration-projections';
@@ -27,6 +29,7 @@ import { SystemHealthService } from '@/main/services/system-health';
 import { HistoryService } from '@/main/services/history-service';
 import { IntervalService } from '@/main/services/interval-service';
 import { ManualTimeService } from '@/main/services/manual-time-service';
+import { SettingsService } from '@/main/services/settings-service';
 import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 import { TaskService } from '@/main/services/task-service';
@@ -71,6 +74,7 @@ export const registerApplicationLifecycle = (): void => {
         const appState = new AppStateRepository(context.db);
         const tasks = new TaskRepository(context.db);
         const intervals = new TimeIntervalRepository(context.db);
+        const settings = new SettingsRepository(context.db);
         const analyticsQueries = new AnalyticsQueryRepository(context.db);
         const historyQueries = new HistoryQueryRepository(context.db);
         const taskSuggestionQueries = new TaskSuggestionQueryRepository(
@@ -97,6 +101,11 @@ export const registerApplicationLifecycle = (): void => {
         const analyticsService = new AnalyticsService({
           clock,
           analyticsQueries,
+        });
+        const settingsService = new SettingsService({
+          clock,
+          settings,
+          logger: console,
         });
         const intervalService = new IntervalService({
           appState,
@@ -171,6 +180,9 @@ export const registerApplicationLifecycle = (): void => {
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
         shutdown.addCleanupHook(
           registerAnalyticsHandler(ipcMain, analyticsService, console),
+        );
+        shutdown.addCleanupHook(
+          registerSettingsHandlers(ipcMain, settingsService, console),
         );
         registerIntervalsHandlers(
           ipcMain,

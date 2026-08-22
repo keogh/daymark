@@ -10,6 +10,11 @@ import {
 } from '@/shared/contracts/intervals';
 import { MANUAL_TIME_CREATE_INTERVAL_CHANNEL } from '@/shared/contracts/manual-time';
 import {
+  SETTINGS_GET_CHANNEL,
+  SETTINGS_SET_THEME_CHANNEL,
+  SETTINGS_SET_WEEK_START_CHANNEL,
+} from '@/shared/contracts/settings';
+import {
   TASKS_DELETE_CHANNEL,
   TASKS_GET_DELETION_SUMMARY_CHANNEL,
   TASKS_GET_SUGGESTIONS_CHANNEL,
@@ -79,6 +84,7 @@ describe('preload API', () => {
       'system',
       'timer',
       'analytics',
+      'settings',
       'history',
       'intervals',
       'manualTime',
@@ -95,6 +101,11 @@ describe('preload API', () => {
     ]);
     expect(Object.keys(api.history)).toEqual(['getPage']);
     expect(Object.keys(api.analytics)).toEqual(['getSummary']);
+    expect(Object.keys(api.settings)).toEqual([
+      'get',
+      'setWeekStartsOn',
+      'setTheme',
+    ]);
     expect(Object.keys(api.intervals)).toEqual(['update', 'delete']);
     expect(Object.keys(api.manualTime)).toEqual(['createInterval']);
     expect(Object.keys(api.tasks)).toEqual([
@@ -130,6 +141,9 @@ describe('preload API', () => {
       registeredListener,
     );
     await api.analytics.getSummary({ range: 'last-7-days' });
+    await api.settings.get();
+    await api.settings.setWeekStartsOn({ weekStartsOn: 'sunday' });
+    await api.settings.setTheme({ theme: 'dark' });
     await api.history.getPage({ beforeDayStartedAt: 0 });
     await api.intervals.update({
       intervalId: 'interval-1',
@@ -159,6 +173,9 @@ describe('preload API', () => {
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],
       [ANALYTICS_GET_SUMMARY_CHANNEL, { range: 'last-7-days' }],
+      [SETTINGS_GET_CHANNEL],
+      [SETTINGS_SET_WEEK_START_CHANNEL, { weekStartsOn: 'sunday' }],
+      [SETTINGS_SET_THEME_CHANNEL, { theme: 'dark' }],
       [HISTORY_GET_PAGE_CHANNEL, { beforeDayStartedAt: 0 }],
       [
         INTERVALS_UPDATE_CHANNEL,
