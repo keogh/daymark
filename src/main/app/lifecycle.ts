@@ -15,6 +15,7 @@ import {
   resolveMigrationsPath,
 } from '@/main/database/path';
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
+import { registerAnalyticsHandler } from '@/main/ipc/analytics';
 import { registerHistoryHandler } from '@/main/ipc/history';
 import { registerIntervalsHandlers } from '@/main/ipc/intervals';
 import { registerManualTimeHandler } from '@/main/ipc/manual-time';
@@ -93,13 +94,10 @@ export const registerApplicationLifecycle = (): void => {
           generateId: randomUUID,
         });
         const historyService = new HistoryService({ clock, historyQueries });
-        // Constructed at the application composition root now; the narrow IPC
-        // boundary is introduced by TASK-009-004.
         const analyticsService = new AnalyticsService({
           clock,
           analyticsQueries,
         });
-        void analyticsService;
         const intervalService = new IntervalService({
           appState,
           intervals,
@@ -171,6 +169,9 @@ export const registerApplicationLifecycle = (): void => {
           console,
         );
         registerHistoryHandler(ipcMain, { clock, historyService }, console);
+        shutdown.addCleanupHook(
+          registerAnalyticsHandler(ipcMain, analyticsService, console),
+        );
         registerIntervalsHandlers(
           ipcMain,
           { commands: intervalService, synchronize: synchronization },

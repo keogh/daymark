@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ANALYTICS_GET_SUMMARY_CHANNEL } from '@/shared/contracts/analytics';
 import { SYSTEM_HEALTH_CHECK_CHANNEL } from '@/shared/contracts/system-health';
 import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
@@ -77,6 +78,7 @@ describe('preload API', () => {
     expect(Object.keys(api)).toEqual([
       'system',
       'timer',
+      'analytics',
       'history',
       'intervals',
       'manualTime',
@@ -92,6 +94,7 @@ describe('preload API', () => {
       'onStateChanged',
     ]);
     expect(Object.keys(api.history)).toEqual(['getPage']);
+    expect(Object.keys(api.analytics)).toEqual(['getSummary']);
     expect(Object.keys(api.intervals)).toEqual(['update', 'delete']);
     expect(Object.keys(api.manualTime)).toEqual(['createInterval']);
     expect(Object.keys(api.tasks)).toEqual([
@@ -126,6 +129,7 @@ describe('preload API', () => {
       TIMER_STATE_CHANGED_CHANNEL,
       registeredListener,
     );
+    await api.analytics.getSummary({ range: 'last-7-days' });
     await api.history.getPage({ beforeDayStartedAt: 0 });
     await api.intervals.update({
       intervalId: 'interval-1',
@@ -154,6 +158,7 @@ describe('preload API', () => {
       [TIMER_PAUSE_CHANNEL],
       [TIMER_RESUME_CHANNEL],
       [TIMER_STOP_CHANNEL],
+      [ANALYTICS_GET_SUMMARY_CHANNEL, { range: 'last-7-days' }],
       [HISTORY_GET_PAGE_CHANNEL, { beforeDayStartedAt: 0 }],
       [
         INTERVALS_UPDATE_CHANNEL,

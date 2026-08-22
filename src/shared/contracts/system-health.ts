@@ -1,3 +1,4 @@
+import type { AnalyticsAPI } from './analytics';
 import type { TimerAPI } from './timer';
 import type { HistoryAPI } from './history';
 import type { IntervalsAPI } from './intervals';
@@ -21,6 +22,7 @@ export interface TimeTrackerAPI {
     healthCheck(): Promise<SystemHealth>;
   };
   readonly timer: TimerAPI;
+  readonly analytics: AnalyticsAPI;
   readonly history: HistoryAPI;
   readonly intervals: IntervalsAPI;
   readonly manualTime: ManualTimeAPI;

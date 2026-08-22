@@ -34,7 +34,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-009-001 | Define Analytics Contracts, Validation, and Calendar Projections | Complete | None | AC-009-001–007, AC-009-017 |
 | TASK-009-002 | Implement Bounded Analytics Queries | Complete | TASK-009-001 | AC-009-003, AC-009-005–007, AC-009-018 |
 | TASK-009-003 | Implement the Authoritative Analytics Service | Complete | TASK-009-001, TASK-009-002 | AC-009-001–008, AC-009-010–012, AC-009-018 |
-| TASK-009-004 | Expose the Narrow Analytics Boundary | Pending | TASK-009-003 | AC-009-016–018 |
+| TASK-009-004 | Expose the Narrow Analytics Boundary | Complete | TASK-009-003 | AC-009-016–018 |
 | TASK-009-005 | Introduce Timer and Analytics Navigation | Pending | TASK-009-004 | AC-009-015 |
 | TASK-009-006 | Render Static Analytics States and Accessible Chart | Pending | TASK-009-004, TASK-009-005 | AC-009-001, AC-009-002, AC-009-004–009, AC-009-016 |
 | TASK-009-007 | Implement Live Analytics and Authoritative Reconciliation | Pending | TASK-009-003, TASK-009-006 | AC-009-010–014, AC-009-016 |
@@ -298,7 +298,7 @@ mutating application state.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -350,8 +350,24 @@ and no generic privileged capability.
 
 ### Completion Evidence
 
-Record commands, test counts, malformed-input no-call evidence, and boundary audit
-when complete.
+- Added the exact `analytics:get-summary` shared channel and a thin handler that
+  accepts only the two validated range objects before invoking AnalyticsService.
+- IPC tests cover missing, null, primitive, array, missing-range, unsupported,
+  unknown-property, and inherited-only input; every malformed case returns
+  `INVALID_ANALYTICS_RANGE` with zero service calls.
+- Unexpected service/query failures are logged locally and reduced to the exact
+  renderer-safe `INTERNAL_ERROR`; injected SQL and database-path details are
+  absent from the serialized renderer result.
+- Registered the handler with the composed AnalyticsService and attached its
+  exact-channel removal callback to idempotent application shutdown cleanup.
+- Added only `window.timeTracker.analytics.getSummary(input)` to the typed preload
+  API. The preload audit confirms the exact invoke channel and no raw Electron,
+  generic invoke/send/on, filesystem, database, or query capability exposure.
+- Focused Analytics validation, IPC, preload, lifecycle, History IPC, and Timer
+  IPC regressions — passed, 6 files and 43 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check` — passed.
+- `npm test` — passed, 71 files and 571 tests.
 
 ---
 

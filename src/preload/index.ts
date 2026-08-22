@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import { ANALYTICS_GET_SUMMARY_CHANNEL } from '@/shared/contracts/analytics';
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
 import {
   INTERVALS_DELETE_CHANNEL,
@@ -50,6 +51,10 @@ const timeTrackerApi: TimeTrackerAPI = {
         );
       };
     },
+  },
+  analytics: {
+    getSummary: (input) =>
+      ipcRenderer.invoke(ANALYTICS_GET_SUMMARY_CHANNEL, input),
   },
   history: {
     getPage: (input) => ipcRenderer.invoke(HISTORY_GET_PAGE_CHANNEL, input),

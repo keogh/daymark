@@ -1,5 +1,7 @@
 import type { AppResult } from './app-result';
 
+export const ANALYTICS_GET_SUMMARY_CHANNEL = 'analytics:get-summary';
+
 export const ANALYTICS_RANGES = ['last-7-days', 'last-30-days'] as const;
 
 export type AnalyticsRange = (typeof ANALYTICS_RANGES)[number];

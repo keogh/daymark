@@ -14,7 +14,9 @@ SPEC-008 is Verified. SPEC-009 implementation is active. TASK-009-001 completed
 the Analytics contracts, strict input validation, and deterministic pure local
 calendar projections. TASK-009-002 completed the fixed-count, bounded, read-only
 Analytics query with disposable-SQLite and query-plan evidence; TASK-009-003
-authoritative service composition is next.
+completed authoritative service composition. TASK-009-004 completed the narrow,
+validated, read-only IPC and preload boundary with safe errors and lifecycle
+cleanup. TASK-009-005 navigation is next.
 
 SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
 requires SPEC-009 to be Verified before Settings and UX Polish implementation
@@ -194,7 +196,7 @@ renderer console.
 
 # Upcoming Specifications
 
-1. SPEC-009 — Analytics (Ready for Implementation; queued behind SPEC-008)
+1. SPEC-009 — Analytics (Ready for Implementation; active)
 2. SPEC-010 — Settings and UX Polish (Ready for Implementation; queued behind
    SPEC-009)
 3. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
@@ -229,13 +231,11 @@ None.
 
 # Active Work
 
-SPEC-008 — System Tray and Window Lifecycle is ready for implementation. Its
-companion task breakdown begins with TASK-008-001 — Define Tray Presentation and
-Platform Asset Selection. No implementation task is currently in progress.
+SPEC-008 — System Tray and Window Lifecycle is Verified.
 
-SPEC-009 — Analytics has a complete companion task breakdown. Its first task is
-TASK-009-001 — Define Analytics Contracts, Validation, and Calendar Projections,
-but it remains pending until SPEC-008 is Verified.
+SPEC-009 — Analytics implementation is active. TASK-009-001 through TASK-009-004
+are complete; TASK-009-005 — Introduce Timer and Analytics Navigation is the next
+unblocked task.
 
 SPEC-010 — Settings and UX Polish has a complete companion task breakdown. Its
 first task is TASK-010-001 — Add Settings Persistence and Contracts, but all
@@ -303,9 +303,8 @@ dependency change is planned.
 
 # Last Updated
 
-2026-08-21 — Added the expected post-MVP sequence, SPEC-013 through SPEC-018, to
-the roadmap. These entries remain undefined and must receive complete
-specifications and task breakdowns before implementation. SPEC-012 remains Ready
-for Implementation but queued behind verification of SPEC-011 and every preceding
-specification. SPEC-008 remains the active implementation specification and
-SPEC-007 remains the latest verified implementation milestone.
+2026-08-21 — Completed TASK-009-004. Analytics now crosses one exact validated,
+read-only IPC/preload method; malformed input cannot execute the service query
+path, unexpected failures remain renderer-safe, and handler cleanup follows the
+application lifecycle. TASK-009-005 is next; SPEC-008 remains the latest verified
+specification milestone.
