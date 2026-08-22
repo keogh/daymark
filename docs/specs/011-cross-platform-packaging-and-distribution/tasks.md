@@ -38,7 +38,7 @@ dependency order in this file.
 | --- | --- | --- | --- | --- |
 | TASK-011-001 | Establish Distribution Metadata and Release Contracts | Complete | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
 | TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
+| TASK-011-003 | Build the Windows x64 Squirrel Installer | In Progress | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
 | TASK-011-004 | Build the Linux x64 Debian Package | Pending | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
 | TASK-011-005 | Add Native CI Builds and Artifact Validation | Pending | TASK-011-002, TASK-011-003, TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
 | TASK-011-006 | Assemble a Checksummed Draft GitHub Prerelease | Pending | TASK-011-005 | AC-011-008, AC-011-009, AC-011-010, AC-011-012, AC-011-017 |
@@ -237,7 +237,7 @@ Verification:
 
 ### Status
 
-Pending
+In Progress
 
 ### Outcome
 
@@ -297,8 +297,24 @@ and installer lifecycle invocations exit before normal Time Tracker initializati
 
 ### Completion Evidence
 
-Record native host, maker output, lifecycle test results, install privilege,
-application identity, icon, launch, and SmartScreen observations here.
+Implementation and local verification completed 2026-08-22 on macOS 26.3.1 arm64.
+The Windows-only Forge maker is configured for the x64 Squirrel Setup executable
+`Time-Tracker-0.1.0-win32-x64 Setup.exe`, no MSI, local source-owned ICO, approved
+author/description/product metadata, and the Squirrel-derived stable App User
+Model ID `com.squirrel.timetracker.time-tracker`. The normal Windows lifecycle
+sets that identity and enforces one reachable instance.
+
+The recommended maintained `electron-squirrel-startup` handler runs at main entry,
+and an explicit guard prevents normal lifecycle registration for install, updated,
+uninstall, and obsolete arguments. Focused packaging, release-contract, icon, and
+startup tests pass for every event and ordinary launch. Documentation records the
+bounded graphical SmartScreen override and prohibits machine-wide security
+weakening.
+
+Native Windows x64 maker output, Setup/ancillary inspection, ordinary-user
+installation, installed launch with a disposable profile, application/tray/icon
+inspection, and observed SmartScreen behavior remain pending on a native Windows
+x64 host. The task stays In Progress until that evidence is recorded.
 
 ---
 

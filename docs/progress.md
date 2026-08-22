@@ -274,8 +274,12 @@ macOS arm64/x64 DMGs with stable identity, source-owned icons, native-module
 rebuilds, local migrations/renderer/tray assets, focused inspection commands, and
 documented Gatekeeper expectations. Both targets built and passed structural
 inspection on macOS Apple Silicon; the arm64 app also launched with an isolated
-profile. Native Intel-host confirmation remains assigned to TASK-011-005. The next
-task is TASK-011-003 — Build the Windows x64 Squirrel Installer.
+profile. Native Intel-host confirmation remains assigned to TASK-011-005.
+TASK-011-003 implementation now adds the Windows x64-only Squirrel maker,
+source-owned ICO generation, stable Squirrel identity, early installer-event
+isolation, single-instance normal launch, and bounded SmartScreen guidance. Native
+Windows maker and installation evidence is still pending, so TASK-011-003 remains
+In Progress.
 
 SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
 Implementation. It defines one exact candidate and acceptance-evidence ledger;
@@ -330,9 +334,8 @@ dependency change is planned.
 
 # Last Updated
 
-2026-08-22 — Completed SPEC-011 TASK-011-002. Distinct macOS arm64 and x64 DMGs
-built successfully with architecture-matched application and `better-sqlite3`
-binaries; packaged identity, icons, migrations, renderer and tray assets passed
-inspection, and the arm64 package launched with a disposable profile. All 698
-tests plus formatting, typecheck, lint, and diff validation passed. TASK-011-003 is
-next.
+2026-08-22 — Implemented and locally verified SPEC-011 TASK-011-003's Windows x64
+Squirrel configuration, icon derivative, startup-event isolation, stable identity,
+single-instance behavior, and unsigned installation documentation. Native Windows
+x64 maker and ordinary-user installation evidence remains required before the task
+can be marked Complete.

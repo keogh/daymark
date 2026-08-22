@@ -6,7 +6,7 @@ export const distributionContract = {
     description: 'A local-first desktop time tracker.',
     identifiers: {
       macosBundleId: 'com.isaaczepeda.timetracker',
-      windowsAppUserModelId: 'com.isaaczepeda.timetracker',
+      windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
       linuxPackageName: 'time-tracker',
     },
   },
@@ -26,6 +26,8 @@ export type PrimaryArtifactDescriptor =
   (typeof distributionContract.primaryArtifacts)[number];
 
 export type MacosArchitecture = 'arm64' | 'x64';
+
+export const windowsSquirrelPackageName = 'timetracker';
 
 export function primaryArtifactName(
   version: string,

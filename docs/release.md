@@ -6,9 +6,10 @@ and testing. It is not a general-public production release.
 ## Stable identity and metadata
 
 The source-controlled distribution contract is
-`scripts/distribution-contract.ts`. Its stable macOS bundle identifier and Windows
-application user model identifier are both `com.isaaczepeda.timetracker`; its
-Linux package identifier is `time-tracker`. The package name is
+`scripts/distribution-contract.ts`. Its stable macOS bundle identifier is
+`com.isaaczepeda.timetracker`; its Windows Squirrel application user model
+identifier is `com.squirrel.timetracker.time-tracker`; and its Linux package
+identifier is `time-tracker`. The package name is
 `time-tracker`, the visible product name is `Time Tracker`, the author and Linux
 maintainer name are `Isaac Zepeda`, and the description is
 `A local-first desktop time tracker.`
@@ -61,6 +62,28 @@ macOS testers may use the documented graphical per-application override: try to
 open Time Tracker once, then open System Settings, choose Privacy & Security, and
 choose **Open Anyway** for Time Tracker. Confirm the subsequent macOS prompt.
 Do not disable Gatekeeper globally or change machine-wide security settings.
+
+## Windows x64 Squirrel installer
+
+Run `npm run icon:windows` to reproduce the committed ICO from the source-owned
+local PNG, and run `npm run make:windows:x64` on a native Windows x64 host. The
+Windows-only Forge maker produces the unsigned per-user
+`Time-Tracker-{version}-win32-x64 Setup.exe` plus Squirrel's `.nupkg` and
+`RELEASES` ancillary files. The Setup executable is the supported installation
+entry point; MSI, machine-wide installation, and automatic updates are not
+supported.
+
+Windows SmartScreen may warn or block first installation because the executable
+is unsigned. After confirming the installer came from this repository's own
+GitHub Release page, a tester may use the warning dialog's **More info**, inspect
+the displayed application and publisher information, and intentionally choose
+**Run anyway** for this installer. Do not disable SmartScreen, antivirus, or other
+machine-wide security controls.
+
+Squirrel install, update, uninstall, and obsolete invocations exit before normal
+database, tray, timer, or window initialization. Normal installed launch uses the
+stable Squirrel identity above and a single-instance lock; a second launch brings
+the existing Time Tracker window forward.
 
 ## Trust and update limitations
 

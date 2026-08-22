@@ -51,7 +51,7 @@ describe('release contract', () => {
     );
     expect(distributionContract.identity.identifiers).toEqual({
       macosBundleId: 'com.isaaczepeda.timetracker',
-      windowsAppUserModelId: 'com.isaaczepeda.timetracker',
+      windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
       linuxPackageName: 'time-tracker',
     });
     expect(distributionContract.linux).toEqual({

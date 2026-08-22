@@ -1,11 +1,14 @@
 import fs from 'node:fs';
 
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { distributionContract } from './scripts/distribution-contract.ts';
 import { macosDmgBaseName } from './scripts/distribution-contract.ts';
+import { primaryArtifactName } from './scripts/distribution-contract.ts';
+import { windowsSquirrelPackageName } from './scripts/distribution-contract.ts';
 
 const packageMetadata = JSON.parse(
   fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
@@ -54,6 +57,31 @@ const config: ForgeConfig = {
         title: distributionContract.identity.productName,
       }),
       ['darwin'],
+    ),
+    new MakerSquirrel(
+      (architecture) => {
+        if (architecture !== 'x64') {
+          throw new Error(
+            `unsupported Windows Squirrel architecture: ${architecture}`,
+          );
+        }
+
+        return {
+          authors: distributionContract.identity.author,
+          description: distributionContract.identity.description,
+          exe: `${distributionContract.identity.productName}.exe`,
+          name: windowsSquirrelPackageName,
+          noMsi: true,
+          setupExe: primaryArtifactName(packageMetadata.version, {
+            platform: 'win32',
+            architecture,
+            extension: ' Setup.exe',
+          }),
+          setupIcon: 'assets/icon/time-tracker.ico',
+          title: distributionContract.identity.productName,
+        };
+      },
+      ['win32'],
     ),
   ],
   plugins: [

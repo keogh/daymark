@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { MakerDMG } from '@electron-forge/maker-dmg';
+import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { describe, expect, it } from 'vitest';
 
 import forgeConfig from '../../../forge.config';
@@ -36,12 +37,16 @@ describe('application packaged resources', () => {
     const source = fs.readFileSync(`${iconBasePath}-source.svg`, 'utf8');
     const macOsIcon = fs.readFileSync(`${iconBasePath}.icns`);
     const reusablePng = fs.readFileSync(`${iconBasePath}.png`);
+    const windowsIcon = fs.readFileSync(`${iconBasePath}.ico`);
 
     expect(source).toContain('viewBox="0 0 1024 1024"');
     expect(source).not.toMatch(/(?:href|src)=["']https?:\/\//);
     expect(macOsIcon.subarray(0, 4).toString('ascii')).toBe('icns');
     expect(reusablePng.subarray(0, 8)).toEqual(
       Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    );
+    expect(windowsIcon.subarray(0, 4)).toEqual(
+      Buffer.from([0x00, 0x00, 0x01, 0x00]),
     );
     expect(path.isAbsolute(iconBasePath)).toBe(false);
   });
@@ -65,4 +70,28 @@ describe('application packaged resources', () => {
       });
     },
   );
+
+  it('configures a Windows-only x64 Squirrel installer', async () => {
+    const squirrelMakers = forgeConfig.makers?.filter(
+      (maker) => maker instanceof MakerSquirrel,
+    );
+
+    expect(squirrelMakers).toHaveLength(1);
+    const maker = squirrelMakers?.[0];
+    expect(maker?.platforms).toEqual(['win32']);
+    await maker?.prepareConfig('x64');
+    expect(maker?.config).toMatchObject({
+      authors: 'Isaac Zepeda',
+      description: 'A local-first desktop time tracker.',
+      exe: 'Time Tracker.exe',
+      name: 'timetracker',
+      noMsi: true,
+      setupExe: 'Time-Tracker-0.1.0-win32-x64 Setup.exe',
+      setupIcon: 'assets/icon/time-tracker.ico',
+      title: 'Time Tracker',
+    });
+    await expect(maker?.prepareConfig('arm64')).rejects.toThrow(
+      'unsupported Windows Squirrel architecture',
+    );
+  });
 });

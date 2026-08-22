@@ -42,6 +42,7 @@ import { TimerPresentationSynchronization } from '@/main/timer/state-synchroniza
 import { selectTrayAsset, type TrayPlatform } from '@/main/tray/assets';
 import { ElectronTrayAdapter } from '@/main/tray/native';
 import { IntervalTrayScheduler, SystemTrayService } from '@/main/tray/service';
+import { distributionContract } from '../../../scripts/distribution-contract';
 
 export const registerApplicationLifecycle = (): void => {
   const shutdown = new ApplicationShutdown({
@@ -55,6 +56,17 @@ export const registerApplicationLifecycle = (): void => {
     isQuitting: () => shutdown.isQuitting(),
     requestForegroundAttention: () => app.focus(),
   });
+
+  if (process.platform === 'win32') {
+    app.setAppUserModelId(
+      distributionContract.identity.identifiers.windowsAppUserModelId,
+    );
+    if (!app.requestSingleInstanceLock()) {
+      app.quit();
+      return;
+    }
+    app.on('second-instance', () => windowOwner.open());
+  }
 
   void app.whenReady().then(() => {
     const lifecycle = new DatabaseLifecycle({

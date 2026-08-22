@@ -7,6 +7,7 @@ import {
 
 const stableSemver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const reverseDomainId = /^[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*){2,}$/;
+const windowsAppUserModelId = /^[a-z][a-z0-9]*(?:\.[a-z][a-z0-9-]*){2,}$/;
 
 export interface PackageMetadata {
   name?: unknown;
@@ -55,13 +56,13 @@ export function validatePackageMetadata(metadata: PackageMetadata): string[] {
       'package.json homepage must be omitted until a canonical value is approved',
     );
   }
-  for (const [name, identifier] of Object.entries({
-    macosBundleId: expected.identifiers.macosBundleId,
-    windowsAppUserModelId: expected.identifiers.windowsAppUserModelId,
-  })) {
-    if (!reverseDomainId.test(identifier)) {
-      errors.push(`${name} must be a reverse-domain-style value`);
-    }
+  if (!reverseDomainId.test(expected.identifiers.macosBundleId)) {
+    errors.push('macosBundleId must be a reverse-domain-style value');
+  }
+  if (!windowsAppUserModelId.test(expected.identifiers.windowsAppUserModelId)) {
+    errors.push(
+      'windowsAppUserModelId must be a reverse-domain-style Squirrel value',
+    );
   }
   if (expected.identifiers.linuxPackageName !== expected.packageName) {
     errors.push('Linux package identifier must match the package name');
