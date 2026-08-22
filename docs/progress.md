@@ -2,30 +2,27 @@
 
 ## Current Phase
 
-Settings and UX Polish implementation
+Cross-Platform Packaging and Distribution queued
 
 ## Current Specification
 
-SPEC-010 — Settings and UX Polish (Ready for Implementation)
+SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation)
 
 ## Current Status
 
-SPEC-010 implementation is active through TASK-010-007. Settings now have
-authoritative persistence and a narrow validated boundary, Analytics honors the
-persisted week start, and the accessible Settings destination applies immediate
-serialized preferences. Complete Light, Dark, and live System appearances use
-semantic tokens, resolve before primary content is revealed, and preserve Timer
-state without appearance-driven settings writes. The bounded whole-app UX audit
-now retains per-surface evidence and targeted duration, Analytics keyboard-focus,
-Add time focus-restoration, and constrained-dialog repairs. A source-owned clock
-icon master is now locally derived and wired into the verified primary-platform
-package without changing the native tray assets. TASK-010-008, packaged settings
-verification and documentation reconciliation, is the next unblocked task.
+SPEC-010 is Verified. Settings use authoritative singleton persistence and a
+narrow validated boundary; Analytics honors persisted Monday/Sunday week starts;
+System, Light, and Dark appearances apply immediately; and the bounded whole-app
+UX audit retains the targeted duration, keyboard, focus-restoration, dialog, and
+minimum-window repairs. The source-owned application icon is packaged locally.
 
-SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
-SPEC-011 remains dependent on verification of SPEC-010 and all preceding work.
-SPEC-012 is the final MVP release gate and cannot begin until SPEC-011 and every
-earlier specification are Verified.
+All SPEC-010 checks and 681 tests in 81 files passed on 2026-08-22. Isolated
+packaged macOS arm64 acceptance verified settings defaults and reload/restart
+persistence, live System and explicit appearance behavior, 3h Sunday versus 1h
+Monday current-week totals, running/paused Timer continuity, keyboard/dialog
+focus, 640x480 usability, icon identity, zero renderer warning/error console
+events, and zero HTTP(S) resources. SPEC-011 is now unblocked. SPEC-012 remains
+the final MVP release gate after SPEC-011 is Verified.
 
 ---
 
@@ -41,6 +38,26 @@ earlier specification are Verified.
 - SPEC-007 — Task Management (Verified 2026-08-21)
 - SPEC-008 — System Tray and Window Lifecycle (Verified 2026-08-21)
 - SPEC-009 — Analytics (Verified 2026-08-22)
+- SPEC-010 — Settings and UX Polish (Verified 2026-08-22)
+
+SPEC-010 delivered:
+
+- one migrated, constrained settings singleton with Monday/System defaults,
+  field-isolated no-op-aware updates, injected-Clock timestamps, and a narrow
+  runtime-validated IPC/preload boundary;
+- persisted Monday/Sunday current-week Analytics projection and immediate
+  System/Light/Dark appearance with live system response and safe rollback;
+- accessible three-destination navigation plus bounded whole-app theme, duration,
+  keyboard, focus, dialog-scroll, long-content, and minimum-window repairs;
+- a source-owned locally packaged application icon without changing tray assets.
+
+Final acceptance covered AC-010-001 through AC-010-019 and the project Definition
+of Done. Formatting, typecheck, lint, all 681 tests in 81 files, macOS arm64
+packaging, and diff checks passed on 2026-08-22. The isolated packaged workflow
+used `/tmp/timetracker-task010-final-user-data`, restored Sunday/Dark and a paused
+Timer across full restart, produced 3h Sunday versus 1h Monday current-week totals,
+remained usable at 640x480, and recorded no HTTP(S) resource or renderer console
+warning/error.
 
 SPEC-009 delivered:
 
@@ -219,10 +236,8 @@ renderer console.
 
 # Upcoming Specifications
 
-1. SPEC-010 — Settings and UX Polish (Ready for Implementation)
-2. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for
-   Implementation; queued behind SPEC-010)
-3. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
+1. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation)
+2. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
    behind SPEC-011)
 
 ## Expected Post-MVP Specifications
@@ -252,11 +267,8 @@ None.
 
 # Active Work
 
-SPEC-009 — Analytics is Verified.
-
-SPEC-010 — Settings and UX Polish has a complete companion task breakdown.
-TASK-010-001 and TASK-010-002 are complete. TASK-010-003 — Integrate Persisted
-Week Start with Analytics is next and remains unblocked.
+SPEC-010 — Settings and UX Polish is Verified. All eight implementation tasks and
+AC-010-001 through AC-010-019 are complete.
 
 SPEC-011 — Cross-Platform Packaging and Distribution is designed and queued as
 Ready for Implementation. It defines unsigned personal-install DMG, Squirrel, and
@@ -264,8 +276,7 @@ Debian artifacts; native GitHub Actions builds; exact package-version/tag matchi
 checksummed draft GitHub prereleases; fresh-machine installation acceptance; and
 data-preserving reinstall, uninstall/reinstall, and later forward-upgrade behavior.
 Its first task is TASK-011-001 — Establish Distribution Metadata and Release
-Contracts. Implementation remains pending until SPEC-010 and every preceding
-specification are Verified.
+Contracts, which is now unblocked.
 
 SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
 Implementation. It defines one exact candidate and acceptance-evidence ledger;

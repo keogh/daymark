@@ -3,8 +3,8 @@
 ## Source
 
 - Specification: `docs/specs/010-settings-and-ux-polish/spec.md`
-- Specification status: Ready for Implementation
-- Last reviewed against specification: 2026-08-21
+- Specification status: Verified
+- Last reviewed against specification: 2026-08-22
 
 The specification is the source of truth for behavior. This file only decomposes
 that behavior into implementation work. If the two conflict, update this breakdown
@@ -33,14 +33,14 @@ external prerequisite does not change the internal dependency order in this file
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-010-001 | Add Settings Persistence and Contracts | Pending | None | AC-010-001–003, AC-010-008, AC-010-016–017 |
+| TASK-010-001 | Add Settings Persistence and Contracts | Complete | None | AC-010-001–003, AC-010-008, AC-010-016–017 |
 | TASK-010-002 | Implement the Settings Service and Narrow Boundary | Complete | TASK-010-001 | AC-010-002–003, AC-010-005, AC-010-008–009, AC-010-016–017 |
-| TASK-010-003 | Integrate Persisted Week Start with Analytics | Pending | TASK-010-002 | AC-010-004, AC-010-017 |
+| TASK-010-003 | Integrate Persisted Week Start with Analytics | Complete | TASK-010-002 | AC-010-004, AC-010-017 |
 | TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Complete | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
 | TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Complete | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
 | TASK-010-006 | Complete the Bounded Whole-App UX Audit | Complete | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
 | TASK-010-007 | Add and Package the Application Icon | Complete | TASK-010-005 | AC-010-018 |
-| TASK-010-008 | Verify Packaged Settings and Reconcile Documentation | Pending | TASK-010-001–007 | AC-010-001–019 |
+| TASK-010-008 | Verify Packaged Settings and Reconcile Documentation | Complete | TASK-010-001–007 | AC-010-001–019 |
 
 ---
 
@@ -633,7 +633,7 @@ cross-platform installer work or rebranding.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -702,10 +702,43 @@ completed implementation.
 
 ### Completion Evidence
 
-Record exact commands, versions/platform, complete test counts, artifact and
-isolated data paths, migration source/target, UX audit reference, Settings/theme
-observations, Analytics boundary totals, icon/network/console results, deviations,
-and documentation changes before marking this task Complete.
+- Final verification ran on macOS 26.3.1 arm64 with Node 24.18.1 and npm 11.16.0.
+  `npm run format:check`, `npm run typecheck`, `npm run lint`, all 681 tests in 81
+  files, `npm run package`, and `git diff --check` passed. The sandboxed package
+  attempt could not resolve `github.com`; the approved network-enabled rerun
+  completed successfully and produced
+  `out/Time Tracker-darwin-arm64/Time Tracker.app`.
+- Isolated packaged acceptance used
+  `/tmp/timetracker-task010-final-user-data/time-tracker.sqlite` and the packaged
+  `file:` renderer. A fresh migrated profile contained exactly one Monday/System
+  settings row with deterministic `updated_at = 0`; prior migration tests prove
+  preservation from schema `0001` through `0002_mute_tarot`.
+- Packaged Settings showed Monday/System defaults, applied Sunday/Dark without a
+  Save action, retained Sunday/Dark across renderer reload, and restored those
+  preferences after a complete process termination and relaunch. The same
+  restart restored the authoritative paused Timer and its one-second session.
+- Representative Sunday and Monday intervals produced a 3h Sunday-based current
+  week and a 1h Monday-based current week. Selected-range total and current-month
+  total both remained 3h, and the disposable database retained two Tasks, three
+  intervals, and the paused AppState through preference changes.
+- Simulated system-light appearance left explicit Dark unchanged. With System
+  selected, simulated light and dark changes updated effective appearance live
+  while the selected preference remained System; automated coverage proves these
+  media-query changes invoke neither settings persistence nor Timer commands.
+  Packaged changes while running and paused preserved the corresponding Timer
+  presentations.
+- At the exact configured 640x480 minimum viewport, Settings had no horizontal
+  overflow. The Add time dialog kept Task focus, remained internally scrollable
+  within the viewport, closed with Escape, and restored the exact Add time trigger.
+  The completed per-surface audit and repair evidence remains in `ux-audit.md`.
+- The packaged renderer emitted zero warning/error console events and requested
+  zero HTTP(S) resources. `Info.plist` selects `electron.icns`; packaged and
+  source ICNS SHA-256 values both equal
+  `7d5ff142d9d04743d3a011342a5f6f1cd11cb0ffa92387b6d966905a28dfa642`.
+- Review found no architecture or accepted-decision change, so
+  `docs/architecture/architecture.md` and `docs/decisions.md` required no edit.
+  Windows/Linux fresh-machine, installer, signing, notarization, publishing, and
+  release validation remain assigned to SPEC-011 and SPEC-012.
 
 ---
 

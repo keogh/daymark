@@ -6,37 +6,38 @@ SPEC-010 — Settings and UX Polish
 
 ## Active Task
 
-TASK-010-007 — Add and Package the Application Icon
+TASK-010-008 — Verify Packaged Settings and Reconcile Documentation
 
 ## Status
 
-TASK-010-007 Complete
+TASK-010-008 Complete
 
 ---
 
 # Immediate Plan
 
-1. Create one source-owned, reusable application-icon master that remains recognizable at ordinary launcher sizes and is visually compatible with, but distinct from, the tray stopwatch.
-2. Derive the primary-platform macOS icon asset locally and configure the existing Electron Forge packaging path to use it.
-3. Run focused configuration and quality checks, package the application, and inspect the packaged icon resources plus ordinary small and large launcher renderings.
-4. Confirm the packaged icon has no runtime network dependency, preserve the native tray assets unchanged, and record completion evidence.
+1. Audit AC-010-001 through AC-010-019 against automated coverage, the retained UX audit, and prior task evidence; identify any acceptance gaps before final verification.
+2. Run the complete formatting, type, lint, test, packaging, and diff validation required by SPEC-010.
+3. Exercise specification section 35 against the packaged macOS arm64 application with isolated data, including settings persistence, appearance behavior, Analytics week boundaries, Timer continuity, keyboard/dialog focus, minimum-window layout, icon presence, and local-only console/network health.
+4. Inspect platform-neutral branches and reconcile the specification, task breakdown, progress, plan, architecture, decisions, and follow-on scope with exact evidence and deviations.
 
 ---
 
 # Scope Guard
 
-Only TASK-010-007 source icon creation, primary-platform conversion, packaging
-configuration, and focused verification are included. Brand-system work,
-renderer redesign, tray replacement, Windows/Linux installer formats, signing,
-notarization, publishing, and final packaged SPEC-010 acceptance remain deferred.
+Only TASK-010-008 final SPEC-010 verification and documentation reconciliation
+are included. Windows/Linux fresh-machine validation, installers, signing,
+notarization, publishing, release automation, unrelated refactoring, and new
+product behavior remain deferred to their owning specifications.
 
 ---
 
 # Completion
 
-TASK-010-007 added a project-authored SVG icon master, reusable 1024x1024 PNG,
-and derived macOS ICNS; configured Electron Forge to package the icon; and
-verified the packaged `Info.plist`, byte-identical embedded ICNS, small and large
-representations, isolated application launch, local-only assets, and unchanged
-tray files. Focused tests, static checks, packaging, and diff validation passed on
-2026-08-22. TASK-010-008 is the next unblocked task.
+TASK-010-008 passed all 681 automated tests in 81 files, formatting, typecheck,
+lint, macOS arm64 packaging, and diff checks. Isolated packaged acceptance proved
+defaults, immediate application, reload/restart persistence, System and explicit
+appearance behavior, Sunday/Monday Analytics totals, running/paused Timer
+continuity, keyboard/dialog focus, minimum-window layout, packaged icon identity,
+clean console, and local-only rendering. SPEC-010 and its documentation are
+reconciled as Verified; SPEC-011 is the next implementation-ready specification.
