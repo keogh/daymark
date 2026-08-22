@@ -182,6 +182,11 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('radio', { name: 'Dark' }));
     expect(document.documentElement).toHaveClass('dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(document.documentElement).toHaveAttribute(
+      'data-theme-preference',
+      'dark',
+    );
 
     theme.resolve({
       ok: false,
@@ -191,7 +196,38 @@ describe('App', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('not saved');
     expect(screen.getByRole('radio', { name: 'System' })).toBeChecked();
     expect(document.documentElement).not.toHaveClass('dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'light');
+    expect(document.documentElement).toHaveAttribute(
+      'data-theme-preference',
+      'system',
+    );
     expect(api.settings.setTheme).toHaveBeenCalledOnce();
+  });
+
+  it('resolves the persisted appearance before revealing primary content', async () => {
+    const settings = deferred<AppResult<ApplicationSettings>>();
+    setTimerApi({ getSettings: vi.fn(() => settings.promise) });
+    render(<App />);
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Loading Time Tracker',
+    );
+    expect(
+      screen.queryByRole('region', { name: 'Timer' }),
+    ).not.toBeInTheDocument();
+
+    settings.resolve({
+      ok: true,
+      value: { ...defaultSettings, theme: 'dark' },
+    });
+
+    expect(await screen.findByRole('region', { name: 'Timer' })).toBeVisible();
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(document.documentElement).toHaveAttribute(
+      'data-theme-preference',
+      'dark',
+    );
+    expect(document.documentElement.style.colorScheme).toBe('dark');
   });
 
   it('uses System fallback after load failure and retries without writing defaults', async () => {
@@ -222,6 +258,7 @@ describe('App', () => {
   it('follows live system appearance only while System is confirmed', async () => {
     let systemIsDark = false;
     let notifyAppearanceChange: (() => void) | undefined;
+    const removeAppearanceListener = vi.fn();
     vi.stubGlobal(
       'matchMedia',
       vi.fn(() => ({
@@ -233,7 +270,7 @@ describe('App', () => {
         addEventListener: (_event: string, listener: () => void) => {
           notifyAppearanceChange = listener;
         },
-        removeEventListener: vi.fn(),
+        removeEventListener: removeAppearanceListener,
         addListener: vi.fn(),
         removeListener: vi.fn(),
         dispatchEvent: vi.fn(),
@@ -245,7 +282,7 @@ describe('App', () => {
         value: { ...defaultSettings, theme: 'light', updatedAt: 1 },
       }),
     });
-    render(<App />);
+    const { unmount } = render(<App />);
     await screen.findByRole('region', { name: 'Timer' });
 
     systemIsDark = true;
@@ -262,6 +299,17 @@ describe('App', () => {
     act(() => notifyAppearanceChange?.());
     expect(document.documentElement).not.toHaveClass('dark');
     expect(api.settings.setTheme).toHaveBeenCalledOnce();
+    expect(api.timer.start).not.toHaveBeenCalled();
+    expect(api.timer.pause).not.toHaveBeenCalled();
+    expect(api.timer.resume).not.toHaveBeenCalled();
+    expect(api.timer.stop).not.toHaveBeenCalled();
+
+    unmount();
+    expect(removeAppearanceListener).toHaveBeenCalledOnce();
+    expect(removeAppearanceListener).toHaveBeenCalledWith(
+      'change',
+      notifyAppearanceChange,
+    );
   });
 
   it('does not issue a Timer command while navigating in either direction', async () => {

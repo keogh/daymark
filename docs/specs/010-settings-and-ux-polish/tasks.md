@@ -37,7 +37,7 @@ external prerequisite does not change the internal dependency order in this file
 | TASK-010-002 | Implement the Settings Service and Narrow Boundary | Complete | TASK-010-001 | AC-010-002–003, AC-010-005, AC-010-008–009, AC-010-016–017 |
 | TASK-010-003 | Integrate Persisted Week Start with Analytics | Pending | TASK-010-002 | AC-010-004, AC-010-017 |
 | TASK-010-004 | Add Settings Navigation, Controller, and Preference UI | Complete | TASK-010-002, TASK-010-003 | AC-010-002–011, AC-010-016–017 |
-| TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Pending | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
+| TASK-010-005 | Implement Complete Light, Dark, and System Appearance | Complete | TASK-010-004 | AC-010-005–009, AC-010-012, AC-010-017 |
 | TASK-010-006 | Complete the Bounded Whole-App UX Audit | Pending | TASK-010-004, TASK-010-005 | AC-010-010–015, AC-010-017 |
 | TASK-010-007 | Add and Package the Application Icon | Pending | TASK-010-005 | AC-010-018 |
 | TASK-010-008 | Verify Packaged Settings and Reconcile Documentation | Pending | TASK-010-001–007 | AC-010-001–019 |
@@ -385,7 +385,7 @@ predictably without interrupting Timer behavior.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -445,8 +445,28 @@ startup resolves appearance before revealing primary content.
 
 ### Completion Evidence
 
-Record commands, test counts, system-listener cleanup/no-write evidence, bootstrap
-behavior, visual surface checklist, and targeted token changes when complete.
+- Added a pure preference resolver and one root appearance applicator exposing
+  `data-theme`, `data-theme-preference`, the existing Dark compatibility class,
+  and matching `color-scheme`. System uses one cached media query with one live
+  listener and lifecycle cleanup; focused tests prove System changes cause no
+  settings or Timer commands and explicit Light remains unchanged.
+- Preserved concurrent Timer/Settings bootstrap while keeping primary destination
+  content behind Settings resolution. A deferred-settings test proves persisted
+  Dark is applied before Timer content appears; failed loads retain the existing
+  renderer-lifetime System fallback without a write.
+- Added system-aware pre-resolution Dark tokens and semantic running, warning,
+  overlay, and elevated-shadow tokens. Replaced the demonstrated raw light-only
+  Timer headings, clock, status, muted copy, suggestion shadow, and dialog overlay;
+  all other renderer presentation colors resolve through the shared palette.
+- Packaged macOS arm64 QA used an isolated temporary profile. Light and Dark
+  Settings at normal size and Dark at the configured 720×560 minimum showed
+  readable navigation, selection, text, cards, borders, and scrolling. CDP evidence
+  confirmed exact root attributes, `color-scheme`, and computed background,
+  foreground, card, and border colors for both appearances.
+- Verification passed on 2026-08-22: focused appearance/App suite (50 tests in 2
+  files), full regression suite (679 tests in 81 files), `npm run typecheck`,
+  `npm run lint`, `npm run format:check`, `npm run package`, and
+  `git diff --check`.
 
 ---
 

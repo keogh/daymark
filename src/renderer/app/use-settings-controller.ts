@@ -5,6 +5,7 @@ import type {
   ThemePreference,
   WeekStartsOn,
 } from '@/shared/contracts/settings';
+import { applyAppearance } from './theme';
 
 type SettingsLoadState =
   | { readonly status: 'loading' }
@@ -26,12 +27,6 @@ const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)';
 const LOAD_ERROR = 'Settings could not be loaded.';
 const SAVE_ERROR = 'This setting was not saved. Please try again.';
 
-const applyTheme = (theme: ThemePreference, systemPrefersDark: boolean) => {
-  const useDark = theme === 'dark' || (theme === 'system' && systemPrefersDark);
-  document.documentElement.classList.toggle('dark', useDark);
-  document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
-};
-
 export const useSettingsController = (
   onWeekStartConfirmed: () => void,
 ): SettingsController => {
@@ -46,23 +41,28 @@ export const useSettingsController = (
   const activeTheme = useRef<ThemePreference>('system');
   const requestSequence = useRef(0);
   const mounted = useRef(true);
+  const systemThemeMedia = useRef<MediaQueryList | null>(null);
   const onWeekStartConfirmedRef = useRef(onWeekStartConfirmed);
 
   useEffect(() => {
     onWeekStartConfirmedRef.current = onWeekStartConfirmed;
   }, [onWeekStartConfirmed]);
 
-  const systemPrefersDark = useCallback(
-    () => window.matchMedia(SYSTEM_THEME_QUERY).matches,
-    [],
-  );
+  const getSystemThemeMedia = useCallback(() => {
+    systemThemeMedia.current ??= window.matchMedia(SYSTEM_THEME_QUERY);
+    return systemThemeMedia.current;
+  }, []);
 
   const showTheme = useCallback(
     (theme: ThemePreference) => {
       activeTheme.current = theme;
-      applyTheme(theme, systemPrefersDark());
+      applyAppearance(
+        document.documentElement,
+        theme,
+        getSystemThemeMedia().matches,
+      );
     },
-    [systemPrefersDark],
+    [getSystemThemeMedia],
   );
 
   const load = useCallback(async () => {
@@ -103,13 +103,15 @@ export const useSettingsController = (
   }, [load]);
 
   useEffect(() => {
-    const media = window.matchMedia(SYSTEM_THEME_QUERY);
+    const media = getSystemThemeMedia();
     const handleChange = () => {
-      if (activeTheme.current === 'system') applyTheme('system', media.matches);
+      if (activeTheme.current === 'system') {
+        applyAppearance(document.documentElement, 'system', media.matches);
+      }
     };
     media.addEventListener('change', handleChange);
     return () => media.removeEventListener('change', handleChange);
-  }, []);
+  }, [getSystemThemeMedia]);
 
   const commit = useCallback(
     async (

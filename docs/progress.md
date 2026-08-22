@@ -10,12 +10,13 @@ SPEC-010 — Settings and UX Polish (Ready for Implementation)
 
 ## Current Status
 
-SPEC-010 implementation is active. TASK-010-001 and TASK-010-002 are complete:
-settings now have shared exact contracts, constrained singleton persistence, an
-injected-Clock service with same-value no-op semantics, three runtime-validated IPC
-handlers, lifecycle cleanup, and three narrow typed preload methods. Safe failure,
-rollback, reconstruction, no-write, and boundary coverage passes. TASK-010-003 is
-the next unblocked task.
+SPEC-010 implementation is active through TASK-010-005. Settings now have
+authoritative persistence and a narrow validated boundary, Analytics honors the
+persisted week start, and the accessible Settings destination applies immediate
+serialized preferences. Complete Light, Dark, and live System appearances use
+semantic tokens, resolve before primary content is revealed, and preserve Timer
+state without appearance-driven settings writes. TASK-010-006, the bounded
+whole-app UX audit, is the next unblocked task.
 
 SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
 SPEC-011 remains dependent on verification of SPEC-010 and all preceding work.

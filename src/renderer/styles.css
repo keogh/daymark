@@ -52,8 +52,12 @@
   --border: #c9d1df;
   --input: #c9d1df;
   --ring: #4c6ef5;
-  color: #172033;
-  background: #f5f7fb;
+  --running: #3156d3;
+  --warning: #8a5700;
+  --overlay: rgb(17 24 39 / 48%);
+  --elevated-shadow: rgb(23 32 51 / 12%);
+  color: var(--foreground);
+  background: var(--background);
   font-family:
     Inter,
     ui-sans-serif,
@@ -65,7 +69,8 @@
   font-synthesis: none;
 }
 
-:root.dark {
+:root.dark,
+:root[data-theme='dark'] {
   --background: #111827;
   --foreground: #f3f4f6;
   --card: #1f2937;
@@ -85,8 +90,41 @@
   --border: #48566b;
   --input: #5d6b80;
   --ring: #a5b4fc;
+  --running: #a5b4fc;
+  --warning: #fbbf6a;
+  --overlay: rgb(0 0 0 / 68%);
+  --elevated-shadow: rgb(0 0 0 / 42%);
   color: var(--foreground);
   background: var(--background);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: #111827;
+    --foreground: #f3f4f6;
+    --card: #1f2937;
+    --card-foreground: #f3f4f6;
+    --popover: #1f2937;
+    --popover-foreground: #f3f4f6;
+    --primary: #8da2fb;
+    --primary-foreground: #111827;
+    --secondary: #293548;
+    --secondary-foreground: #e5e7eb;
+    --muted: #293548;
+    --muted-foreground: #aeb8c8;
+    --accent: #344158;
+    --accent-foreground: #f3f4f6;
+    --destructive: #f97066;
+    --destructive-foreground: #111827;
+    --border: #48566b;
+    --input: #5d6b80;
+    --ring: #a5b4fc;
+    --running: #a5b4fc;
+    --warning: #fbbf6a;
+    --overlay: rgb(0 0 0 / 68%);
+    --elevated-shadow: rgb(0 0 0 / 42%);
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -516,7 +554,7 @@ input {
 .active-timer h2,
 .timer-message h2 {
   margin: 0;
-  color: #111827;
+  color: var(--foreground);
   font-size: clamp(2rem, 5vw, 3.4rem);
   font-weight: 670;
   letter-spacing: -0.05em;
@@ -549,7 +587,7 @@ input {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--popover);
-  box-shadow: 0 1rem 2rem rgb(23 32 51 / 12%);
+  box-shadow: 0 1rem 2rem var(--elevated-shadow);
 }
 
 .task-suggestion {
@@ -606,7 +644,7 @@ input {
 .timer-message p,
 .active-timer p {
   margin: 0.875rem 0 0;
-  color: #667085;
+  color: var(--muted-foreground);
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -635,7 +673,7 @@ input {
 .active-timer__clock {
   display: block;
   margin-top: 1.75rem;
-  color: #111827;
+  color: var(--foreground);
   font-variant-numeric: tabular-nums;
   font-size: clamp(3.5rem, 10vw, 6.5rem);
   font-weight: 620;
@@ -645,17 +683,17 @@ input {
 
 .active-timer .active-timer__status {
   margin-top: 0.75rem;
-  color: #3156d3;
+  color: var(--running);
   font-weight: 650;
 }
 
 .active-timer[aria-label='paused timer'] .active-timer__status {
-  color: #9a6700;
+  color: var(--warning);
 }
 
 .active-timer .active-timer__totals {
   margin-top: 1.5rem;
-  color: #667085;
+  color: var(--muted-foreground);
 }
 
 .timer-controls {
