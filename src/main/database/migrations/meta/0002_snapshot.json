@@ -1,0 +1,288 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "73b59d40-d882-40cb-a868-43760b56e8f7",
+  "prevId": "aef01b8b-6fef-4c76-8075-b851d23f99c9",
+  "tables": {
+    "app_state": {
+      "name": "app_state",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timer_status": {
+          "name": "timer_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "current_task_id": {
+          "name": "current_task_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "session_started_at": {
+          "name": "session_started_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "app_state_current_task_id_tasks_id_fk": {
+          "name": "app_state_current_task_id_tasks_id_fk",
+          "tableFrom": "app_state",
+          "tableTo": "tasks",
+          "columnsFrom": ["current_task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "app_state_singleton_id_check": {
+          "name": "app_state_singleton_id_check",
+          "value": "\"app_state\".\"id\" = 1"
+        },
+        "app_state_timer_status_check": {
+          "name": "app_state_timer_status_check",
+          "value": "\"app_state\".\"timer_status\" in ('idle', 'running', 'paused')"
+        }
+      }
+    },
+    "application_settings": {
+      "name": "application_settings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "week_starts_on": {
+          "name": "week_starts_on",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'monday'"
+        },
+        "theme": {
+          "name": "theme",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'system'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "application_settings_singleton_id_check": {
+          "name": "application_settings_singleton_id_check",
+          "value": "\"application_settings\".\"id\" = 1"
+        },
+        "application_settings_week_start_check": {
+          "name": "application_settings_week_start_check",
+          "value": "\"application_settings\".\"week_starts_on\" in ('monday', 'sunday')"
+        },
+        "application_settings_theme_check": {
+          "name": "application_settings_theme_check",
+          "value": "\"application_settings\".\"theme\" in ('system', 'light', 'dark')"
+        }
+      }
+    },
+    "tasks": {
+      "name": "tasks",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "normalized_description": {
+          "name": "normalized_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "tasks_normalized_description_unique_idx": {
+          "name": "tasks_normalized_description_unique_idx",
+          "columns": ["normalized_description"],
+          "isUnique": true
+        },
+        "tasks_updated_at_idx": {
+          "name": "tasks_updated_at_idx",
+          "columns": ["updated_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "time_intervals": {
+      "name": "time_intervals",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "time_intervals_task_id_idx": {
+          "name": "time_intervals_task_id_idx",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "time_intervals_started_at_idx": {
+          "name": "time_intervals_started_at_idx",
+          "columns": ["started_at"],
+          "isUnique": false
+        },
+        "time_intervals_task_started_idx": {
+          "name": "time_intervals_task_started_idx",
+          "columns": ["task_id", "started_at"],
+          "isUnique": false
+        },
+        "one_open_interval_only_idx": {
+          "name": "one_open_interval_only_idx",
+          "columns": ["(1)"],
+          "isUnique": true,
+          "where": "\"time_intervals\".\"ended_at\" is null"
+        }
+      },
+      "foreignKeys": {
+        "time_intervals_task_id_tasks_id_fk": {
+          "name": "time_intervals_task_id_tasks_id_fk",
+          "tableFrom": "time_intervals",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "time_intervals_valid_timestamp_order_check": {
+          "name": "time_intervals_valid_timestamp_order_check",
+          "value": "\"time_intervals\".\"ended_at\" is null or \"time_intervals\".\"ended_at\" > \"time_intervals\".\"started_at\""
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {
+      "one_open_interval_only_idx": {
+        "columns": {
+          "(1)": {
+            "isExpression": true
+          }
+        }
+      }
+    }
+  }
+}

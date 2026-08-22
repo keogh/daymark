@@ -110,6 +110,16 @@ describe('foundation database migration and invariants', () => {
         .run(),
     ).toThrow(/check constraint failed/i);
   });
+
+  it.each([
+    'insert into application_settings (id, updated_at) values (2, 2000)',
+    "update application_settings set week_starts_on = 'friday' where id = 1",
+    "update application_settings set theme = 'sepia' where id = 1",
+  ])('rejects invalid settings writes: %s', (statement) => {
+    expect(() => context.sqlite.prepare(statement).run()).toThrow(
+      /check constraint failed/i,
+    );
+  });
 });
 
 const insertTask = (context: DatabaseContext, id: string): void => {

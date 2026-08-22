@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Settings and UX Polish queued
+Settings and UX Polish implementation
 
 ## Current Specification
 
@@ -10,14 +10,12 @@ SPEC-010 — Settings and UX Polish (Ready for Implementation)
 
 ## Current Status
 
-SPEC-009 is Verified. Its final automated suite, macOS arm64 package, isolated
-packaged Analytics workflow, accessibility/layout checks, offline/security audit,
-and documentation reconciliation passed. SPEC-010 is the next implementation-ready
-specification and is now unblocked.
-
-SPEC-010 is designed and queued as Ready for Implementation. Its task breakdown
-requires SPEC-009 to be Verified before Settings and UX Polish implementation
-begins.
+SPEC-010 implementation is active. TASK-010-001 is complete: shared settings
+contracts and exact validators, the constrained singleton settings schema and
+forward migration, and the field-isolated settings repository are implemented.
+Migration coverage proves existing Task, TimeInterval, and AppState rows remain
+unchanged while Monday/System defaults are seeded exactly once. TASK-010-002 is
+the next unblocked task.
 
 SPEC-011 and SPEC-012 are also designed and queued as Ready for Implementation.
 SPEC-011 remains dependent on verification of SPEC-010 and all preceding work.

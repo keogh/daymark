@@ -50,7 +50,7 @@ external prerequisite does not change the internal dependency order in this file
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -108,8 +108,23 @@ prerequisite.
 
 ### Completion Evidence
 
-Record commands, passing test counts, migration source/target versions, preserved
-row evidence, and constraint results when complete.
+- Added shared preference contracts, distinct controlled validation codes, and
+  exact-own-shape validators that reject malformed, extra, inherited, and
+  unsupported values.
+- Added Drizzle migration `0002_mute_tarot`, advancing the prior two-migration
+  schema to a constrained `application_settings` singleton seeded exactly once as
+  Monday/System with deterministic `updated_at = 0`.
+- Disposable migration coverage preserved byte-for-value query results for an
+  existing Task, TimeInterval, and paused AppState while adding exactly one
+  settings row. Direct singleton-ID, week-start, and theme constraint violations
+  were rejected.
+- Added a dedicated repository whose reads surface missing/invalid singleton
+  invariants and whose updates change only the requested preference and timestamp;
+  sequential update tests preserve the other preference.
+- Verification passed on 2026-08-22: focused settings/database/shared suite (269
+  tests in 28 files), full regression suite (627 tests in 77 files),
+  `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check`.
 
 ---
 

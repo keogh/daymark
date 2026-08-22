@@ -15,6 +15,13 @@
       "when": 1786660942131,
       "tag": "0001_colossal_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1787420166729,
+      "tag": "0002_mute_tarot",
+      "breakpoints": true
     }
   ]
 }

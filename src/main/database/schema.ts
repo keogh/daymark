@@ -72,3 +72,30 @@ export const appState = sqliteTable(
     ),
   ],
 );
+
+export const applicationSettings = sqliteTable(
+  'application_settings',
+  {
+    id: integer('id').primaryKey().notNull(),
+    weekStartsOn: text('week_starts_on', {
+      enum: ['monday', 'sunday'],
+    })
+      .notNull()
+      .default('monday'),
+    theme: text('theme', { enum: ['system', 'light', 'dark'] })
+      .notNull()
+      .default('system'),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (table) => [
+    check('application_settings_singleton_id_check', sql`${table.id} = 1`),
+    check(
+      'application_settings_week_start_check',
+      sql`${table.weekStartsOn} in ('monday', 'sunday')`,
+    ),
+    check(
+      'application_settings_theme_check',
+      sql`${table.theme} in ('system', 'light', 'dark')`,
+    ),
+  ],
+);

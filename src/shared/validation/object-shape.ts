@@ -6,8 +6,18 @@ export const hasExactKeys = (
   expected: readonly string[],
 ): boolean => {
   const keys = Object.keys(value);
-  return (
+  if (!(
     keys.length === expected.length &&
     expected.every((key) => keys.includes(key))
-  );
+  )) {
+    return false;
+  }
+
+  for (const key in value) {
+    if (!Object.hasOwn(value, key)) {
+      return false;
+    }
+  }
+
+  return true;
 };
