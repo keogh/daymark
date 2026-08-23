@@ -1,5 +1,7 @@
 import path from 'node:path';
 
+import { productIdentity } from '@/shared/product-identity';
+
 export type TrayPlatform = 'darwin' | 'win32' | 'linux';
 
 export interface TrayAssetEnvironment {
@@ -12,8 +14,8 @@ export interface TrayAssetEnvironment {
 export interface TrayAssetSelection {
   readonly iconPath: string;
   readonly isTemplateImage: boolean;
-  readonly title: 'Time Tracker';
-  readonly tooltip: 'Time Tracker';
+  readonly title: typeof productIdentity.displayName;
+  readonly tooltip: typeof productIdentity.displayName;
 }
 
 export const selectTrayAsset = (
@@ -30,7 +32,7 @@ export const selectTrayAsset = (
       isMacOs ? 'time-trackerTemplate.png' : 'time-tracker.png',
     ),
     isTemplateImage: isMacOs,
-    title: 'Time Tracker',
-    tooltip: 'Time Tracker',
+    title: productIdentity.displayName,
+    tooltip: productIdentity.displayName,
   };
 };

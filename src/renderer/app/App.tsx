@@ -17,6 +17,7 @@ import { Field, FieldError, FieldLabel } from '@/renderer/components/ui/field';
 import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import type { TimerState } from '@/shared/contracts/timer';
+import { productIdentity } from '@/shared/product-identity';
 import { Analytics } from './Analytics';
 import { DailyHistory } from './DailyHistory';
 import { ManualTimeEntryDialog } from './ManualTimeEntryDialog';
@@ -66,7 +67,7 @@ export const App = () => {
   return (
     <main className="app-shell">
       <header className="app-header">
-        <h1>Time Tracker</h1>
+        <h1>{productIdentity.displayName}</h1>
         <nav aria-label="Primary" className="app-navigation">
           <button
             aria-current={destination === 'timer' ? 'page' : undefined}
@@ -98,7 +99,7 @@ export const App = () => {
       {settingsController.loadState.status === 'loading' && (
         <div className="application-loading" role="status">
           <Spinner aria-hidden="true" />
-          <p>Loading Time Tracker…</p>
+          <p>Loading {productIdentity.displayName}…</p>
         </div>
       )}
 

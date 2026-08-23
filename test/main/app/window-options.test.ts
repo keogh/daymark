@@ -13,4 +13,10 @@ describe('main window security configuration', () => {
       sandbox: true,
     });
   });
+
+  it('uses the Daymark native window title', () => {
+    expect(createMainWindowOptions('/application/preload.js').title).toBe(
+      'Daymark',
+    );
+  });
 });

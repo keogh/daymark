@@ -38,12 +38,14 @@ import { createMainWindow } from './create-window';
 import { ApplicationShutdown } from './shutdown';
 import { startApplication } from './startup';
 import { MainWindowOwner } from './window-owner';
+import { nativeErrorPresentation } from './error-presentation';
 import { publishTimerState } from '@/main/timer/state-publisher';
 import { TimerPresentationSynchronization } from '@/main/timer/state-synchronization';
 import { selectTrayAsset, type TrayPlatform } from '@/main/tray/assets';
 import { ElectronTrayAdapter } from '@/main/tray/native';
 import { IntervalTrayScheduler, SystemTrayService } from '@/main/tray/service';
 import { distributionContract } from '../../../scripts/distribution-contract';
+import { productIdentity } from '@/shared/product-identity';
 
 export const registerApplicationLifecycle = (): void => {
   app.setPath(
@@ -171,7 +173,7 @@ export const registerApplicationLifecycle = (): void => {
               : () => windowOwner.handleTrayDoubleClick(),
           quitApplication: () => shutdown.requestQuit(),
           showError: (message) =>
-            dialog.showErrorBox('Time Tracker timer error', message),
+            dialog.showErrorBox(nativeErrorPresentation.timerTitle, message),
           logUnexpectedError: (message, error) => console.error(message, error),
         });
         shutdown.addCleanupHook(() => trayService?.dispose());
@@ -225,12 +227,15 @@ export const registerApplicationLifecycle = (): void => {
         windowOwner.open();
       },
       logInitializationFailure: (error) => {
-        console.error('Failed to initialize Time Tracker.', error);
+        console.error(
+          `Failed to initialize ${productIdentity.displayName}.`,
+          error,
+        );
       },
       showInitializationFailure: () => {
         dialog.showErrorBox(
-          'Time Tracker could not start',
-          'Required local resources could not be initialized. Please restart the application.',
+          nativeErrorPresentation.initialization.title,
+          nativeErrorPresentation.initialization.message,
         );
       },
       cleanupAfterFailure: () => shutdown.handleApplicationShutdown(),

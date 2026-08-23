@@ -19,8 +19,8 @@ describe('tray asset selection', () => {
         'assets/tray/time-trackerTemplate.png',
       ),
       isTemplateImage: true,
-      title: 'Time Tracker',
-      tooltip: 'Time Tracker',
+      title: 'Daymark',
+      tooltip: 'Daymark',
     });
   });
 

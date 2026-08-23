@@ -6,7 +6,7 @@ SPEC-014 — Daymark Product Rename
 
 ## Active Task
 
-TASK-014-001 — Establish the Daymark Identity and Profile-Compatibility Contract
+TASK-014-002 — Rename Renderer and Native Desktop Presentation
 
 ## Status
 
@@ -16,26 +16,26 @@ Complete
 
 # Immediate Plan
 
-1. Centralize the visible Daymark name and preserved technical identifiers.
-2. Resolve the packaged and development profile paths to the established Time
-   Tracker profile before database initialization.
-3. Update canonical package metadata and focused identity, package, release, and
-   path tests.
-4. Run the focused verification commands and `npm run typecheck`.
+1. Replace renderer and HTML product presentation with Daymark.
+2. Set the native window, tray, tooltip, command, and native error presentation
+   from the canonical Daymark identity.
+3. Update focused renderer, window, tray, and lifecycle regression tests.
+4. Verify the rendered 640×480 presentation and run focused tests, typecheck,
+   and lint.
 
 ---
 
 # Scope Guard
 
-Only TASK-014-001 identity, metadata, and deterministic profile compatibility are
-included. Renderer/tray copy, asset filenames, package inspectors, documentation
-alignment, database migration, and packaged acceptance remain deferred.
+Only TASK-014-002 renderer and native desktop presentation is included. Packaging
+artifact names, icon filenames, documentation alignment, internal symbol renames,
+database changes, and packaged acceptance remain deferred.
 
 ---
 
 # Completion
 
-Implemented the shared Daymark/stable-identifier contract, canonical package
-metadata, deterministic established-profile resolution before database startup,
-and direct contract use by database and preload boundaries. Seven focused test
-files (40 tests), release validation, typecheck, formatting, and diff checks pass.
+Implemented canonical Daymark presentation across the renderer, native window,
+tray/menu-bar, tooltip, commands, and native product error surfaces. Nine focused
+test files (84 tests), typecheck, lint, formatting, package, source scans, and a
+640×480 packaged visual/interaction comparison pass.

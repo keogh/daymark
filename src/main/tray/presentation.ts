@@ -1,8 +1,9 @@
 import type { Clock } from '@/main/domain/clock';
 import type { TimerState } from '@/shared/contracts/timer';
+import { productIdentity } from '@/shared/product-identity';
 
-export const TRAY_TITLE = 'Time Tracker';
-export const TRAY_TOOLTIP = 'Time Tracker';
+export const TRAY_TITLE = productIdentity.displayName;
+export const TRAY_TOOLTIP = productIdentity.displayName;
 
 export type TrayCommand = 'open' | 'pause' | 'resume' | 'stop' | 'quit';
 
@@ -78,7 +79,7 @@ export const createTrayPresentation = (
 ): TrayPresentation => {
   const commonEnding: readonly TrayMenuItem[] = [
     separator,
-    command('Open Time Tracker', 'open'),
+    command(`Open ${productIdentity.displayName}`, 'open'),
     separator,
     command('Quit', 'quit'),
   ];

@@ -33,13 +33,13 @@ describe('tray presentation', () => {
   it('builds the informational idle menu without timer commands', () => {
     expect(createTrayPresentation(timerState('idle'), clockAt(10_000))).toEqual(
       {
-        title: 'Time Tracker',
-        tooltip: 'Time Tracker',
+        title: 'Daymark',
+        tooltip: 'Daymark',
         items: [
-          { kind: 'information', label: 'Time Tracker' },
+          { kind: 'information', label: 'Daymark' },
           { kind: 'information', label: 'No active timer' },
           { kind: 'separator' },
-          { kind: 'command', command: 'open', label: 'Open Time Tracker' },
+          { kind: 'command', command: 'open', label: 'Open Daymark' },
           { kind: 'separator' },
           { kind: 'command', command: 'quit', label: 'Quit' },
         ],
@@ -52,14 +52,14 @@ describe('tray presentation', () => {
     const presentation = createTrayPresentation(state, clockAt(12_400));
 
     expect(presentation.items).toEqual([
-      { kind: 'information', label: 'Time Tracker' },
+      { kind: 'information', label: 'Daymark' },
       { kind: 'information', label: 'Implement authentication' },
       { kind: 'information', label: '00:00:07' },
       { kind: 'separator' },
       { kind: 'command', command: 'pause', label: 'Pause' },
       { kind: 'command', command: 'stop', label: 'Stop' },
       { kind: 'separator' },
-      { kind: 'command', command: 'open', label: 'Open Time Tracker' },
+      { kind: 'command', command: 'open', label: 'Open Daymark' },
       { kind: 'separator' },
       { kind: 'command', command: 'quit', label: 'Quit' },
     ]);

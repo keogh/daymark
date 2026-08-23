@@ -19,12 +19,12 @@ describe('SystemTrayService', () => {
 
     expect(fixture.native.createCount).toBe(1);
     expect(labels(fixture.native.currentMenu)).toEqual([
-      'Time Tracker',
+      'Daymark',
       'Focused work',
       '00:00:10',
       'Pause',
       'Stop',
-      'Open Time Tracker',
+      'Open Daymark',
       'Quit',
     ]);
     expect(fixture.scheduler.activeCount).toBe(1);
@@ -101,7 +101,7 @@ describe('SystemTrayService', () => {
     expect(fixture.dependencies.readState).toHaveBeenCalledTimes(1);
     expect(fixture.dependencies.publishState).toHaveBeenCalledWith(idleState());
     expect(fixture.dependencies.showError).toHaveBeenCalledWith(
-      'Time Tracker could not pause the timer. Open Time Tracker to review its current state.',
+      'Daymark could not pause the timer. Open Daymark to review its current state.',
     );
     expect(fixture.dependencies.logUnexpectedError).not.toHaveBeenCalled();
     expect(labels(fixture.native.currentMenu)).toContain('No active timer');
@@ -131,7 +131,7 @@ describe('SystemTrayService', () => {
       expect.any(Error),
     );
     expect(fixture.dependencies.showError).toHaveBeenCalledWith(
-      'Time Tracker could not stop the timer. Open Time Tracker to review its current state.',
+      'Daymark could not stop the timer. Open Daymark to review its current state.',
     );
     expect(item(fixture.native.currentMenu, 'Stop').enabled).toBe(true);
   });

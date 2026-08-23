@@ -1,6 +1,7 @@
 import type { Clock } from '@/main/domain/clock';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { TimerState } from '@/shared/contracts/timer';
+import { productIdentity } from '@/shared/product-identity';
 
 import {
   applyTrayIdentity,
@@ -232,4 +233,4 @@ const isTimerCommand = (command: TrayCommand): command is TimerCommand =>
   command === 'pause' || command === 'resume' || command === 'stop';
 
 const errorMessage = (command: TimerCommand): string =>
-  `Time Tracker could not ${command} the timer. Open Time Tracker to review its current state.`;
+  `${productIdentity.displayName} could not ${command} the timer. Open ${productIdentity.displayName} to review its current state.`;

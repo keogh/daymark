@@ -87,6 +87,15 @@ const historyPageWithTask = (
 });
 
 describe('App', () => {
+  it('presents Daymark as the product heading', async () => {
+    setTimerApi();
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Daymark' }),
+    ).toBeVisible();
+  });
+
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
@@ -209,9 +218,7 @@ describe('App', () => {
     setTimerApi({ getSettings: vi.fn(() => settings.promise) });
     render(<App />);
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Loading Time Tracker',
-    );
+    expect(screen.getByRole('status')).toHaveTextContent('Loading Daymark');
     expect(
       screen.queryByRole('region', { name: 'Timer' }),
     ).not.toBeInTheDocument();

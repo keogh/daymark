@@ -29,7 +29,7 @@ to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-014-001 | Establish the Daymark identity and profile-compatibility contract | Complete | None | AC-014-002, AC-014-003, AC-014-005, AC-014-006 |
-| TASK-014-002 | Rename renderer and native desktop presentation | Pending | TASK-014-001 | AC-014-001, AC-014-006 |
+| TASK-014-002 | Rename renderer and native desktop presentation | Complete | TASK-014-001 | AC-014-001, AC-014-006 |
 | TASK-014-003 | Rename packaging presentation and asset references | Pending | TASK-014-001 | AC-014-002, AC-014-003, AC-014-007 |
 | TASK-014-004 | Align current documentation and downstream release specifications | Pending | TASK-014-001, TASK-014-002, TASK-014-003 | AC-014-008 |
 | TASK-014-005 | Verify packaged upgrade compatibility and final acceptance | Pending | TASK-014-002, TASK-014-003, TASK-014-004 | AC-014-004, AC-014-005, AC-014-006, AC-014-009 |
@@ -112,7 +112,7 @@ None.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -154,7 +154,27 @@ TASK-014-001.
 
 ### Completion Evidence
 
-Record commands, results, and inspected product-named surfaces.
+- Renderer heading, loading copy, HTML title, native `BrowserWindow` title,
+  tray title/tooltip/information row, `Open Daymark` command, tray timer-error
+  copy, and native timer/startup error titles now use the canonical Daymark
+  identity. Compatibility-sensitive profile, executable-fixture, preload, IPC,
+  database, and asset identifiers remain unchanged.
+- `npm test -- --run test/renderer/app/App.test.tsx test/main/app/window-options.test.ts test/main/app/error-presentation.test.ts test/main/app/startup.test.ts test/main/app/window-owner.test.ts test/main/app/windows-startup.test.ts test/main/tray/presentation.test.ts test/main/tray/service.test.ts test/main/tray/assets.test.ts`
+  — passed, 9 files and 84 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, and
+  `git diff --check` — passed.
+- `npm run package` — passed for macOS arm64. The packaged Daymark renderer was
+  inspected through local Chrome DevTools Protocol because Browser/IAB was not
+  available. At the 640×480 native window minimum, `document.title` and the
+  product heading were exactly `Daymark`, body width remained 640 pixels without
+  horizontal overflow, and Timer → Analytics → Timer navigation preserved its
+  selected-state behavior.
+- Compared `/private/tmp/daymark-task014-002-reference-640x480.png` from the
+  attributable pre-rename package with
+  `/private/tmp/daymark-task014-002-current-640x480.png` using `view_image` at
+  original detail. Copy, layout, typography, palette, controls, spacing, and
+  narrow-window behavior matched; the only intended visible difference was the
+  `Time Tracker` → `Daymark` product heading replacement.
 
 ---
 
