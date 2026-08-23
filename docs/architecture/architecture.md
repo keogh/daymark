@@ -343,6 +343,11 @@ This protects timer invariants.
 
 SQLite runs only in the Electron main process.
 
+Development and packaged launches use separate OS-appropriate Electron `userData`
+directories. This keeps development migrations and data changes isolated from the
+packaged application profile while retaining writable per-user storage in both
+modes.
+
 Recommended database initialization:
 
 ```text

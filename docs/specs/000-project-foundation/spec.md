@@ -1134,6 +1134,11 @@ The packaged application must successfully initialize SQLite.
 
 Development and packaged builds must both resolve a valid writable user application data directory.
 
+Development runs must use a distinct per-user application data directory from
+packaged builds. Starting the development application must not open, migrate, or
+otherwise modify the packaged application's database. Existing packaged data is
+not copied into the development profile automatically.
+
 Never attempt to write the production database inside:
 
 - application source directory;
@@ -1333,6 +1338,10 @@ On application startup:
 The database is stored in an OS-appropriate per-user application data directory.
 
 The path is resolved in the main process.
+
+The development and packaged applications use distinct per-user application data
+directories. A development launch does not open or modify the packaged
+application's database.
 
 ---
 

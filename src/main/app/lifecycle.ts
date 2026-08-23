@@ -14,6 +14,7 @@ import { DatabaseLifecycle } from '@/main/database/lifecycle';
 import {
   resolveDatabasePath,
   resolveMigrationsPath,
+  resolveUserDataPath,
 } from '@/main/database/path';
 import { registerSystemHealthHandler } from '@/main/ipc/system-health';
 import { registerAnalyticsHandler } from '@/main/ipc/analytics';
@@ -45,6 +46,11 @@ import { IntervalTrayScheduler, SystemTrayService } from '@/main/tray/service';
 import { distributionContract } from '../../../scripts/distribution-contract';
 
 export const registerApplicationLifecycle = (): void => {
+  app.setPath(
+    'userData',
+    resolveUserDataPath(app.getPath('userData'), app.isPackaged),
+  );
+
   const shutdown = new ApplicationShutdown({
     quitApplication: () => app.quit(),
     logCleanupFailure: (error) => {

@@ -4,7 +4,7 @@
 
 - Specification: `docs/specs/000-project-foundation/spec.md`
 - Specification status: Verified
-- Last reviewed against specification: 2026-08-13
+- Last reviewed against specification: 2026-08-22
 
 `spec.md` is the source of truth for behavior. This file only decomposes it into
 implementation work and must be updated if the specification changes.
@@ -38,6 +38,7 @@ implementation work and must be updated if the specification changes.
 | TASK-000-010 | Configure native-module packaging | Complete | TASK-000-002, TASK-000-004 | AC-000-006, AC-000-017 |
 | TASK-000-011 | Smoke-test packaged SQLite and offline startup | Complete | TASK-000-005, TASK-000-006, TASK-000-010 | AC-000-018–019 |
 | TASK-000-012 | Run final acceptance and update documentation | Complete | TASK-000-007–011 | AC-000-001–019 |
+| TASK-000-013 | Isolate development application data | Complete | TASK-000-012 | AC-000-006 |
 
 ---
 
@@ -726,8 +727,67 @@ TASK-000-007, TASK-000-008, TASK-000-009, TASK-000-010, and TASK-000-011.
 
 ---
 
+## TASK-000-013 — Isolate Development Application Data
+
+### Status
+
+Complete
+
+### Outcome
+
+Development launches use a distinct OS-appropriate per-user application data
+directory and cannot open or migrate the packaged application's database by
+default.
+
+### Dependencies
+
+TASK-000-012.
+
+### Included
+
+- Derive a development-only user-data directory before Electron readiness.
+- Retain the existing packaged user-data directory and database filename.
+- Add focused path-selection tests for development and packaged modes.
+- Document that existing packaged data is neither copied nor modified.
+
+### Excluded
+
+- Database schema changes or migrations.
+- Copying, importing, deleting, or resetting existing user data.
+- Changing disposable test-database behavior.
+
+### Deliverables
+
+- Main-process development profile selection and focused automated tests.
+- Updated foundation, architecture, and progress documentation.
+
+### Verification
+
+- Run the focused database-path tests.
+- Run `npm run typecheck`, `npm run lint`, `npm test`, `npm run format:check`, and
+  `npm run package`.
+
+### Traceability
+
+- Acceptance criterion: AC-000-006
+- Specification sections: 19 and 57
+
+### Completion Evidence
+
+- 2026-08-22: Added development-only Electron `userData` selection before
+  application readiness. Packaged builds retain Electron's default profile;
+  development builds append ` Development`, and neither profile is copied,
+  deleted, or migrated into the other.
+- 2026-08-22: The focused database-path test passed with four tests, including
+  explicit development isolation and packaged-path preservation coverage.
+- 2026-08-22: `npm run typecheck`, `npm run lint`, `npm run format:check`, all 715
+  tests in 86 files, `npm run package`, and `git diff --check` passed on macOS
+  arm64. No schema, migration, dependency, or product behavior changed.
+
+---
+
 # Final Specification Verification
 
-TASK-000-012 completed the final cross-task verification. All tasks, automated
-checks, manual checks, acceptance criteria, and Definition of Done items passed;
-SPEC-000 is `Verified`.
+TASK-000-012 completed the original cross-task verification, and TASK-000-013
+subsequently verified development-profile isolation for AC-000-006. All SPEC-000
+tasks and automated checks pass; SPEC-000 remains `Verified`.

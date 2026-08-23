@@ -10,6 +10,12 @@ SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation
 
 ## Current Status
 
+SPEC-000 maintenance TASK-000-013 is complete. Development launches now select a
+separate OS-appropriate Electron `userData` directory before readiness, while
+packaged builds retain the existing application profile. Focused path tests, all
+715 tests, formatting, typecheck, lint, and macOS arm64 packaging pass; no existing
+data was copied, deleted, or migrated and no schema change was required.
+
 TASK-011-001 is complete. Distribution now has one validated source-controlled
 contract for package metadata, stable macOS/Windows/Linux identity, exact stable
 SemVer tag agreement, and four collision-free primary artifact descriptors. Local
