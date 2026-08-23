@@ -2,46 +2,40 @@
 
 ## Current Specification
 
-SPEC-011 — Cross-Platform Packaging and Distribution
+SPEC-014 — Daymark Product Rename
 
 ## Active Task
 
-TASK-011-005 — Add Native CI Builds and Artifact Validation
+TASK-014-001 — Establish the Daymark Identity and Profile-Compatibility Contract
 
 ## Status
 
-In Progress — implementation and local contract verification complete; hosted
-native workflow run pending
+Complete
 
 ---
 
 # Immediate Plan
 
-1. Resolve the task-breakdown dependency cycle so native CI may supply the pending
-   native-host evidence for TASK-011-002 through TASK-011-004.
-2. Add a read-only tag/manual-dry-run workflow with one validation gate and four
-   isolated stable native build jobs.
-3. Add Windows package inspection and cross-job artifact-manifest validation.
-4. Add focused workflow/manifest contract tests and document runner selections.
-5. Run focused and baseline repository validation; leave hosted-run evidence
-   pending until the workflow is pushed and executed.
+1. Centralize the visible Daymark name and preserved technical identifiers.
+2. Resolve the packaged and development profile paths to the established Time
+   Tracker profile before database initialization.
+3. Update canonical package metadata and focused identity, package, release, and
+   path tests.
+4. Run the focused verification commands and `npm run typecheck`.
 
 ---
 
 # Scope Guard
 
-Only TASK-011-005 native CI building and workflow-artifact validation are included.
-GitHub Release creation, checksums, signing, secrets, manual installation
-acceptance, application features, and database changes remain deferred.
+Only TASK-014-001 identity, metadata, and deterministic profile compatibility are
+included. Renderer/tray copy, asset filenames, package inspectors, documentation
+alignment, database migration, and packaged acceptance remain deferred.
 
 ---
 
 # Completion
 
-Implemented the read-only native workflow, exact tag/SHA gate, four stable native
-jobs, platform package inspection, isolated uploads, and complete-set provenance
-validation. Workflow YAML parsing, 32 focused tests, all 713 project tests,
-release validation, formatting, typecheck, lint, and diff checks pass locally.
-The required GitHub Actions run URL/results and native artifact evidence remain
-pending until this workflow is committed, pushed, and run for an existing valid
-tag.
+Implemented the shared Daymark/stable-identifier contract, canonical package
+metadata, deterministic established-profile resolution before database startup,
+and direct contract use by database and preload boundaries. Seven focused test
+files (40 tests), release validation, typecheck, formatting, and diff checks pass.

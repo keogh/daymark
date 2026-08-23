@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { distributionContract } from '../../scripts/distribution-contract.ts';
 import { macosDmgBaseName } from '../../scripts/distribution-contract.ts';
+import { productIdentity } from '../../src/shared/product-identity.ts';
 import {
   expectedArtifactManifest,
   validateArtifactManifest,
@@ -10,7 +11,7 @@ import {
 
 const packageMetadata = {
   name: 'time-tracker',
-  productName: 'Time Tracker',
+  productName: 'Daymark',
   version: '0.1.0',
   description: 'A local-first desktop time tracker.',
   author: 'Isaac Zepeda',
@@ -54,6 +55,19 @@ describe('release contract', () => {
       windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
       linuxPackageName: 'time-tracker',
     });
+    expect(productIdentity).toEqual({
+      displayName: 'Daymark',
+      stable: {
+        macosBundleId: 'com.isaaczepeda.timetracker',
+        windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
+        linuxPackageName: 'time-tracker',
+        squirrelPackageName: 'timetracker',
+        databaseFilename: 'time-tracker.sqlite',
+        preloadGlobal: 'timeTracker',
+        npmPackageName: 'time-tracker',
+        profileDirectoryName: 'Time Tracker',
+      },
+    });
     expect(distributionContract.linux).toEqual({
       maintainerName: 'Isaac Zepeda',
       maintainerEmail: 'isaaczepeda@users.noreply.github.com',
@@ -68,11 +82,9 @@ describe('release contract', () => {
 
   it('defines distinct supported macOS DMG base names', () => {
     expect(macosDmgBaseName('0.1.0', 'arm64')).toBe(
-      'Time-Tracker-0.1.0-darwin-arm64',
+      'Daymark-0.1.0-darwin-arm64',
     );
-    expect(macosDmgBaseName('0.1.0', 'x64')).toBe(
-      'Time-Tracker-0.1.0-darwin-x64',
-    );
+    expect(macosDmgBaseName('0.1.0', 'x64')).toBe('Daymark-0.1.0-darwin-x64');
     expect(() => macosDmgBaseName('0.1.0', 'universal')).toThrow(
       'unsupported macOS DMG architecture',
     );

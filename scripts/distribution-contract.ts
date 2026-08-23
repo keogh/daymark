@@ -1,13 +1,15 @@
+import { productIdentity } from '../src/shared/product-identity.ts';
+
 export const distributionContract = {
   identity: {
-    packageName: 'time-tracker',
-    productName: 'Time Tracker',
+    packageName: productIdentity.stable.npmPackageName,
+    productName: productIdentity.displayName,
     author: 'Isaac Zepeda',
     description: 'A local-first desktop time tracker.',
     identifiers: {
-      macosBundleId: 'com.isaaczepeda.timetracker',
-      windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
-      linuxPackageName: 'time-tracker',
+      macosBundleId: productIdentity.stable.macosBundleId,
+      windowsAppUserModelId: productIdentity.stable.windowsAppUserModelId,
+      linuxPackageName: productIdentity.stable.linuxPackageName,
     },
   },
   linux: {
@@ -27,7 +29,8 @@ export type PrimaryArtifactDescriptor =
 
 export type MacosArchitecture = 'arm64' | 'x64';
 
-export const windowsSquirrelPackageName = 'timetracker';
+export const windowsSquirrelPackageName =
+  productIdentity.stable.squirrelPackageName;
 
 export function primaryArtifactName(
   version: string,

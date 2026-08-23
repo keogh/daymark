@@ -28,7 +28,7 @@ to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-014-001 | Establish the Daymark identity and profile-compatibility contract | Pending | None | AC-014-002, AC-014-003, AC-014-005, AC-014-006 |
+| TASK-014-001 | Establish the Daymark identity and profile-compatibility contract | Complete | None | AC-014-002, AC-014-003, AC-014-005, AC-014-006 |
 | TASK-014-002 | Rename renderer and native desktop presentation | Pending | TASK-014-001 | AC-014-001, AC-014-006 |
 | TASK-014-003 | Rename packaging presentation and asset references | Pending | TASK-014-001 | AC-014-002, AC-014-003, AC-014-007 |
 | TASK-014-004 | Align current documentation and downstream release specifications | Pending | TASK-014-001, TASK-014-002, TASK-014-003 | AC-014-008 |
@@ -42,7 +42,7 @@ to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -89,8 +89,22 @@ None.
 
 ### Completion Evidence
 
-Record commands, results, exact preserved identity values, and the resolved
-cross-platform profile-path behavior.
+- Added `src/shared/product-identity.ts` as the tested source-controlled contract:
+  visible name `Daymark`; macOS bundle ID `com.isaaczepeda.timetracker`;
+  Windows AppUserModelID `com.squirrel.timetracker.time-tracker`; Linux package
+  identity `time-tracker`; Squirrel identity `timetracker`; database filename
+  `time-tracker.sqlite`; preload global `timeTracker`; npm package name
+  `time-tracker`.
+- Packaged startup deterministically replaces Electron's visible-name-derived
+  final `userData` segment with the established `Time Tracker` profile directory
+  before database initialization. Development uses the same established path
+  plus ` Development`, preserving profile isolation. No profile or database is
+  copied, moved, migrated, or renamed.
+- `npm test -- --run test/scripts/release-contract.test.ts test/main/app/packaging.test.ts test/main/database/path.test.ts test/main/database/lifecycle.test.ts test/main/app/startup.test.ts test/main/app/windows-startup.test.ts test/preload/index.test.ts`
+  — passed, 7 files and 40 tests.
+- `npm run release:validate -- --tag v0.1.0` — passed.
+- `npm run typecheck` — passed.
+- `npm run format:check` and `git diff --check` — passed.
 
 ---
 

@@ -31,6 +31,7 @@ import {
   TIMER_STATE_CHANGED_CHANNEL,
   TIMER_SWITCH_TO_TASK_CHANNEL,
 } from '@/shared/contracts/timer';
+import { productIdentity } from '@/shared/product-identity';
 
 const timeTrackerApi: TimeTrackerAPI = {
   system: {
@@ -88,4 +89,7 @@ const timeTrackerApi: TimeTrackerAPI = {
   },
 };
 
-contextBridge.exposeInMainWorld('timeTracker', timeTrackerApi);
+contextBridge.exposeInMainWorld(
+  productIdentity.stable.preloadGlobal,
+  timeTrackerApi,
+);

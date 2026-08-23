@@ -66,8 +66,8 @@ describe('application packaged resources', () => {
       expect(maker?.config).toMatchObject({
         format: 'ULFO',
         icon: 'assets/icon/time-tracker.icns',
-        name: `Time-Tracker-0.1.0-darwin-${architecture}`,
-        title: 'Time Tracker',
+        name: `Daymark-0.1.0-darwin-${architecture}`,
+        title: 'Daymark',
       });
     },
   );
@@ -84,12 +84,12 @@ describe('application packaged resources', () => {
     expect(maker?.config).toMatchObject({
       authors: 'Isaac Zepeda',
       description: 'A local-first desktop time tracker.',
-      exe: 'Time Tracker.exe',
+      exe: 'Daymark.exe',
       name: 'timetracker',
       noMsi: true,
-      setupExe: 'Time-Tracker-0.1.0-win32-x64 Setup.exe',
+      setupExe: 'Daymark-0.1.0-win32-x64 Setup.exe',
       setupIcon: 'assets/icon/time-tracker.ico',
-      title: 'Time Tracker',
+      title: 'Daymark',
     });
     await expect(maker?.prepareConfig('arm64')).rejects.toThrow(
       'unsupported Windows Squirrel architecture',
@@ -107,13 +107,13 @@ describe('application packaged resources', () => {
     await maker?.prepareConfig('x64');
     expect(maker?.config).toEqual({
       options: {
-        bin: 'Time Tracker',
+        bin: 'Daymark',
         categories: ['Utility'],
         description: 'A local-first desktop time tracker.',
         icon: 'assets/icon/time-tracker.png',
         maintainer: 'Isaac Zepeda <isaaczepeda@users.noreply.github.com>',
         name: 'time-tracker',
-        productName: 'Time Tracker',
+        productName: 'Daymark',
       },
     });
     expect(maker?.config.options).not.toHaveProperty('homepage');

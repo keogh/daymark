@@ -1,6 +1,6 @@
 {
   "name": "time-tracker",
-  "productName": "Time Tracker",
+  "productName": "Daymark",
   "version": "0.1.0",
   "description": "A local-first desktop time tracker.",
   "author": "Isaac Zepeda",
