@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "A local-first desktop time tracker.",
   "author": "Isaac Zepeda",
+  "license": "Apache-2.0",
   "type": "module",
   "main": ".vite/build/main.cjs",
   "private": true,

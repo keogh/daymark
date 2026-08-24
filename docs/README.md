@@ -20,6 +20,11 @@ The product prioritizes:
 
 The application does not require an account, backend, cloud service, or internet connection.
 
+## License
+
+Daymark is open-source software licensed under the
+[Apache License 2.0](../LICENSE).
+
 ## Target Platforms
 
 The MVP targets:
