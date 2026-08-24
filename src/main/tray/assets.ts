@@ -29,7 +29,7 @@ export const selectTrayAsset = (
   return {
     iconPath: path.join(
       assetsRoot,
-      isMacOs ? 'time-trackerTemplate.png' : 'time-tracker.png',
+      isMacOs ? 'daymarkTemplate.png' : 'daymark.png',
     ),
     isTemplateImage: isMacOs,
     title: productIdentity.displayName,

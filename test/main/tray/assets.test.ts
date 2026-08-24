@@ -11,12 +11,12 @@ describe('tray asset selection', () => {
         platform: 'darwin',
         isPackaged: false,
         appPath: '/workspace/time-tracker',
-        resourcesPath: '/Applications/Time Tracker.app/Contents/Resources',
+        resourcesPath: '/Applications/Daymark.app/Contents/Resources',
       }),
     ).toEqual({
       iconPath: path.join(
         '/workspace/time-tracker',
-        'assets/tray/time-trackerTemplate.png',
+        'assets/tray/daymarkTemplate.png',
       ),
       isTemplateImage: true,
       title: 'Daymark',
@@ -35,10 +35,7 @@ describe('tray asset selection', () => {
           resourcesPath: '/opt/time-tracker/resources',
         }).iconPath,
       ).toBe(
-        path.join(
-          '/opt/time-tracker/resources',
-          'assets/tray/time-tracker.png',
-        ),
+        path.join('/opt/time-tracker/resources', 'assets/tray/daymark.png'),
       );
     },
   );
@@ -51,8 +48,6 @@ describe('tray asset selection', () => {
         appPath: '/workspace/time-tracker',
         resourcesPath: '/unused/resources',
       }).iconPath,
-    ).toBe(
-      path.join('/workspace/time-tracker', 'assets/tray/time-tracker.png'),
-    );
+    ).toBe(path.join('/workspace/time-tracker', 'assets/tray/daymark.png'));
   });
 });

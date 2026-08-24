@@ -27,7 +27,7 @@ async function assertPe(
 }
 
 const projectRoot = process.cwd();
-const packageRoot = path.join(projectRoot, 'out', 'Time Tracker-win32-x64');
+const packageRoot = path.join(projectRoot, 'out', 'Daymark-win32-x64');
 const resourcesRoot = path.join(packageRoot, 'resources');
 const asarPath = path.join(resourcesRoot, 'app.asar');
 const setupName = primaryArtifactName(packageMetadata.version, {
@@ -44,11 +44,7 @@ const setupPath = path.join(
   setupName,
 );
 
-await assertPe(
-  path.join(packageRoot, 'Time Tracker.exe'),
-  'application',
-  0x8664,
-);
+await assertPe(path.join(packageRoot, 'Daymark.exe'), 'application', 0x8664);
 await assertPe(setupPath, 'Squirrel Setup executable');
 await assertPe(
   path.join(
@@ -77,10 +73,10 @@ for (const entry of [
   }
 }
 for (const asset of [
-  'icon/time-tracker.ico',
-  'tray/time-tracker.png',
-  'tray/time-trackerTemplate.png',
-  'tray/time-trackerTemplate@2x.png',
+  'icon/daymark.ico',
+  'tray/daymark.png',
+  'tray/daymarkTemplate.png',
+  'tray/daymarkTemplate@2x.png',
 ]) {
   await readFile(path.join(resourcesRoot, 'assets', asset));
 }

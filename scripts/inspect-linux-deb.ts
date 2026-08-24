@@ -84,7 +84,7 @@ try {
     ),
     'utf8',
   );
-  requireMatch(desktopEntry, /^Name=Time Tracker$/m, 'desktop entry name');
+  requireMatch(desktopEntry, /^Name=Daymark$/m, 'desktop entry name');
   requireMatch(
     desktopEntry,
     /^Exec=time-tracker %U$/m,
@@ -104,10 +104,7 @@ try {
     throw new Error('installed launcher icon is not a PNG');
   }
 
-  await assertX64Elf(
-    path.join(appRoot, 'Time Tracker'),
-    'application executable',
-  );
+  await assertX64Elf(path.join(appRoot, 'Daymark'), 'application executable');
   await assertX64Elf(
     path.join(
       appRoot,
@@ -131,9 +128,9 @@ try {
   }
 
   for (const asset of [
-    'time-tracker.png',
-    'time-trackerTemplate.png',
-    'time-trackerTemplate@2x.png',
+    'daymark.png',
+    'daymarkTemplate.png',
+    'daymarkTemplate@2x.png',
   ]) {
     await readFile(path.join(appRoot, 'resources/assets/tray', asset));
   }

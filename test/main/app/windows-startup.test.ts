@@ -13,10 +13,7 @@ describe('Windows main-process startup', () => {
       vi.stubGlobal('process', { ...process, platform: 'win32' });
 
       expect(
-        startMainProcess(
-          ['Time Tracker.exe', argument],
-          registerNormalLifecycle,
-        ),
+        startMainProcess(['Daymark.exe', argument], registerNormalLifecycle),
       ).toBe(false);
       expect(registerNormalLifecycle).not.toHaveBeenCalled();
 
@@ -28,9 +25,9 @@ describe('Windows main-process startup', () => {
     const registerNormalLifecycle = vi.fn();
     vi.stubGlobal('process', { ...process, platform: 'win32' });
 
-    expect(
-      startMainProcess(['Time Tracker.exe'], registerNormalLifecycle),
-    ).toBe(true);
+    expect(startMainProcess(['Daymark.exe'], registerNormalLifecycle)).toBe(
+      true,
+    );
     expect(registerNormalLifecycle).toHaveBeenCalledOnce();
 
     vi.unstubAllGlobals();

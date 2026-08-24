@@ -26,7 +26,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     appBundleId: distributionContract.identity.identifiers.macosBundleId,
     asar: true,
-    icon: 'assets/icon/time-tracker',
+    icon: 'assets/icon/daymark',
     extraResource: ['assets'],
     ignore: (filePath) => {
       if (filePath.length === 0) {
@@ -58,7 +58,7 @@ const config: ForgeConfig = {
     new MakerDMG(
       (architecture) => ({
         format: 'ULFO',
-        icon: 'assets/icon/time-tracker.icns',
+        icon: 'assets/icon/daymark.icns',
         name: macosDmgBaseName(packageMetadata.version, architecture),
         title: distributionContract.identity.productName,
       }),
@@ -83,7 +83,7 @@ const config: ForgeConfig = {
             architecture,
             extension: ' Setup.exe',
           }),
-          setupIcon: 'assets/icon/time-tracker.ico',
+          setupIcon: 'assets/icon/daymark.ico',
           title: distributionContract.identity.productName,
         };
       },
@@ -102,7 +102,7 @@ const config: ForgeConfig = {
             bin: distributionContract.identity.productName,
             categories: ['Utility'],
             description: distributionContract.identity.description,
-            icon: 'assets/icon/time-tracker.png',
+            icon: 'assets/icon/daymark.png',
             maintainer: `${distributionContract.linux.maintainerName} <${distributionContract.linux.maintainerEmail}>`,
             name: distributionContract.identity.identifiers.linuxPackageName,
             productName: distributionContract.identity.productName,

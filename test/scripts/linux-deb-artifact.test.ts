@@ -44,7 +44,7 @@ describe('Linux Debian artifact normalization', () => {
     await normalizeLinuxDebArtifacts([result]);
 
     expect(path.basename(result.artifacts[0] ?? '')).toBe(
-      'Time-Tracker-0.1.0-linux-x64.deb',
+      'Daymark-0.1.0-linux-x64.deb',
     );
   });
 

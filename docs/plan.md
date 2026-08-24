@@ -6,7 +6,7 @@ SPEC-014 — Daymark Product Rename
 
 ## Active Task
 
-TASK-014-002 — Rename Renderer and Native Desktop Presentation
+TASK-014-003 — Rename Packaging Presentation and Asset References
 
 ## Status
 
@@ -16,26 +16,28 @@ Complete
 
 # Immediate Plan
 
-1. Replace renderer and HTML product presentation with Daymark.
-2. Set the native window, tray, tooltip, command, and native error presentation
-   from the canonical Daymark identity.
-3. Update focused renderer, window, tray, and lifecycle regression tests.
-4. Verify the rendered 640×480 presentation and run focused tests, typecheck,
-   and lint.
+1. Rename source-owned application and tray asset files to Daymark without
+   changing their bytes, and update runtime and Forge references atomically.
+2. Update macOS, Windows, and Linux package inspectors to require Daymark
+   display names and executables while preserving stable install identities.
+3. Update focused packaging, artifact-name, release-contract, and asset tests,
+   including fixed content hashes for the renamed artwork.
+4. Run the focused checks, package macOS arm64, and inspect its structure.
 
 ---
 
 # Scope Guard
 
-Only TASK-014-002 renderer and native desktop presentation is included. Packaging
-artifact names, icon filenames, documentation alignment, internal symbol renames,
-database changes, and packaged acceptance remain deferred.
+Only TASK-014-003 packaging presentation, artifact contracts, package inspection,
+and source-owned asset references are included. Documentation alignment, internal
+symbol renames, database changes, and packaged upgrade acceptance remain deferred.
 
 ---
 
 # Completion
 
-Implemented canonical Daymark presentation across the renderer, native window,
-tray/menu-bar, tooltip, commands, and native product error surfaces. Nine focused
-test files (84 tests), typecheck, lint, formatting, package, source scans, and a
-640×480 packaged visual/interaction comparison pass.
+Renamed all source-owned application and tray assets to Daymark with their
+pre-rename bytes preserved, updated every runtime/Forge/package-inspector
+reference, and aligned supported package and artifact presentation contracts.
+Focused tests, typecheck, lint, formatting, release validation, macOS arm64
+packaging, and structural inspection pass.

@@ -17,10 +17,10 @@ const requiredAsarEntries = [
 ];
 
 const requiredResources = [
-  'assets/icon/time-tracker.icns',
-  'assets/tray/time-tracker.png',
-  'assets/tray/time-trackerTemplate.png',
-  'assets/tray/time-trackerTemplate@2x.png',
+  'assets/icon/daymark.icns',
+  'assets/tray/daymark.png',
+  'assets/tray/daymarkTemplate.png',
+  'assets/tray/daymarkTemplate@2x.png',
 ];
 
 function parseArchitecture(args: string[]): MacosArchitecture {
@@ -59,13 +59,13 @@ export function inspectMacosPackage(
   const appPath = path.join(
     projectRoot,
     'out',
-    `Time Tracker-darwin-${architecture}`,
-    'Time Tracker.app',
+    `Daymark-darwin-${architecture}`,
+    'Daymark.app',
   );
   const contentsPath = path.join(appPath, 'Contents');
   const resourcesPath = path.join(contentsPath, 'Resources');
   const asarPath = path.join(resourcesPath, 'app.asar');
-  const executablePath = path.join(contentsPath, 'MacOS', 'Time Tracker');
+  const executablePath = path.join(contentsPath, 'MacOS', 'Daymark');
   const nativeModulePath = path.join(
     resourcesPath,
     'app.asar.unpacked',

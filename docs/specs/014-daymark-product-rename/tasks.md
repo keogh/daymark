@@ -30,7 +30,7 @@ to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-014-001 | Establish the Daymark identity and profile-compatibility contract | Complete | None | AC-014-002, AC-014-003, AC-014-005, AC-014-006 |
 | TASK-014-002 | Rename renderer and native desktop presentation | Complete | TASK-014-001 | AC-014-001, AC-014-006 |
-| TASK-014-003 | Rename packaging presentation and asset references | Pending | TASK-014-001 | AC-014-002, AC-014-003, AC-014-007 |
+| TASK-014-003 | Rename packaging presentation and asset references | Complete | TASK-014-001 | AC-014-002, AC-014-003, AC-014-007 |
 | TASK-014-004 | Align current documentation and downstream release specifications | Pending | TASK-014-001, TASK-014-002, TASK-014-003 | AC-014-008 |
 | TASK-014-005 | Verify packaged upgrade compatibility and final acceptance | Pending | TASK-014-002, TASK-014-003, TASK-014-004 | AC-014-004, AC-014-005, AC-014-006, AC-014-009 |
 
@@ -182,7 +182,7 @@ TASK-014-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -229,8 +229,40 @@ TASK-014-001.
 
 ### Completion Evidence
 
-Record commands, package paths, inspected names/identifiers, and before/after
-asset hashes when filenames change.
+- Forge configuration, primary artifact generation, and the macOS, Windows, and
+  Linux package inspectors now require Daymark application, executable,
+  installer, launcher, DMG, and primary artifact presentation. The intentionally
+  stable macOS bundle ID, Windows AppUserModelID, Debian package/launcher
+  identity, Squirrel package name, npm package name, profile directory, database
+  filename, and preload global remain unchanged.
+- Renamed the four application icon inputs and four tray inputs from
+  `time-tracker*` to `daymark*`, updating Forge, runtime selection, generation,
+  package inspection, and test references atomically. Fixed SHA-256 tests prove
+  the pre/post-rename bytes are identical. The hashes are:
+  `d03dac643a61359fcf5340bba8733cfcc2b67128ed342002e45f513a79ad5cfb`
+  (icon source),
+  `7d5ff142d9d04743d3a011342a5f6f1cd11cb0ffa92387b6d966905a28dfa642`
+  (ICNS),
+  `3b19074fa62693d3ac26a3f310253bce38f049761aa7bccd6d0dabb15353c989`
+  (ICO),
+  `81a57cc793f4c623e8b95875c0183e9ac84eea051dc5001e008735250b71c02d`
+  (application PNG),
+  `5b6066dc0dba87a9c4e76d6bc741d40a33b895f7a48c4b25cabc2923950aa414`
+  (tray source),
+  `ef16bcc79dc8a05c78ab1dd39deccc9262b82710b5b0428983b4d740ae88d6e4`
+  (tray PNG and 2x template), and
+  `5eb0584faccb43df7e5517be9defe4d627ebd302971d6c1c481b1146bda54577`
+  (1x template).
+- `npm test -- --run test/main/app/packaging.test.ts test/main/app/windows-startup.test.ts test/main/tray/assets.test.ts test/scripts/release-contract.test.ts test/scripts/linux-deb-artifact.test.ts test/scripts/workflow-artifacts.test.ts test/scripts/native-build-workflow.test.ts`
+  — passed, 7 files and 39 tests.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`,
+  `npm run release:validate -- --tag v0.1.0`, and `git diff --check` — passed.
+- `npm run package` produced
+  `out/Daymark-darwin-arm64/Daymark.app`; `npm run inspect:macos:arm64` passed.
+  `Info.plist` reports display name and executable `Daymark` while retaining
+  bundle ID `com.isaaczepeda.timetracker`, and structural inspection found the
+  renamed Daymark icon/tray resources plus the required ASAR and arm64 native
+  module content.
 
 ---
 
