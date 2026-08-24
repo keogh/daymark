@@ -62,7 +62,7 @@ export const useHistoryController = (
 
     const loadInitialPage = async () => {
       try {
-        const result = await window.timeTracker.history.getPage({});
+        const result = await window.daymark.history.getPage({});
         if (isActive) {
           if (result.ok) {
             nextOlderCursor.current = result.value.nextBeforeDayStartedAt;
@@ -95,7 +95,7 @@ export const useHistoryController = (
     const version = ++requestVersion.current;
     setLoadState({ status: 'loading' });
     try {
-      const result = await window.timeTracker.history.getPage({});
+      const result = await window.daymark.history.getPage({});
       if (version === requestVersion.current) {
         if (result.ok) {
           nextOlderCursor.current = result.value.nextBeforeDayStartedAt;
@@ -125,7 +125,7 @@ export const useHistoryController = (
       if (current.status !== 'ready') return;
 
       const targetCursor = current.page.nextBeforeDayStartedAt;
-      const result = await window.timeTracker.history.getPage({});
+      const result = await window.daymark.history.getPage({});
       if (version !== requestVersion.current) {
         return;
       }
@@ -143,7 +143,7 @@ export const useHistoryController = (
         refreshedPage.nextBeforeDayStartedAt !== null &&
         refreshedPage.nextBeforeDayStartedAt !== targetCursor
       ) {
-        const olderResult = await window.timeTracker.history.getPage({
+        const olderResult = await window.daymark.history.getPage({
           beforeDayStartedAt: refreshedPage.nextBeforeDayStartedAt,
         });
         if (version !== requestVersion.current) return;
@@ -234,7 +234,7 @@ export const useHistoryController = (
     });
 
     try {
-      const result = await window.timeTracker.history.getPage({
+      const result = await window.daymark.history.getPage({
         beforeDayStartedAt: cursor,
       });
       olderRequestPending.current = false;

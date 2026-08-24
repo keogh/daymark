@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ANALYTICS_GET_SUMMARY_CHANNEL } from '@/shared/contracts/analytics';
 import { SYSTEM_HEALTH_CHECK_CHANNEL } from '@/shared/contracts/system-health';
-import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import type { DaymarkAPI } from '@/shared/contracts/system-health';
 import { HISTORY_GET_PAGE_CHANNEL } from '@/shared/contracts/history';
 import {
   INTERVALS_DELETE_CHANNEL,
@@ -31,9 +31,9 @@ import {
 } from '@/shared/contracts/timer';
 
 const electronMocks = vi.hoisted(() => ({
-  exposedApi: undefined as TimeTrackerAPI | undefined,
-  exposeInMainWorld: vi.fn((key: string, api: TimeTrackerAPI): void => {
-    if (key === 'timeTracker') {
+  exposedApi: undefined as DaymarkAPI | undefined,
+  exposeInMainWorld: vi.fn((key: string, api: DaymarkAPI): void => {
+    if (key === 'daymark') {
       electronMocks.exposedApi = api;
     }
   }),
@@ -56,8 +56,8 @@ describe('preload API', () => {
     vi.resetModules();
     electronMocks.exposeInMainWorld.mockReset();
     electronMocks.exposeInMainWorld.mockImplementation(
-      (key: string, api: TimeTrackerAPI): void => {
-        if (key === 'timeTracker') {
+      (key: string, api: DaymarkAPI): void => {
+        if (key === 'daymark') {
           electronMocks.exposedApi = api;
         }
       },

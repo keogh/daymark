@@ -99,7 +99,7 @@ export function inspectMacosPackage(
     ],
     { encoding: 'utf8' },
   ).trim();
-  if (bundleIdentifier !== 'com.isaaczepeda.timetracker') {
+  if (bundleIdentifier !== 'com.isaaczepeda.daymark') {
     throw new Error(`unexpected bundle identifier: ${bundleIdentifier}`);
   }
 

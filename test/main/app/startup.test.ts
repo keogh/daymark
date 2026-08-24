@@ -80,10 +80,10 @@ describe('application startup', () => {
 
   it('does not expose readiness when a controlled migration fails', async () => {
     const temporaryDirectory = await mkdtemp(
-      path.join(tmpdir(), 'time-tracker-startup-'),
+      path.join(tmpdir(), 'daymark-startup-'),
     );
     const databaseLifecycle = new DatabaseLifecycle({
-      databasePath: path.join(temporaryDirectory, 'time-tracker.sqlite'),
+      databasePath: path.join(temporaryDirectory, 'daymark.sqlite'),
       migrationsFolder: path.join(temporaryDirectory, 'missing-migrations'),
     });
     const logInitializationFailure = vi.fn();

@@ -461,7 +461,7 @@ interface AnalyticsAPI {
   ): Promise<AppResult<AnalyticsSummary>>;
 }
 
-window.timeTracker.analytics.getSummary({
+window.daymark.analytics.getSummary({
   range: 'last-7-days',
 });
 ```
@@ -591,7 +591,7 @@ authoritative state without a false idle or `00:00:00` flash.
 Conceptual layout:
 
 ```text
-Time Tracker                         Timer  Analytics
+Daymark                         Timer  Analytics
 
 Analytics
 Recent tracked time
@@ -1176,7 +1176,7 @@ Shared validation, IPC, preload, and safe-error tests must cover:
 - safe conversion of unexpected service or database failures to `INTERNAL_ERROR`;
 - no stack trace, SQL, database path, or unnecessary Task content exposed to the
   renderer;
-- `window.timeTracker.analytics.getSummary` as the only new preload capability;
+- `window.daymark.analytics.getSummary` as the only new preload capability;
 - absence of raw `ipcRenderer`, generic invoke/send/on, Node.js, filesystem, or
   database exposure.
 

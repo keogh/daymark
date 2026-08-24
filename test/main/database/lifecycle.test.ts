@@ -21,7 +21,7 @@ describe('DatabaseLifecycle', () => {
 
   beforeEach(async () => {
     temporaryDirectory = await mkdtemp(
-      path.join(tmpdir(), 'time-tracker-database-'),
+      path.join(tmpdir(), 'daymark-database-'),
     );
   });
 
@@ -87,7 +87,7 @@ describe('DatabaseLifecycle', () => {
 
   it('does not report readiness when migrations fail', () => {
     const lifecycle = new DatabaseLifecycle({
-      databasePath: path.join(temporaryDirectory, 'time-tracker.sqlite'),
+      databasePath: path.join(temporaryDirectory, 'daymark.sqlite'),
       migrationsFolder: path.join(temporaryDirectory, 'missing-migrations'),
     });
 
@@ -101,7 +101,7 @@ const createLifecycle = (
   timestamp: number,
 ): DatabaseLifecycle =>
   new DatabaseLifecycle({
-    databasePath: path.join(directory, 'time-tracker.sqlite'),
+    databasePath: path.join(directory, 'daymark.sqlite'),
     migrationsFolder,
     now: () => timestamp,
   });

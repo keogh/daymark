@@ -110,7 +110,7 @@ const renderDialog = ({
   );
 
 const setDeleteApi = (remove: ReturnType<typeof vi.fn>) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: { intervals: { delete: remove } },
   });

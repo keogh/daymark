@@ -53,7 +53,7 @@ export const RenameTaskDialog = ({
     setIsPending(true);
     setError(null);
     try {
-      const result = await window.timeTracker.tasks.rename({
+      const result = await window.daymark.tasks.rename({
         taskId: validation.value.taskId,
         description: validation.value.description,
       });

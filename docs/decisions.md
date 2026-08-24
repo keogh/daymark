@@ -13,6 +13,40 @@ When changing a decision:
 
 ---
 
+# DEC-037 — Daymark-Only Initial Product Identity
+
+## Status
+
+Accepted
+
+## Decision
+
+The first installed release uses Daymark consistently for visible and technical
+identity. Its application profile is `Daymark`, its database is `daymark.sqlite`,
+its package and installer identities use `daymark`, its process-boundary API is
+`window.daymark`, and its platform identifiers use the Daymark name.
+
+No compatibility path, import, copy, or migration from development builds using
+the provisional product identity is provided. Those builds were used only by the
+owner before the first clear installable release.
+
+## Context
+
+SPEC-014 originally preserved provisional identifiers and the provisional local
+profile as though an externally distributed version already existed. The owner
+confirmed that no external user has installed the application and chose a clean,
+consistent identity before the first release.
+
+## Consequences
+
+- Existing provisional local data is not opened by Daymark automatically.
+- Fresh and replacement installs use the same Daymark profile identity.
+- No schema migration is necessary because the database schema is unchanged.
+- Release artifacts, platform metadata, source contracts, tests, and current
+  documentation use the Daymark identity consistently.
+
+---
+
 # DEC-001 — Desktop Runtime
 
 ## Status

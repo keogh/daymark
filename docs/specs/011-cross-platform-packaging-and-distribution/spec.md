@@ -242,7 +242,7 @@ future upgrade, shortcuts, and application-data paths refer to the same product.
 Required product metadata:
 
 ```text
-package name: time-tracker
+package name: daymark
 product name: Daymark
 author: Isaac Zepeda
 description: A local-first desktop time tracker.
@@ -450,7 +450,7 @@ describe them as a substitute for code signing or publisher authentication.
 
 Acceptance must use disposable OS users, virtual machines, or physical test
 profiles that do not point at the developer's real Daymark data in the
-compatibility-preserved `Time Tracker` profile directory.
+compatibility-preserved `Daymark` profile directory.
 
 On first ordinary launch, the installed application must:
 

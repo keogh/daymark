@@ -7,17 +7,17 @@ and testing. It is not a general-public production release.
 
 The source-controlled distribution contract is
 `scripts/distribution-contract.ts`. Its stable macOS bundle identifier is
-`com.isaaczepeda.timetracker`; its Windows Squirrel application user model
-identifier is `com.squirrel.timetracker.time-tracker`; and its Linux package
-identifier is `time-tracker`. The package name is
-`time-tracker`, the visible product name is `Daymark`, the author and Linux
+`com.isaaczepeda.daymark`; its Windows Squirrel application user model
+identifier is `com.squirrel.daymark.daymark`; and its Linux package
+identifier is `daymark`. The package name is
+`daymark`, the visible product name is `Daymark`, the author and Linux
 maintainer name are `Isaac Zepeda`, and the description is
 `A local-first desktop time tracker.`
 
-Daymark retains the established `Time Tracker` operating-system profile directory
-and `time-tracker.sqlite` database filename so replacement installations open
-existing data in place. These compatibility identifiers do not represent the
-current visible product name.
+Daymark uses the `Daymark` operating-system profile directory and
+`daymark.sqlite` database filename. Replacement installations and future forward
+upgrades open that Daymark data in place. No compatibility or import path exists
+for owner-only development profiles that predate the first release.
 
 Linux temporarily uses `isaaczepeda@users.noreply.github.com` as its maintainer
 email and intentionally omits homepage metadata. Before signed or general-public
@@ -129,7 +129,7 @@ administrator authorization, then launch **Daymark** from the Ubuntu GNOME
 application launcher as the disposable ordinary desktop user. Do not launch the
 application with `sudo`. Confirm its profile beneath that user's configuration
 directory is owned by the ordinary user. Removal may use normal administrator
-authorization; after removal, confirm `/usr/bin/time-tracker`, the desktop entry,
+authorization; after removal, confirm `/usr/bin/daymark`, the desktop entry,
 installed application files, and installed icon are gone while the disposable
 user's profile and representative data remain. Reinstall and launch as that same
 ordinary user to confirm the data remains available.

@@ -178,7 +178,7 @@ TASK-004-002.
 ### Included
 
 - Register the explicit `timer:switch-to-task` IPC handler.
-- Expose `window.timeTracker.timer.switchToTask(...)` through preload.
+- Expose `window.daymark.timer.switchToTask(...)` through preload.
 - Validate switch input in the main-process boundary before service execution.
 - Map expected failures to controlled `AppResult` values and log unexpected
   failures safely.
@@ -204,7 +204,7 @@ TASK-004-002.
 
 ### Completion Evidence
 
-- Added `window.timeTracker.timer.switchToTask(...)` to the shared timer/preload
+- Added `window.daymark.timer.switchToTask(...)` to the shared timer/preload
   boundary and routed it over the explicit `timer:switch-to-task` channel.
 - Registered validated timer-switch IPC handling that rejects malformed input
   before service execution and preserves existing renderer-safe expected and
@@ -349,7 +349,7 @@ TASK-004-004.
 - `npm run lint` — passed on 2026-08-15.
 - `npm test` — passed on 2026-08-15, 267 tests in 38 files.
 - `npm run package` — passed on 2026-08-15 for macOS arm64. Electron Forge emitted only its existing Vite `inlineDynamicImports` deprecation warning.
-- 2026-08-15: Launched the packaged macOS arm64 app with isolated user data via `--user-data-dir=/tmp/timetracker-spec004-user-data` and exercised SPEC-004 history-row flows over Electron CDP. Idle Play, running different-task switch, paused different-task switch, paused same-task resume, running same-task disabled state, and stale-task inline feedback all passed.
-- 2026-08-15: The isolated packaged acceptance mutated only `/tmp/timetracker-spec004-user-data/time-tracker.sqlite` to create the stale-task condition, leaving the real application profile untouched.
+- 2026-08-15: Launched the packaged macOS arm64 app with isolated user data via `--user-data-dir=/tmp/daymark-spec004-user-data` and exercised SPEC-004 history-row flows over Electron CDP. Idle Play, running different-task switch, paused different-task switch, paused same-task resume, running same-task disabled state, and stale-task inline feedback all passed.
+- 2026-08-15: The isolated packaged acceptance mutated only `/tmp/daymark-spec004-user-data/daymark.sqlite` to create the stale-task condition, leaving the real application profile untouched.
 - No schema, migration, architectural decision, or additional product-documentation changes were required beyond verification status and progress updates.
 - Deviations: none.

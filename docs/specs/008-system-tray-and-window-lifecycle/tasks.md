@@ -455,7 +455,7 @@ TASK-008-005.
 - `npm run package` — passed for the macOS arm64 Electron package; packaged
   source-owned tray assets were included.
 - Packaged macOS verification used the isolated
-  `/tmp/timetracker-spec008-verification` profile. It covered idle launch,
+  `/tmp/daymark-spec008-verification` profile. It covered idle launch,
   local-only renderer resources, Start, close-to-hide, an advancing native tray,
   tray Pause/Open/Resume/Stop, and repeated Open/restore behavior.
 - Quit from the tray left the active interval open and `AppState` running in the

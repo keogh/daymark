@@ -1,13 +1,13 @@
 export const productIdentity = {
   displayName: 'Daymark',
   stable: {
-    macosBundleId: 'com.isaaczepeda.timetracker',
-    windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
-    linuxPackageName: 'time-tracker',
-    squirrelPackageName: 'timetracker',
-    databaseFilename: 'time-tracker.sqlite',
-    preloadGlobal: 'timeTracker',
-    npmPackageName: 'time-tracker',
-    profileDirectoryName: 'Time Tracker',
+    macosBundleId: 'com.isaaczepeda.daymark',
+    windowsAppUserModelId: 'com.squirrel.daymark.daymark',
+    linuxPackageName: 'daymark',
+    squirrelPackageName: 'daymark',
+    databaseFilename: 'daymark.sqlite',
+    preloadGlobal: 'daymark',
+    npmPackageName: 'daymark',
+    profileDirectoryName: 'Daymark',
   },
 } as const;

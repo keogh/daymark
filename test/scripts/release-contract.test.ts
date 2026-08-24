@@ -10,7 +10,7 @@ import {
 } from '../../scripts/release-contract.ts';
 
 const packageMetadata = {
-  name: 'time-tracker',
+  name: 'daymark',
   productName: 'Daymark',
   version: '0.1.0',
   description: 'A local-first desktop time tracker.',
@@ -51,21 +51,21 @@ describe('release contract', () => {
       'package.json homepage must be omitted until a canonical value is approved',
     );
     expect(distributionContract.identity.identifiers).toEqual({
-      macosBundleId: 'com.isaaczepeda.timetracker',
-      windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
-      linuxPackageName: 'time-tracker',
+      macosBundleId: 'com.isaaczepeda.daymark',
+      windowsAppUserModelId: 'com.squirrel.daymark.daymark',
+      linuxPackageName: 'daymark',
     });
     expect(productIdentity).toEqual({
       displayName: 'Daymark',
       stable: {
-        macosBundleId: 'com.isaaczepeda.timetracker',
-        windowsAppUserModelId: 'com.squirrel.timetracker.time-tracker',
-        linuxPackageName: 'time-tracker',
-        squirrelPackageName: 'timetracker',
-        databaseFilename: 'time-tracker.sqlite',
-        preloadGlobal: 'timeTracker',
-        npmPackageName: 'time-tracker',
-        profileDirectoryName: 'Time Tracker',
+        macosBundleId: 'com.isaaczepeda.daymark',
+        windowsAppUserModelId: 'com.squirrel.daymark.daymark',
+        linuxPackageName: 'daymark',
+        squirrelPackageName: 'daymark',
+        databaseFilename: 'daymark.sqlite',
+        preloadGlobal: 'daymark',
+        npmPackageName: 'daymark',
+        profileDirectoryName: 'Daymark',
       },
     });
     expect(distributionContract.linux).toEqual({

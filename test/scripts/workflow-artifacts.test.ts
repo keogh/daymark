@@ -24,7 +24,7 @@ afterEach(async () => {
 async function temporaryDirectory(): Promise<string> {
   const directory = path.join(
     tmpdir(),
-    `time-tracker-workflow-artifacts-${crypto.randomUUID()}`,
+    `daymark-workflow-artifacts-${crypto.randomUUID()}`,
   );
   temporaryDirectories.push(directory);
   await mkdir(directory, { recursive: true });

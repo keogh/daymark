@@ -850,7 +850,7 @@ const setHistoryApi = (
     readonly getDeletionSummary?: ReturnType<typeof vi.fn>;
   } = {},
 ) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: {
       history: { getPage },

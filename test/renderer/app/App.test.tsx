@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '@/renderer/app/App';
 import type { AppResult } from '@/shared/contracts/app-result';
 import type { HistoryPage } from '@/shared/contracts/history';
-import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import type { DaymarkAPI } from '@/shared/contracts/system-health';
 import type { ApplicationSettings } from '@/shared/contracts/settings';
 import type { TaskSuggestionPage } from '@/shared/contracts/tasks';
 import type { TimerState } from '@/shared/contracts/timer';
@@ -1382,26 +1382,26 @@ describe('App', () => {
 });
 
 interface TimerApiOverrides {
-  readonly getState?: TimeTrackerAPI['timer']['getState'];
-  readonly start?: TimeTrackerAPI['timer']['start'];
-  readonly switchToTask?: TimeTrackerAPI['timer']['switchToTask'];
-  readonly pause?: TimeTrackerAPI['timer']['pause'];
-  readonly resume?: TimeTrackerAPI['timer']['resume'];
-  readonly stop?: TimeTrackerAPI['timer']['stop'];
-  readonly onStateChanged?: TimeTrackerAPI['timer']['onStateChanged'];
-  readonly getHistoryPage?: TimeTrackerAPI['history']['getPage'];
-  readonly createManualInterval?: TimeTrackerAPI['manualTime']['createInterval'];
-  readonly getSuggestions?: TimeTrackerAPI['tasks']['getSuggestions'];
-  readonly renameTask?: TimeTrackerAPI['tasks']['rename'];
-  readonly deleteTask?: TimeTrackerAPI['tasks']['delete'];
-  readonly getTaskDeletionSummary?: TimeTrackerAPI['tasks']['getDeletionSummary'];
-  readonly getSettings?: TimeTrackerAPI['settings']['get'];
-  readonly setWeekStartsOn?: TimeTrackerAPI['settings']['setWeekStartsOn'];
-  readonly setTheme?: TimeTrackerAPI['settings']['setTheme'];
+  readonly getState?: DaymarkAPI['timer']['getState'];
+  readonly start?: DaymarkAPI['timer']['start'];
+  readonly switchToTask?: DaymarkAPI['timer']['switchToTask'];
+  readonly pause?: DaymarkAPI['timer']['pause'];
+  readonly resume?: DaymarkAPI['timer']['resume'];
+  readonly stop?: DaymarkAPI['timer']['stop'];
+  readonly onStateChanged?: DaymarkAPI['timer']['onStateChanged'];
+  readonly getHistoryPage?: DaymarkAPI['history']['getPage'];
+  readonly createManualInterval?: DaymarkAPI['manualTime']['createInterval'];
+  readonly getSuggestions?: DaymarkAPI['tasks']['getSuggestions'];
+  readonly renameTask?: DaymarkAPI['tasks']['rename'];
+  readonly deleteTask?: DaymarkAPI['tasks']['delete'];
+  readonly getTaskDeletionSummary?: DaymarkAPI['tasks']['getDeletionSummary'];
+  readonly getSettings?: DaymarkAPI['settings']['get'];
+  readonly setWeekStartsOn?: DaymarkAPI['settings']['setWeekStartsOn'];
+  readonly setTheme?: DaymarkAPI['settings']['setTheme'];
 }
 
-const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
-  const api: TimeTrackerAPI = {
+const setTimerApi = (overrides: TimerApiOverrides = {}): DaymarkAPI => {
+  const api: DaymarkAPI = {
     system: { healthCheck: vi.fn() },
     timer: {
       getState:
@@ -1501,7 +1501,7 @@ const setTimerApi = (overrides: TimerApiOverrides = {}): TimeTrackerAPI => {
     },
   };
 
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: api,
   });

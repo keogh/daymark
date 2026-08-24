@@ -265,7 +265,7 @@ TASK-000-003.
 - 2026-08-13: Added the central typed SQLite/Drizzle context and database lifecycle,
   including foreign-key configuration, automatic migrations, idempotent AppState
   seeding, readiness reporting, single-connection reuse, and clean closure.
-- 2026-08-13: Wired Electron startup to resolve `time-tracker.sqlite` beneath the
+- 2026-08-13: Wired Electron startup to resolve `daymark.sqlite` beneath the
   per-user application data directory, initialize persistence before creating the
   main window, stop startup on migration failure, and close SQLite on `will-quit`.
 - 2026-08-13: Disposable-database tests verified repeated initialization, one
@@ -284,7 +284,7 @@ Complete
 
 ### Outcome
 
-The renderer can call a fully typed `window.timeTracker.system.healthCheck()` that
+The renderer can call a fully typed `window.daymark.system.healthCheck()` that
 travels through contextBridge and an explicit IPC handler to database readiness.
 
 ### Dependencies
@@ -318,7 +318,7 @@ TASK-000-002 and TASK-000-004.
 
 ### Completion Evidence
 
-- 2026-08-13: Added the shared `SystemHealth`/`TimeTrackerAPI` contract and global
+- 2026-08-13: Added the shared `SystemHealth`/`DaymarkAPI` contract and global
   Window declaration, database-backed health service, explicit IPC handler,
   startup registration, and narrow contextBridge API.
 - 2026-08-13: Verified initialized and unavailable database responses, explicit
@@ -370,7 +370,7 @@ TASK-000-005.
 ### Completion Evidence
 
 - 2026-08-13: Replaced the static renderer shell message with local React health
-  state that uses only the typed `window.timeTracker.system.healthCheck()` API and
+  state that uses only the typed `window.daymark.system.healthCheck()` API and
   renders accessible loading, ready/database-connected, and initialization-failure
   states.
 - 2026-08-13: Added focused renderer tests with a mocked typed preload boundary for
@@ -483,7 +483,7 @@ TASK-000-005 and TASK-000-006.
   disposable SQLite database, including unavailable-before-initialization and
   ready-after-initialization responses.
 - 2026-08-13: Verified the renderer loading-to-ready transition plus unavailable
-  database and rejected-call failure states through a mocked `TimeTrackerAPI`.
+  database and rejected-call failure states through a mocked `DaymarkAPI`.
   Strengthened the component assertions to prove one health-check call and removal
   of the loading state on failure.
 - 2026-08-13: Focused health-boundary tests passed (3 files, 4 tests), and focused
@@ -654,7 +654,7 @@ TASK-000-005, TASK-000-006, and TASK-000-010.
   flag; no shipped configuration or source was changed. A control `curl` under the
   same policy failed DNS resolution, demonstrating that network access was
   unavailable.
-- 2026-08-13: The offline launch created `time-tracker.sqlite`; read-only inspection
+- 2026-08-13: The offline launch created `daymark.sqlite`; read-only inspection
   found one applied Drizzle migration, the singleton AppState row in the expected
   idle state, and `PRAGMA integrity_check` returned `ok`. The process remained
   running without initialization errors until it was stopped cleanly.

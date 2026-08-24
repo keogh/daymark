@@ -420,7 +420,7 @@ const HistoryTaskRow = ({
     setIsDeletionSummaryPending(true);
     setDeletionSummaryError(null);
     try {
-      const result = await window.timeTracker.tasks.getDeletionSummary({
+      const result = await window.daymark.tasks.getDeletionSummary({
         taskId: task.task.id,
       });
       if (!result.ok) {

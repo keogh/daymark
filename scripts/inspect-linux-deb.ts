@@ -38,7 +38,7 @@ async function assertX64Elf(filePath: string, label: string): Promise<void> {
 }
 
 const extractionDirectory = await mkdtemp(
-  path.join(tmpdir(), 'time-tracker-linux-deb-'),
+  path.join(tmpdir(), 'daymark-linux-deb-'),
 );
 
 try {
@@ -50,7 +50,7 @@ try {
     '--field',
     packagePath,
   ]);
-  requireMatch(control, /^Package: time-tracker$/m, 'package identity');
+  requireMatch(control, /^Package: daymark$/m, 'package identity');
   requireMatch(
     control,
     new RegExp(
@@ -76,25 +76,18 @@ try {
   }
 
   await execute('dpkg-deb', ['--extract', packagePath, extractionDirectory]);
-  const appRoot = path.join(extractionDirectory, 'usr/lib/time-tracker');
+  const appRoot = path.join(extractionDirectory, 'usr/lib/daymark');
   const desktopEntry = await readFile(
-    path.join(
-      extractionDirectory,
-      'usr/share/applications/time-tracker.desktop',
-    ),
+    path.join(extractionDirectory, 'usr/share/applications/daymark.desktop'),
     'utf8',
   );
   requireMatch(desktopEntry, /^Name=Daymark$/m, 'desktop entry name');
-  requireMatch(
-    desktopEntry,
-    /^Exec=time-tracker %U$/m,
-    'desktop entry command',
-  );
-  requireMatch(desktopEntry, /^Icon=time-tracker$/m, 'desktop entry icon');
+  requireMatch(desktopEntry, /^Exec=daymark %U$/m, 'desktop entry command');
+  requireMatch(desktopEntry, /^Icon=daymark$/m, 'desktop entry icon');
   requireMatch(desktopEntry, /^Categories=Utility;$/m, 'desktop category');
 
   const icon = await readFile(
-    path.join(extractionDirectory, 'usr/share/pixmaps/time-tracker.png'),
+    path.join(extractionDirectory, 'usr/share/pixmaps/daymark.png'),
   );
   if (
     !icon

@@ -267,7 +267,7 @@ TASK-002-003.
 ### Included
 
 - Register the narrow `history:get-page` IPC handler.
-- Expose `window.timeTracker.history.getPage` through contextBridge.
+- Expose `window.daymark.history.getPage` through contextBridge.
 - Connect service construction through the existing application lifecycle.
 - Reject unknown, malformed, unsafe, future, and non-local-midnight cursors.
 - Map expected and unexpected errors without exposing internal details.
@@ -302,7 +302,7 @@ database, projection, and handler failures are logged in the main process and
 mapped to the renderer-safe `INTERNAL_ERROR` value without exposing technical
 details.
 
-The typed preload surface now exposes only `window.timeTracker.history.getPage`
+The typed preload surface now exposes only `window.daymark.history.getPage`
 for history access. Production lifecycle wiring constructs HistoryQueryRepository
 and HistoryService from the initialized application database and shared SystemClock,
 then registers the handler before window creation. No generic IPC access, renderer

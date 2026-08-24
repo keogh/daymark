@@ -23,7 +23,7 @@ export const createDisposableDatabase = async (
   timestamp = 1_000,
 ): Promise<DisposableDatabase> => {
   const directory = await mkdtemp(
-    path.join(tmpdir(), 'time-tracker-database-test-'),
+    path.join(tmpdir(), 'daymark-database-test-'),
   );
   const databasePath = path.join(directory, 'test.sqlite');
   const lifecycle = new DatabaseLifecycle({

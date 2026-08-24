@@ -57,7 +57,7 @@ export const useTimerController = (): TimerController => {
 
     const loadTimer = async () => {
       try {
-        const result = await window.timeTracker.timer.getState();
+        const result = await window.daymark.timer.getState();
         if (!isActive || version !== requestVersion.current) {
           return;
         }
@@ -82,7 +82,7 @@ export const useTimerController = (): TimerController => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = window.timeTracker.timer.onStateChanged((state) => {
+    const unsubscribe = window.daymark.timer.onStateChanged((state) => {
       if (isTimerState(state)) {
         acceptAuthoritativeState(state);
       }
@@ -138,7 +138,7 @@ export const useTimerController = (): TimerController => {
       const validatedDescription = validation.value.description;
 
       await runCommand('start', () =>
-        window.timeTracker.timer.start({
+        window.daymark.timer.start({
           source: 'description',
           description: validatedDescription,
         }),
@@ -148,13 +148,13 @@ export const useTimerController = (): TimerController => {
   );
 
   const pause = useCallback(
-    () => runCommand('pause', window.timeTracker.timer.pause),
+    () => runCommand('pause', window.daymark.timer.pause),
     [runCommand],
   );
   const startExistingTask = useCallback(
     (taskId: string) =>
       runCommand('start', () =>
-        window.timeTracker.timer.start({
+        window.daymark.timer.start({
           source: 'existing-task',
           taskId,
         }),
@@ -162,11 +162,11 @@ export const useTimerController = (): TimerController => {
     [runCommand],
   );
   const resume = useCallback(
-    () => runCommand('resume', window.timeTracker.timer.resume),
+    () => runCommand('resume', window.daymark.timer.resume),
     [runCommand],
   );
   const stop = useCallback(
-    () => runCommand('stop', window.timeTracker.timer.stop),
+    () => runCommand('stop', window.daymark.timer.stop),
     [runCommand],
   );
   const switchToTask = useCallback(
@@ -175,7 +175,7 @@ export const useTimerController = (): TimerController => {
       setCommandError(null);
 
       try {
-        const result = await window.timeTracker.timer.switchToTask({ taskId });
+        const result = await window.daymark.timer.switchToTask({ taskId });
         if (version === requestVersion.current) {
           if (result.ok) {
             setLoadState({ status: 'ready', timer: result.value });
@@ -201,7 +201,7 @@ export const useTimerController = (): TimerController => {
 
     const interval = window.setInterval(() => {
       const version = requestVersion.current;
-      void window.timeTracker.timer
+      void window.daymark.timer
         .getState()
         .then((result) => {
           if (result.ok && version === requestVersion.current) {
@@ -219,7 +219,7 @@ export const useTimerController = (): TimerController => {
   const refresh = useCallback(async (): Promise<void> => {
     const version = ++requestVersion.current;
     try {
-      const result = await window.timeTracker.timer.getState();
+      const result = await window.daymark.timer.getState();
       if (result.ok && version === requestVersion.current) {
         setLoadState({ status: 'ready', timer: result.value });
       }

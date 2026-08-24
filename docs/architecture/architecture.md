@@ -93,7 +93,7 @@ Exact package versions belong in `package.json` and the lockfile rather than arc
 │                                             │
 └───────────────────┬─────────────────────────┘
                     │
-              window.timeTracker
+              window.daymark
                     │
 ┌───────────────────▼─────────────────────────┐
 │                 Preload                     │
@@ -167,7 +167,7 @@ The preload layer exposes the smallest useful typed API.
 Example conceptual API:
 
 ```ts
-interface TimeTrackerAPI {
+interface DaymarkAPI {
   timer: {
     getState(): Promise<TimerState>;
     start(input: StartTaskInput): Promise<TimerState>;

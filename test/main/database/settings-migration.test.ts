@@ -19,7 +19,7 @@ describe('settings migration', () => {
 
   beforeEach(async () => {
     temporaryDirectory = await mkdtemp(
-      path.join(tmpdir(), 'time-tracker-settings-migration-'),
+      path.join(tmpdir(), 'daymark-settings-migration-'),
     );
   });
 

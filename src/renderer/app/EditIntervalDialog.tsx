@@ -110,7 +110,7 @@ const EditIntervalForm = ({
     setIsPending(true);
     setError(null);
     try {
-      const result = await window.timeTracker.intervals.update(input);
+      const result = await window.daymark.intervals.update(input);
       if (!result.ok) {
         setError(editErrorMessage(result.error));
         return;

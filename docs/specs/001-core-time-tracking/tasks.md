@@ -619,7 +619,7 @@ Complete
 
 ### Outcome
 
-The renderer receives a narrow, fully typed `window.timeTracker.timer` API for
+The renderer receives a narrow, fully typed `window.daymark.timer` API for
 getState/start/pause/resume/stop, with runtime input validation and safe errors.
 
 ### Dependencies

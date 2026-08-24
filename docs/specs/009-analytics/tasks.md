@@ -319,8 +319,8 @@ and no generic privileged capability.
 - Map unexpected failures to renderer-safe `INTERNAL_ERROR` and local technical
   logging.
 - Register and dispose the handler through established lifecycle composition.
-- Expose only `window.timeTracker.analytics.getSummary(input)` through preload.
-- Update the typed `TimeTrackerAPI` boundary.
+- Expose only `window.daymark.analytics.getSummary(input)` through preload.
+- Update the typed `DaymarkAPI` boundary.
 - Add shared-validation, IPC, preload, safe-error, and lifecycle tests.
 
 ### Excluded
@@ -360,7 +360,7 @@ and no generic privileged capability.
   absent from the serialized renderer result.
 - Registered the handler with the composed AnalyticsService and attached its
   exact-channel removal callback to idempotent application shutdown cleanup.
-- Added only `window.timeTracker.analytics.getSummary(input)` to the typed preload
+- Added only `window.daymark.analytics.getSummary(input)` to the typed preload
   API. The preload audit confirms the exact invoke channel and no raw Electron,
   generic invoke/send/on, filesystem, database, or query capability exposure.
 - Focused Analytics validation, IPC, preload, lifecycle, History IPC, and Timer
@@ -706,9 +706,9 @@ accurately reflect the completed implementation.
   tests.
 - `npm run package` passed with Electron Forge 7.11.2 and Electron 43.4.0 on
   macOS 26.3.1 arm64 using Node 24.18.1 and npm 11.16.0. The packaged artifact is
-  `out/Time Tracker-darwin-arm64/Time Tracker.app` (444 MB).
+  `out/Daymark-darwin-arm64/Daymark.app` (444 MB).
 - Isolated packaged acceptance used
-  `/tmp/timetracker-spec009-user-data/time-tracker.sqlite` with eight Tasks and
+  `/tmp/daymark-spec009-user-data/daymark.sqlite` with eight Tasks and
   nine intervals. Seeded data covered 7-day and 30-day ranges, Monday/current
   week, current month, zero-duration days, cross-midnight overlap, more than five
   Tasks, a deterministic top five, an older 30-day-only contribution, and an open

@@ -12,24 +12,24 @@ import {
 
 describe('database paths', () => {
   it('preserves the established database filename', () => {
-    expect(DATABASE_FILENAME).toBe('time-tracker.sqlite');
+    expect(DATABASE_FILENAME).toBe('daymark.sqlite');
   });
 
   it('isolates development application data from the packaged profile', () => {
     expect(resolveUserDataPath('/application-data/Daymark', false)).toBe(
-      `/application-data/Time Tracker${DEVELOPMENT_USER_DATA_SUFFIX}`,
+      `/application-data/Daymark${DEVELOPMENT_USER_DATA_SUFFIX}`,
     );
   });
 
   it('retains the established packaged profile after the visible rename', () => {
     expect(resolveUserDataPath('/application-data/Daymark', true)).toBe(
-      '/application-data/Time Tracker',
+      '/application-data/Daymark',
     );
   });
 
   it('normalizes an already established default to the same profile', () => {
-    expect(resolveUserDataPath('/application-data/Time Tracker', true)).toBe(
-      '/application-data/Time Tracker',
+    expect(resolveUserDataPath('/application-data/Daymark', true)).toBe(
+      '/application-data/Daymark',
     );
   });
 

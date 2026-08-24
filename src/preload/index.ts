@@ -20,7 +20,7 @@ import {
 } from '@/shared/contracts/tasks';
 import {
   SYSTEM_HEALTH_CHECK_CHANNEL,
-  type TimeTrackerAPI,
+  type DaymarkAPI,
 } from '@/shared/contracts/system-health';
 import {
   TIMER_GET_STATE_CHANNEL,
@@ -33,7 +33,7 @@ import {
 } from '@/shared/contracts/timer';
 import { productIdentity } from '@/shared/product-identity';
 
-const timeTrackerApi: TimeTrackerAPI = {
+const daymarkApi: DaymarkAPI = {
   system: {
     healthCheck: () => ipcRenderer.invoke(SYSTEM_HEALTH_CHECK_CHANNEL),
   },
@@ -91,5 +91,5 @@ const timeTrackerApi: TimeTrackerAPI = {
 
 contextBridge.exposeInMainWorld(
   productIdentity.stable.preloadGlobal,
-  timeTrackerApi,
+  daymarkApi,
 );

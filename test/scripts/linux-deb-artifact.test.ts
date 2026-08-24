@@ -23,11 +23,11 @@ async function makeResult(
 ): Promise<ForgeMakeResult> {
   const directory = path.join(
     tmpdir(),
-    `time-tracker-linux-deb-${crypto.randomUUID()}`,
+    `daymark-linux-deb-${crypto.randomUUID()}`,
   );
   temporaryDirectories.push(directory);
   await mkdir(directory, { recursive: true });
-  const artifact = path.join(directory, 'time-tracker_0.1.0_amd64.deb');
+  const artifact = path.join(directory, 'daymark_0.1.0_amd64.deb');
   await writeFile(artifact, 'deb');
   return {
     arch,

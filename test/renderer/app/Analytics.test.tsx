@@ -14,7 +14,7 @@ import type {
   AnalyticsRange,
   AnalyticsSummary,
 } from '@/shared/contracts/analytics';
-import type { TimeTrackerAPI } from '@/shared/contracts/system-health';
+import type { DaymarkAPI } from '@/shared/contracts/system-health';
 
 const DAY = 86_400_000;
 const CAPTURED_AT = new Date(2026, 7, 21, 12).getTime();
@@ -72,9 +72,9 @@ const summary = (
 };
 
 const installAnalyticsApi = (
-  getSummary: TimeTrackerAPI['analytics']['getSummary'],
+  getSummary: DaymarkAPI['analytics']['getSummary'],
 ) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: { analytics: { getSummary } },
   });

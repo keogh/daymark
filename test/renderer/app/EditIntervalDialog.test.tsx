@@ -135,7 +135,7 @@ const renderDialog = ({
   );
 
 const setUpdateApi = (update: ReturnType<typeof vi.fn>) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: { intervals: { update } },
   });

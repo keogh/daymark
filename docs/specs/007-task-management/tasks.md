@@ -108,7 +108,7 @@ None.
   already-trimmed-ID convention established by `interval-correction-input.ts`.
 - Consistent with the SPEC-004/SPEC-006 precedent (`SwitchToTaskInput` /
   `IntervalsAPI` were defined before their API surface was wired), the
-  `TasksAPI` interface and preload/`TimeTrackerAPI` wiring are intentionally
+  `TasksAPI` interface and preload/`DaymarkAPI` wiring are intentionally
   deferred to TASK-007-004 so this task stays self-contained without touching
   IPC registration or renderer/preload code.
 
@@ -300,7 +300,7 @@ and deletion-summary operations without widening renderer privileges.
 
 - Register explicit `tasks:rename`, `tasks:delete`, and
   `tasks:get-deletion-summary` handlers.
-- Extend the typed `window.timeTracker.tasks` API with `.rename(...)`,
+- Extend the typed `window.daymark.tasks` API with `.rename(...)`,
   `.delete(...)`, and `.getDeletionSummary(...)`.
 - Runtime-validate each exact input shape before service execution.
 - Map expected failures and sanitize/log unexpected failures.

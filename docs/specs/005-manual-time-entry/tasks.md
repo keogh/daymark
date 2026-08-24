@@ -202,7 +202,7 @@ TASK-005-002.
 ### Included
 
 - Register the explicit `manual-time:create-interval` IPC handler.
-- Expose `window.timeTracker.manualTime.createInterval(...)` through preload.
+- Expose `window.daymark.manualTime.createInterval(...)` through preload.
 - Validate manual-entry input in the main-process boundary before service
   execution.
 - Map expected failures to controlled `AppResult` values and log unexpected
@@ -238,7 +238,7 @@ TASK-005-002.
   the manual-time IPC handler alongside the existing timer/history/task
   handlers.
 - Kept the preload surface narrow through the existing typed
-  `window.timeTracker.manualTime.createInterval(...)` API and aligned
+  `window.daymark.manualTime.createInterval(...)` API and aligned
   `ManualTimeService.createInterval(...)` with the shared
   `CreateManualIntervalInput` contract.
 - Added focused boundary coverage in `test/main/ipc/manual-time.test.ts` for

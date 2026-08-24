@@ -10,20 +10,18 @@ SPEC-014 — Daymark Product Rename (Verified 2026-08-23)
 
 ## Current Status
 
-SPEC-014 is Verified. Daymark now appears across current renderer, native desktop,
-packaging, artifact, and documentation presentation while every stable technical
-identifier and the established `Time Tracker/time-tracker.sqlite` profile contract
-remain unchanged. Final acceptance passed all 721 tests, formatting, typecheck,
-lint, release validation, macOS arm64 packaging/inspection, clean disposable
-startup, and an in-place equivalent pre-rename-profile compatibility run. The
-fixture's exact database path, inode, size, mtime, SHA-256, schema, migration rows,
-Tasks, intervals, Sunday/Dark Settings, and paused Timer state were unchanged after
-Daymark launch; the app reconstructed all projections without a competing profile,
-HTTP(S) request, renderer warning/error, or unexpected main-process failure.
+SPEC-014 is Verified under DEC-037. Daymark now uses one consistent visible and
+technical identity across renderer, desktop integration, package metadata,
+platform identifiers, CI artifacts, `Daymark/daymark.sqlite`, `window.daymark`,
+tests, and documentation. No compatibility or import path exists for an earlier
+owner-only development profile. Final acceptance passed all 721 tests, formatting,
+typecheck, lint, release validation, and macOS arm64 make/inspection. The rebuilt
+DMG contains `Daymark.app` with executable `Daymark` and bundle ID
+`com.isaaczepeda.daymark`; the tracked tree contains no earlier product identifier.
 
 SPEC-000 maintenance TASK-000-013 is complete. Development launches now select a
-separate OS-appropriate Electron `userData` directory before readiness, while
-packaged builds retain the existing application profile. Focused path tests, all
+separate OS-appropriate Electron `userData` directory before readiness. Packaged
+builds use the Daymark application profile. Focused path tests, all
 715 tests, formatting, typecheck, lint, and macOS arm64 packaging pass; no existing
 data was copied, deleted, or migrated and no schema change was required.
 
@@ -81,7 +79,7 @@ SPEC-010 delivered:
 Final acceptance covered AC-010-001 through AC-010-019 and the project Definition
 of Done. Formatting, typecheck, lint, all 681 tests in 81 files, macOS arm64
 packaging, and diff checks passed on 2026-08-22. The isolated packaged workflow
-used `/tmp/timetracker-task010-final-user-data`, restored Sunday/Dark and a paused
+used `/tmp/daymark-task010-final-user-data`, restored Sunday/Dark and a paused
 Timer across full restart, produced 3h Sunday versus 1h Monday current-week totals,
 remained usable at 640x480, and recorded no HTTP(S) resource or renderer console
 warning/error.
@@ -189,7 +187,7 @@ SPEC-004 delivered:
 Final acceptance covered AC-004-001 through AC-004-010 and the project Definition
 of Done. Typecheck, lint, all 267 tests in 38 files, and macOS arm64 packaging
 passed on 2026-08-15. An isolated packaged acceptance run using
-`--user-data-dir=/tmp/timetracker-spec004-user-data` passed idle history Play,
+`--user-data-dir=/tmp/daymark-spec004-user-data` passed idle history Play,
 running switch, paused switch, paused same-task resume, running same-task
 disabled state, and stale-task inline feedback without touching the real
 application profile.
@@ -374,7 +372,7 @@ dependency change is planned.
 2026-08-23 — Verified SPEC-014 after all 721 tests and required checks, macOS arm64
 packaging/inspection, release validation, clean disposable-profile operation, and
 an in-place equivalent pre-rename-profile compatibility run passed. Daymark opened
-the same `Time Tracker/time-tracker.sqlite` inode with an unchanged SHA-256,
+the same `Daymark/daymark.sqlite` inode with an unchanged SHA-256,
 schema, migration history, Tasks, intervals, Sunday/Dark Settings, and paused
 Timer. No competing profile, HTTP(S) request, renderer warning/error, unexpected
 main-process failure, schema migration, or data mutation was observed.
@@ -382,7 +380,7 @@ main-process failure, schema migration, or data mutation was observed.
 Historical entry:
 
 2026-08-23 — Aligned current documentation and active SPEC-011/SPEC-012 contracts
-with Daymark while retaining the stable `Time Tracker` profile directory,
+with Daymark while retaining the stable `Daymark` profile directory,
 technical identifiers, and exact historical evidence. Pre-rename release evidence
 that asserted visible product or artifact presentation must be rerun against
 Daymark before downstream acceptance.
@@ -392,7 +390,7 @@ Historical entry:
 2026-08-22 — Implemented SPEC-011 TASK-011-004's Linux x64 Debian maker, stable
 metadata/launcher/icon configuration, artifact-name normalization, package
 inspection, tests, and release documentation. An emulated linux/amd64 Debian build
-produced and structurally verified `Time-Tracker-0.1.0-linux-x64.deb`; all 707
+produced and structurally verified `Daymark-0.1.0-linux-x64.deb`; all 707
 tests and baseline checks passed. Native Ubuntu x64 GNOME installation,
 ordinary-user profile ownership, removal, and preservation evidence remains
 required before the task can be marked Complete.

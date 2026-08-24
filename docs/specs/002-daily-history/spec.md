@@ -374,7 +374,7 @@ count grows linearly with the number of rendered tasks.
 Preload exposes an explicit history API:
 
 ```ts
-window.timeTracker.history.getPage(
+window.daymark.history.getPage(
   input: HistoryPageInput,
 ): Promise<AppResult<HistoryPage>>
 ```
@@ -443,7 +443,7 @@ Daily history is part of the main Timer view, below the existing timer area.
 Conceptual layout:
 
 ```text
-Time Tracker
+Daymark
 
                current timer
 

@@ -228,9 +228,9 @@ Expose explicit feature APIs instead.
 
 Example:
 
-    window.timeTracker.timer.start(...)
-    window.timeTracker.timer.pause()
-    window.timeTracker.history.getRange(...)
+    window.daymark.timer.start(...)
+    window.daymark.timer.pause()
+    window.daymark.history.getRange(...)
 
 The preload layer must not contain domain business logic.
 

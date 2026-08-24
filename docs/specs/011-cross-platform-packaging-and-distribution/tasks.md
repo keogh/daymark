@@ -15,9 +15,9 @@ of any task below begins. That external prerequisite does not change the interna
 dependency order in this file.
 
 SPEC-014 renamed the current product to Daymark while preserving the established
-`Time Tracker` profile directory and other stable identifiers. Completed evidence
+`Daymark` profile directory and other stable identifiers. Completed evidence
 below remains an exact historical record. Any earlier evidence that asserted a
-`Time Tracker` visible name, executable, installer, DMG, launcher, icon filename,
+`Daymark` visible name, executable, installer, DMG, launcher, icon filename,
 or primary artifact filename is stale and must be rerun against Daymark before
 SPEC-011 acceptance or release assembly.
 
@@ -127,9 +127,9 @@ External prerequisite: SPEC-010 and every preceding specification are Verified.
 ### Completion Evidence
 
 Completed 2026-08-22. `scripts/distribution-contract.ts` is the single packaging
-contract. Stable identifiers are `com.isaaczepeda.timetracker` for the macOS bundle
-and Windows App User Model identity, and `time-tracker` for the Linux package.
-Approved identity remains Time Tracker / Isaac Zepeda / version `0.1.0`; Linux uses
+contract. Stable identifiers are `com.isaaczepeda.daymark` for the macOS bundle
+and Windows App User Model identity, and `daymark` for the Linux package.
+Approved identity remains Daymark / Isaac Zepeda / version `0.1.0`; Linux uses
 temporary maintainer email `isaaczepeda@users.noreply.github.com` with homepage
 omitted. `docs/release.md` retains the required contact/homepage follow-up and
 unsigned/checksum/no-auto-update limitations.
@@ -156,7 +156,7 @@ Complete
 
 ### Outcome
 
-Electron Forge produces distinct unsigned Time Tracker DMGs for macOS arm64 and
+Electron Forge produces distinct unsigned Daymark DMGs for macOS arm64 and
 x64, with correct native modules, icons, migrations, product identity, and local
 runtime assets.
 
@@ -213,17 +213,17 @@ runtime assets.
 ### Completion Evidence
 
 Completed 2026-08-22 on macOS 26.3.1 arm64. Electron Forge 7.11.2 produced
-unsigned ULFO DMGs named `Time-Tracker-0.1.0-darwin-arm64.dmg` and
-`Time-Tracker-0.1.0-darwin-x64.dmg`. `npm run make:macos:arm64` and
+unsigned ULFO DMGs named `Daymark-0.1.0-darwin-arm64.dmg` and
+`Daymark-0.1.0-darwin-x64.dmg`. `npm run make:macos:arm64` and
 `npm run make:macos:x64` both completed, including one native dependency rebuild
 per target. Package inspection confirmed bundle identifier
-`com.isaaczepeda.timetracker`, arm64/x86_64 application executables and matching
+`com.isaaczepeda.daymark`, arm64/x86_64 application executables and matching
 `better-sqlite3` Mach-O bundles, local renderer resources, all three migrations,
 application/tray icons, and ASAR native unpacking for both targets. `hdiutil
 imageinfo` confirmed checksummed read-only lzfse disk images.
 
 The arm64 package launched with disposable profile
-`/tmp/timetracker-task011-arm64-user-data`, initialized its SQLite database, and
+`/tmp/daymark-task011-arm64-user-data`, initialized its SQLite database, and
 loaded Electron renderer/profile resources without the repository or a runtime
 network dependency. Native Intel-host execution remains required in TASK-011-005;
 this Apple Silicon host could build and structurally inspect x64 but is not the
@@ -306,9 +306,9 @@ and installer lifecycle invocations exit before normal Daymark initialization.
 
 Implementation and local verification completed 2026-08-22 on macOS 26.3.1 arm64.
 The Windows-only Forge maker is configured for the x64 Squirrel Setup executable
-`Time-Tracker-0.1.0-win32-x64 Setup.exe`, no MSI, local source-owned ICO, approved
+`Daymark-0.1.0-win32-x64 Setup.exe`, no MSI, local source-owned ICO, approved
 author/description/product metadata, and the Squirrel-derived stable App User
-Model ID `com.squirrel.timetracker.time-tracker`. The normal Windows lifecycle
+Model ID `com.squirrel.daymark.daymark`. The normal Windows lifecycle
 sets that identity and enforces one reachable instance.
 
 The recommended maintained `electron-squirrel-startup` handler runs at main entry,
@@ -389,11 +389,11 @@ assets and per-user data ownership.
 
 Implementation and local verification completed 2026-08-22 on macOS 26.3.1 arm64.
 The Linux-only Forge maker is restricted to x64 and configures the stable
-`time-tracker` package/launcher identity, the visible `Time Tracker` product name,
+`daymark` package/launcher identity, the visible `Daymark` product name,
 the source-owned PNG icon, Utility category, approved description, and temporary
 `Isaac Zepeda <isaaczepeda@users.noreply.github.com>` maintainer while omitting a
 homepage. A post-make hook converts the maker's Debian-style filename to the
-contracted `Time-Tracker-0.1.0-linux-x64.deb` name.
+contracted `Daymark-0.1.0-linux-x64.deb` name.
 
 An emulated linux/amd64 `node:24-bookworm` container ran `npm ci`,
 `npm run make:linux:x64`, and `npm run inspect:linux:x64`. Inspection passed for
@@ -620,7 +620,7 @@ matrix before manual publication.
   vendor-supported and available, with an explicit exception record otherwise.
 - Cover Ubuntu 26.04 LTS GNOME x64 and Ubuntu 24.04 LTS GNOME x64.
 - Require disposable OS users/VMs/profiles isolated from real Daymark data in the
-  compatibility-preserved `Time Tracker` profile directory.
+  compatibility-preserved `Daymark` profile directory.
 - Verify release download origin and SHA-256 before install.
 - Document graphical per-application Gatekeeper/SmartScreen override paths without
   disabling global security.

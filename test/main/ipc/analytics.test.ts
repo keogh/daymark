@@ -65,7 +65,7 @@ describe('analytics IPC handler', () => {
 
   it('logs unexpected failures and exposes only the safe internal error', () => {
     const technicalError = new Error(
-      'SELECT description FROM tasks at /private/user/time-tracker.sqlite',
+      'SELECT description FROM tasks at /private/user/daymark.sqlite',
     );
     const logger = { error: vi.fn() };
     const { handler, service } = setup(logger);
@@ -83,7 +83,7 @@ describe('analytics IPC handler', () => {
       },
     });
     expect(JSON.stringify(result)).not.toContain('SELECT');
-    expect(JSON.stringify(result)).not.toContain('time-tracker.sqlite');
+    expect(JSON.stringify(result)).not.toContain('daymark.sqlite');
     expect(logger.error).toHaveBeenCalledWith(
       'Unexpected analytics IPC failure.',
       technicalError,

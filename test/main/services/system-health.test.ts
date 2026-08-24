@@ -11,9 +11,7 @@ describe('SystemHealthService', () => {
   let temporaryDirectory: string;
 
   beforeEach(async () => {
-    temporaryDirectory = await mkdtemp(
-      path.join(tmpdir(), 'time-tracker-health-'),
-    );
+    temporaryDirectory = await mkdtemp(path.join(tmpdir(), 'daymark-health-'));
   });
 
   afterEach(async () => {
@@ -22,7 +20,7 @@ describe('SystemHealthService', () => {
 
   it('reports ready after the disposable database is initialized', () => {
     const lifecycle = new DatabaseLifecycle({
-      databasePath: path.join(temporaryDirectory, 'time-tracker.sqlite'),
+      databasePath: path.join(temporaryDirectory, 'daymark.sqlite'),
       migrationsFolder: path.join(
         process.cwd(),
         'src',

@@ -496,7 +496,7 @@ The owner checklist must include:
 11. confirm no unexpected renderer error, main-process error, or runtime network
     dependency;
 12. confirm acceptance used no personal Daymark data in the compatibility-preserved
-    `Time Tracker` profile directory;
+    `Daymark` profile directory;
 13. record result, observations, owner name, date, OS version, architecture,
     artifact name, and checksum result.
 

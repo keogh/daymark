@@ -351,7 +351,7 @@ interface SettingsAPI {
   setTheme(input: SetThemeInput): Promise<AppResult<ApplicationSettings>>;
 }
 
-interface TimeTrackerAPI {
+interface DaymarkAPI {
   // Existing feature APIs remain unchanged.
   settings: SettingsAPI;
 }
@@ -481,7 +481,7 @@ application shell's logical heading structure.
 Conceptual layout:
 
 ```text
-Time Tracker                         Timer  Analytics  Settings
+Daymark                         Timer  Analytics  Settings
 
 Settings
 Preferences apply automatically.

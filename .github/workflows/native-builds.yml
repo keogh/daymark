@@ -89,11 +89,11 @@ jobs:
           --commit "${{ needs.validate.outputs.commit }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: Time-Tracker-${{ needs.validate.outputs.version }}-darwin-arm64
+          name: Daymark-${{ needs.validate.outputs.version }}-darwin-arm64
           if-no-files-found: error
           retention-days: 14
           path: |
-            out/make/**/Time-Tracker-${{ needs.validate.outputs.version }}-darwin-arm64.dmg
+            out/make/**/Daymark-${{ needs.validate.outputs.version }}-darwin-arm64.dmg
             out/artifact-manifest.json
 
   macos-x64:
@@ -123,11 +123,11 @@ jobs:
           --commit "${{ needs.validate.outputs.commit }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: Time-Tracker-${{ needs.validate.outputs.version }}-darwin-x64
+          name: Daymark-${{ needs.validate.outputs.version }}-darwin-x64
           if-no-files-found: error
           retention-days: 14
           path: |
-            out/make/**/Time-Tracker-${{ needs.validate.outputs.version }}-darwin-x64.dmg
+            out/make/**/Daymark-${{ needs.validate.outputs.version }}-darwin-x64.dmg
             out/artifact-manifest.json
 
   windows-x64:
@@ -161,11 +161,11 @@ jobs:
           --commit "${{ needs.validate.outputs.commit }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: Time-Tracker-${{ needs.validate.outputs.version }}-win32-x64
+          name: Daymark-${{ needs.validate.outputs.version }}-win32-x64
           if-no-files-found: error
           retention-days: 14
           path: |
-            out/make/**/Time-Tracker-${{ needs.validate.outputs.version }}-win32-x64 Setup.exe
+            out/make/**/Daymark-${{ needs.validate.outputs.version }}-win32-x64 Setup.exe
             out/artifact-manifest.json
 
   linux-x64:
@@ -199,11 +199,11 @@ jobs:
           --commit "${{ needs.validate.outputs.commit }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: Time-Tracker-${{ needs.validate.outputs.version }}-linux-x64
+          name: Daymark-${{ needs.validate.outputs.version }}-linux-x64
           if-no-files-found: error
           retention-days: 14
           path: |
-            out/make/**/Time-Tracker-${{ needs.validate.outputs.version }}-linux-x64.deb
+            out/make/**/Daymark-${{ needs.validate.outputs.version }}-linux-x64.deb
             out/artifact-manifest.json
 
   artifacts-valid:
@@ -224,7 +224,7 @@ jobs:
           node-version-file: .nvmrc
       - uses: actions/download-artifact@v4
         with:
-          pattern: Time-Tracker-${{ needs.validate.outputs.version }}-*
+          pattern: Daymark-${{ needs.validate.outputs.version }}-*
           path: out/downloaded-artifacts
       - name: Validate artifact set and build provenance
         run: >-

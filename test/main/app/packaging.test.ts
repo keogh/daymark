@@ -53,10 +53,10 @@ describe('application packaged resources', () => {
     expect(path.isAbsolute(iconBasePath)).toBe(false);
   });
 
-  it('retains the pre-rename icon and tray artwork byte for byte', () => {
+  it('retains the approved icon and tray artwork byte for byte', () => {
     const expectedHashes = {
       'assets/icon/daymark-source.svg':
-        'd03dac643a61359fcf5340bba8733cfcc2b67128ed342002e45f513a79ad5cfb',
+        'b7debba0d85d01528d4a269c90a9458d34b9b231de1b24bcf88b8d4f205aac42',
       'assets/icon/daymark.icns':
         '7d5ff142d9d04743d3a011342a5f6f1cd11cb0ffa92387b6d966905a28dfa642',
       'assets/icon/daymark.ico':
@@ -115,7 +115,7 @@ describe('application packaged resources', () => {
       authors: 'Isaac Zepeda',
       description: 'A local-first desktop time tracker.',
       exe: 'Daymark.exe',
-      name: 'timetracker',
+      name: 'daymark',
       noMsi: true,
       setupExe: 'Daymark-0.1.0-win32-x64 Setup.exe',
       setupIcon: 'assets/icon/daymark.ico',
@@ -142,7 +142,7 @@ describe('application packaged resources', () => {
         description: 'A local-first desktop time tracker.',
         icon: 'assets/icon/daymark.png',
         maintainer: 'Isaac Zepeda <isaaczepeda@users.noreply.github.com>',
-        name: 'time-tracker',
+        name: 'daymark',
         productName: 'Daymark',
       },
     });

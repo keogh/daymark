@@ -60,7 +60,7 @@ export const DeleteIntervalDialog = ({
     setIsPending(true);
     setError(null);
     try {
-      const result = await window.timeTracker.intervals.delete({
+      const result = await window.daymark.intervals.delete({
         intervalId: interval.id,
       });
       if (!result.ok) {

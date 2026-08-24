@@ -49,7 +49,7 @@ export const DeleteTaskDialog = ({
     setIsPending(true);
     setError(null);
     try {
-      const result = await window.timeTracker.tasks.delete({
+      const result = await window.daymark.tasks.delete({
         taskId: summary.task.id,
       });
       if (!result.ok) {

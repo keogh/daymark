@@ -56,7 +56,7 @@ export const useAnalyticsController = (
     setRefreshError(false);
 
     try {
-      const result = await window.timeTracker.analytics.getSummary({ range });
+      const result = await window.daymark.analytics.getSummary({ range });
       if (requestId !== requestSequence.current) return;
 
       pendingRangeRef.current = null;
@@ -98,7 +98,7 @@ export const useAnalyticsController = (
 
     const loadInitialSummary = async () => {
       try {
-        const result = await window.timeTracker.analytics.getSummary({
+        const result = await window.daymark.analytics.getSummary({
           range: 'last-7-days',
         });
         if (!isActive || requestId !== requestSequence.current) return;

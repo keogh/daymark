@@ -141,7 +141,7 @@ const setRenameApi = (
     value: { task: { ...task, description: 'Renamed task' } },
   }),
 ) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: { tasks: { rename } },
   });

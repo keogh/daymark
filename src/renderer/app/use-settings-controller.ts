@@ -71,7 +71,7 @@ export const useSettingsController = (
     setMutationError(null);
 
     try {
-      const result = await window.timeTracker.settings.get();
+      const result = await window.daymark.settings.get();
       if (!mounted.current || requestId !== requestSequence.current) return;
       if (result.ok) {
         confirmedSettings.current = result.value;
@@ -116,7 +116,7 @@ export const useSettingsController = (
   const commit = useCallback(
     async (
       preference: Exclude<PendingPreference, null>,
-      request: () => ReturnType<Window['timeTracker']['settings']['get']>,
+      request: () => ReturnType<Window['daymark']['settings']['get']>,
       optimisticTheme?: ThemePreference,
     ) => {
       const previous = confirmedSettings.current;
@@ -166,7 +166,7 @@ export const useSettingsController = (
       return;
     }
     void commit('week-start', () =>
-      window.timeTracker.settings.setWeekStartsOn({ weekStartsOn }),
+      window.daymark.settings.setWeekStartsOn({ weekStartsOn }),
     );
   };
 
@@ -181,7 +181,7 @@ export const useSettingsController = (
     }
     void commit(
       'theme',
-      () => window.timeTracker.settings.setTheme({ theme }),
+      () => window.daymark.settings.setTheme({ theme }),
       theme,
     );
   };

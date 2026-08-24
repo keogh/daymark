@@ -16,7 +16,7 @@ P0
 
 # 1. Objective
 
-Create the minimum production-quality technical foundation required to implement the Time Tracker MVP.
+Create the minimum production-quality technical foundation required to implement the Daymark MVP.
 
 At the end of this specification, the repository must contain a working Electron desktop application using:
 
@@ -56,7 +56,7 @@ so that product features can be implemented incrementally without repeatedly res
 
 # 3. Background
 
-Time Tracker is a local-first desktop application.
+Daymark is a local-first desktop application.
 
 It must eventually support:
 
@@ -335,7 +335,7 @@ ipcRenderer
 The renderer interacts with privileged functionality only through:
 
 ```
-window.timeTracker
+window.daymark
 ```
 
 ---
@@ -351,7 +351,7 @@ contextBridge
 Initial foundation API:
 
 ```
-interface TimeTrackerAPI {
+interface DaymarkAPI {
   system: {
     healthCheck(): Promise<SystemHealth>;
   };
@@ -378,7 +378,7 @@ The semantics must remain equivalent.
 Provide TypeScript declaration support so React can safely use:
 
 ```
-window.timeTracker.system.healthCheck()
+window.daymark.system.healthCheck()
 ```
 
 without:
@@ -440,7 +440,7 @@ The renderer should display a minimal foundation screen.
 Example:
 
 ```
-Time Tracker
+Daymark
 
 Application ready.
 Local database connected.
@@ -451,7 +451,7 @@ A loading state is acceptable while performing the initial check.
 Failure example:
 
 ```
-Time Tracker
+Daymark
 
 Application initialization failed.
 ```
@@ -473,7 +473,7 @@ The renderer must not resolve or receive the database filesystem path.
 Use a filename such as:
 
 ```
-time-tracker.sqlite
+daymark.sqlite
 ```
 
 Avoid environment-specific absolute paths in source code.
@@ -821,7 +821,7 @@ The foundation UI only verifies:
 - IPC works;
 - SQLite is ready.
 
-Do not build the full Time Tracker interface in SPEC-000.
+Do not build the full Daymark interface in SPEC-000.
 
 ---
 
@@ -1234,7 +1234,7 @@ nodeIntegration = false
 The React renderer must only use the exposed:
 
 ```
-window.timeTracker
+window.daymark
 ```
 
 bridge.
@@ -1301,7 +1301,7 @@ The renderer does not directly access Node.js APIs.
 The renderer can call:
 
 ```
-window.timeTracker.system.healthCheck()
+window.daymark.system.healthCheck()
 ```
 
 with complete TypeScript typing.

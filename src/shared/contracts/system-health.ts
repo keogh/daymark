@@ -18,7 +18,7 @@ export type SystemHealth =
       readonly database: 'unavailable';
     };
 
-export interface TimeTrackerAPI {
+export interface DaymarkAPI {
   readonly system: {
     healthCheck(): Promise<SystemHealth>;
   };
@@ -33,6 +33,6 @@ export interface TimeTrackerAPI {
 
 declare global {
   interface Window {
-    readonly timeTracker: TimeTrackerAPI;
+    readonly daymark: DaymarkAPI;
   }
 }

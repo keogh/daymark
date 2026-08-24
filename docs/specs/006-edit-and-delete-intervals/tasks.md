@@ -239,7 +239,7 @@ operations without widening renderer privileges.
 ### Included
 
 - Register explicit `intervals:update` and `intervals:delete` handlers.
-- Expose typed `window.timeTracker.intervals.update(...)` and `.delete(...)`
+- Expose typed `window.daymark.intervals.update(...)` and `.delete(...)`
   operations.
 - Runtime-validate each exact input shape before service execution.
 - Map expected failures and sanitize/log unexpected failures.

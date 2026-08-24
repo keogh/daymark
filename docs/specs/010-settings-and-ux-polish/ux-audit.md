@@ -47,7 +47,7 @@ records evidence only for implemented surfaces and does not expand product scope
 - `npm run typecheck`, `npm run lint`, `npm run format:check`,
   `git diff --check`, and `npm run package` passed. The final package run required
   network access after the sandboxed run could not resolve `github.com`.
-- Packaged artifact: `out/Time Tracker-darwin-arm64/Time Tracker.app`, isolated
+- Packaged artifact: `out/Daymark-darwin-arm64/Daymark.app`, isolated
   profile, `file:` renderer, effective Dark appearance, normal 1040×720 and exact
   configured-minimum 640×480 renderer viewports.
 - Packaged keyboard path: Timer navigation focus → Tab → Analytics → Enter;
@@ -59,9 +59,9 @@ records evidence only for implemented surfaces and does not expand product scope
 - Renderer console warning/error count was zero and the Resource Timing list had
   zero HTTP(S) resources.
 - Screenshots were kept outside the repository at
-  `/tmp/timetracker-task010-minimum.png`,
-  `/tmp/timetracker-task010-dialog-minimum.png`, and
-  `/tmp/timetracker-task010-settings-minimum.png`.
+  `/tmp/daymark-task010-minimum.png`,
+  `/tmp/daymark-task010-dialog-minimum.png`, and
+  `/tmp/daymark-task010-settings-minimum.png`.
 
 ## Scope Review
 

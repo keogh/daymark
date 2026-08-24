@@ -268,7 +268,7 @@ TASK-003-003.
 ### Included
 
 - Register an explicit suggestion IPC channel and thin handler.
-- Expose `window.timeTracker.tasks.getSuggestions` through contextBridge.
+- Expose `window.daymark.tasks.getSuggestions` through contextBridge.
 - Wire the revised discriminated timer Start input end to end.
 - Validate all input before repository queries or mutation.
 - Map expected and unexpected failures without leaking internal details or user

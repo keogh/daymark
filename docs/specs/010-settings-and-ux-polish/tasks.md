@@ -607,21 +607,21 @@ cross-platform installer work or rebranding.
 
 ### Completion Evidence
 
-- Added the project-authored `assets/icon/time-tracker-source.svg` master: a
+- Added the project-authored `assets/icon/daymark-source.svg` master: a
   text-free clock on a high-contrast blue rounded tile that is compatible with,
   but distinct from, the monochrome native tray stopwatch. No third-party or
   network source was used. Preserved a reusable 1024x1024 RGBA PNG and generated
   the primary-platform ICNS locally with macOS Quick Look, `sips`, and `iconutil`.
 - Configured Electron Forge's extensionless packager icon path as
-  `assets/icon/time-tracker`. Focused packaging coverage verifies the local
+  `assets/icon/daymark`. Focused packaging coverage verifies the local
   relative path, source master, lack of external SVG image links, PNG signature,
   and ICNS signature without changing tray selection behavior.
 - `npm run package` produced
-  `out/Time Tracker-darwin-arm64/Time Tracker.app`. Its `Info.plist` selects
+  `out/Daymark-darwin-arm64/Daymark.app`. Its `Info.plist` selects
   `electron.icns`; the embedded 1024x1024 ICNS SHA-256 matched the source asset
   exactly. Visual inspection confirmed recognizable 32x32 and 1024x1024
   representations, and the packaged app launched with isolated data.
-- Packaged `time-trackerTemplate.png` and `time-trackerTemplate@2x.png` hashes
+- Packaged `daymarkTemplate.png` and `daymarkTemplate@2x.png` hashes
   matched their unchanged source files. Focused application-packaging and tray
   coverage passed (14 tests in 3 files), along with `npm run typecheck`, `npm run
   lint`, `npm run format:check`, `npm run package`, and `git diff --check` on
@@ -707,9 +707,9 @@ completed implementation.
   files, `npm run package`, and `git diff --check` passed. The sandboxed package
   attempt could not resolve `github.com`; the approved network-enabled rerun
   completed successfully and produced
-  `out/Time Tracker-darwin-arm64/Time Tracker.app`.
+  `out/Daymark-darwin-arm64/Daymark.app`.
 - Isolated packaged acceptance used
-  `/tmp/timetracker-task010-final-user-data/time-tracker.sqlite` and the packaged
+  `/tmp/daymark-task010-final-user-data/daymark.sqlite` and the packaged
   `file:` renderer. A fresh migrated profile contained exactly one Monday/System
   settings row with deterministic `updated_at = 0`; prior migration tests prove
   preservation from schema `0001` through `0002_mute_tarot`.

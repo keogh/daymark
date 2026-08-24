@@ -131,7 +131,7 @@ const setDeleteApi = (
     value: { taskId: 'task-1' },
   }),
 ) => {
-  Object.defineProperty(window, 'timeTracker', {
+  Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: { tasks: { delete: remove } },
   });

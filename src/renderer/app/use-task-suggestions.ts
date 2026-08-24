@@ -36,7 +36,7 @@ export const useTaskSuggestions = (): TaskSuggestionsController => {
     setError(null);
 
     try {
-      const result = await window.timeTracker.tasks.getSuggestions({ query });
+      const result = await window.daymark.tasks.getSuggestions({ query });
       if (generation !== requestGeneration.current) {
         return;
       }

@@ -859,17 +859,17 @@ reconstructs presentation.
 Preload must expose:
 
 ```ts
-window.timeTracker.timer.getState(): Promise<AppResult<TimerState>>
+window.daymark.timer.getState(): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.start({
+window.daymark.timer.start({
   description
 }): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.pause(): Promise<AppResult<TimerState>>
+window.daymark.timer.pause(): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.resume(): Promise<AppResult<TimerState>>
+window.daymark.timer.resume(): Promise<AppResult<TimerState>>
 
-window.timeTracker.timer.stop(): Promise<AppResult<TimerState>>
+window.daymark.timer.stop(): Promise<AppResult<TimerState>>
 ```
 
 The renderer must not invoke arbitrary IPC channels.

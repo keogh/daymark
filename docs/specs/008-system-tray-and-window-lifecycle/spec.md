@@ -16,7 +16,7 @@ P0
 
 # 1. Objective
 
-Allow Time Tracker to remain unobtrusive while tracking by keeping the
+Allow Daymark to remain unobtrusive while tracking by keeping the
 application available through a native system tray/menu-bar item, exposing the
 essential timer controls there, and making window close, restore, and explicit
 quit behavior reliable and distinct.
@@ -30,7 +30,7 @@ As an individual user,
 I want to hide the main window and control the active timer from the system
 tray,
 
-so that I can continue tracking without keeping Time Tracker visible and can
+so that I can continue tracking without keeping Daymark visible and can
 return to the complete application whenever I need it.
 
 ---
@@ -74,7 +74,7 @@ This specification includes:
 - native, safe failure feedback when a tray timer command does not succeed;
 - hiding, rather than destroying, the main window after its normal close
   control is used;
-- restoring and focusing the existing main window through `Open Time Tracker`;
+- restoring and focusing the existing main window through `Open Daymark`;
 - supported platform-standard restoration gestures in addition to the explicit
   Open command;
 - explicit Quit that exits without pausing, stopping, closing, or otherwise
@@ -189,10 +189,10 @@ semantics must be equivalent.
 ## Idle
 
 ```text
-Time Tracker
+Daymark
 No active timer
 -----------------
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
@@ -200,14 +200,14 @@ Quit
 ## Running
 
 ```text
-Time Tracker
+Daymark
 Implement authentication
 01:23:42
 -----------------
 Pause
 Stop
 -----------------
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
@@ -215,19 +215,19 @@ Quit
 ## Paused
 
 ```text
-Time Tracker
+Daymark
 Implement authentication
 Paused · 01:23:42
 -----------------
 Resume
 Stop
 -----------------
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
 
-`Time Tracker`, current information, and duration rows are informational and
+`Daymark`, current information, and duration rows are informational and
 must not invoke commands. Pause/Resume and Stop are omitted while idle rather
 than presented as usable actions.
 
@@ -250,7 +250,7 @@ Tray icon requirements:
 - provide an appropriate Windows/Linux fallback rather than relying on a
   remote resource or renderer asset URL;
 - include recognizable visible content at native tray sizes and an accessible
-  tooltip/title of `Time Tracker` where the platform supports one.
+  tooltip/title of `Daymark` where the platform supports one.
 
 ---
 
@@ -306,8 +306,8 @@ Pause, Resume, and Stop tray actions must:
 6. on a controlled or unexpected failure, obtain a fresh authoritative state
    when safely possible, synchronize and publish it, and never claim the
    requested transition succeeded;
-7. show a short native error dialog such as `Time Tracker could not pause the
-   timer. Open Time Tracker to review its current state.`;
+7. show a short native error dialog such as `Daymark could not pause the
+   timer. Open Daymark to review its current state.`;
 8. log unexpected technical failures locally without logging Task descriptions,
    while avoiding unnecessary error logging for expected controlled outcomes;
 9. return the menu to an actionable state after completion.
@@ -337,7 +337,7 @@ Normal window close must:
 
 The normal minimize control retains ordinary operating-system minimize behavior.
 
-`Open Time Tracker` must:
+`Open Daymark` must:
 
 1. use the retained window when it exists;
 2. restore it first if minimized;
@@ -352,7 +352,7 @@ window options.
 
 Platform restoration behavior:
 
-- the context-menu `Open Time Tracker` command works on macOS, Windows, and
+- the context-menu `Open Daymark` command works on macOS, Windows, and
   Linux;
 - macOS application activation, including normal Dock activation, restores the
   existing window or creates one replacement if none exists;
@@ -593,7 +593,7 @@ timer or persistence state changes.
 
 Given the main window is hidden or minimized,
 
-When `Open Time Tracker` is selected one or more times,
+When `Open Daymark` is selected one or more times,
 
 Then one existing window is restored, shown, and focused without creating a
 duplicate.
@@ -792,8 +792,8 @@ Not applicable.
 - Informational rows cannot be mistaken for commands.
 - Unavailable commands are omitted or disabled consistently with §9 and pending
   behavior.
-- `Open Time Tracker` remains present in every timer state.
-- The tray exposes the application tooltip/title `Time Tracker` where supported.
+- `Open Daymark` remains present in every timer state.
+- The tray exposes the application tooltip/title `Daymark` where supported.
 - Restoring the window focuses it without unexpectedly moving focus inside the
   renderer beyond normal platform behavior.
 - Native error feedback clearly states that the requested timer action may not

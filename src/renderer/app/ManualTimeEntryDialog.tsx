@@ -106,7 +106,7 @@ export const ManualTimeEntryDialog = ({
     setIsPending(true);
     setError(null);
     try {
-      const result = await window.timeTracker.manualTime.createInterval({
+      const result = await window.daymark.manualTime.createInterval({
         ...taskSource,
         date,
         startTime,
