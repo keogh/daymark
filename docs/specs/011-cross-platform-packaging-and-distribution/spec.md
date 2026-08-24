@@ -16,7 +16,7 @@ P0
 
 # 1. Objective
 
-Produce reproducible, installable Time Tracker artifacts for supported macOS,
+Produce reproducible, installable Daymark artifacts for supported macOS,
 Windows, and Linux targets and assemble them into a version-consistent draft
 GitHub prerelease that can be verified on clean systems before a person publishes
 it.
@@ -35,7 +35,7 @@ As the application owner,
 I want versioned installers built on their native operating systems and collected
 in one reviewable GitHub prerelease,
 
-so that I can install and evaluate Time Tracker on macOS, Windows, and Linux
+so that I can install and evaluate Daymark on macOS, Windows, and Linux
 without a development environment and without risking existing local data.
 
 ---
@@ -47,6 +47,13 @@ SPEC-008 owns tray and window lifecycle behavior. SPEC-010 owns the source-owned
 application icon, its primary-platform packaging, and platform-neutral UX polish.
 Neither earlier specification creates installers, release automation, or complete
 fresh-machine cross-platform evidence.
+
+SPEC-014 renamed the current product to Daymark while preserving the established
+profile and package identifiers. All future SPEC-011 artifacts, installation
+evidence, and release assembly must use Daymark presentation. Pre-rename evidence
+that asserted visible names, executable names, launcher names, or artifact names
+must be rerun; its original commands, paths, and observed output remain historical
+records.
 
 DEC-001 and DEC-003 require Electron and Electron Forge. The roadmap's M9 milestone
 requires macOS, Windows, and Linux installable builds and fresh-machine testing.
@@ -236,7 +243,7 @@ Required product metadata:
 
 ```text
 package name: time-tracker
-product name: Time Tracker
+product name: Daymark
 author: Isaac Zepeda
 description: A local-first desktop time tracker.
 ```
@@ -274,7 +281,7 @@ commit or deterministically generate the platform formats and sizes required by
 the selected makers.
 
 The installed application, installer where supported, launcher/Start menu entry,
-task switcher/dock, and Linux desktop entry must show the Time Tracker application
+task switcher/dock, and Linux desktop entry must show the Daymark application
 icon without runtime network access. The separate tray icon behavior established
 by SPEC-008 must remain platform-appropriate and must not be replaced casually by
 the application icon.
@@ -291,7 +298,7 @@ during install, update, and uninstall events. The application must handle those
 events before normal database, tray, or window initialization so installer events
 do not:
 
-- open the ordinary Time Tracker window;
+- open the ordinary Daymark window;
 - create or mutate the user's database;
 - start a tray instance;
 - leave a background process;
@@ -313,7 +320,7 @@ under §7.
 The Debian artifact must install through the operating system's standard package
 tooling on supported Ubuntu LTS systems. It must provide:
 
-- the Time Tracker executable;
+- the Daymark executable;
 - a desktop application entry in the normal application launcher;
 - the configured application icon;
 - required package metadata;
@@ -321,7 +328,7 @@ tooling on supported Ubuntu LTS systems. It must provide:
   copying into system locations.
 
 System package installation/removal may require normal administrator authorization.
-Launching Time Tracker and storing its SQLite profile must occur as the ordinary
+Launching Daymark and storing its SQLite profile must occur as the ordinary
 desktop user, never as root.
 
 The representative desktop environment is Ubuntu GNOME. Other Debian-based
@@ -442,7 +449,8 @@ describe them as a substitute for code signing or publisher authentication.
 # 18. Installation and Profile Ownership
 
 Acceptance must use disposable OS users, virtual machines, or physical test
-profiles that do not point at the developer's real Time Tracker profile.
+profiles that do not point at the developer's real Daymark data in the
+compatibility-preserved `Time Tracker` profile directory.
 
 On first ordinary launch, the installed application must:
 
@@ -664,7 +672,7 @@ Given artifacts from every platform and a replacement/reinstall,
 
 when their application identity and package metadata are inspected,
 
-then they consistently identify Time Tracker and Isaac Zepeda, preserve the same
+then they consistently identify Daymark and Isaac Zepeda, preserve the same
 per-user profile identity, and contain only the explicitly approved temporary
 contact metadata.
 
@@ -713,7 +721,7 @@ Given each clean environment in §21,
 when its matching artifact is downloaded, checksum-verified, installed through the
 normal platform flow, and launched,
 
-then Time Tracker runs as the ordinary user with the expected launcher icon, tray,
+then Daymark runs as the ordinary user with the expected launcher icon, tray,
 per-user profile, and no development toolchain dependency.
 
 ## AC-011-012 — Unsigned Warnings Are Explicit and Bounded

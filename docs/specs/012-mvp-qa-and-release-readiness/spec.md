@@ -16,7 +16,7 @@ P0
 
 # 1. Objective
 
-Establish whether one exact Time Tracker release candidate is ready for the owner
+Establish whether one exact Daymark release candidate is ready for the owner
 to publish as an unsigned personal-testing MVP prerelease by auditing all earlier
 specification evidence, exercising the complete product as an integrated system,
 resolving bounded release-blocking defects, and recording an explicit `GO` or
@@ -495,7 +495,8 @@ The owner checklist must include:
 10. repeat representative launch/tracking while offline;
 11. confirm no unexpected renderer error, main-process error, or runtime network
     dependency;
-12. confirm acceptance used no personal Time Tracker profile or Task data;
+12. confirm acceptance used no personal Daymark data in the compatibility-preserved
+    `Time Tracker` profile directory;
 13. record result, observations, owner name, date, OS version, architecture,
     artifact name, and checksum result.
 

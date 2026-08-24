@@ -1,6 +1,6 @@
 # Distribution and Release Contract
 
-Time Tracker distribution is currently limited to unsigned personal installation
+Daymark distribution is currently limited to unsigned personal installation
 and testing. It is not a general-public production release.
 
 ## Stable identity and metadata
@@ -10,9 +10,14 @@ The source-controlled distribution contract is
 `com.isaaczepeda.timetracker`; its Windows Squirrel application user model
 identifier is `com.squirrel.timetracker.time-tracker`; and its Linux package
 identifier is `time-tracker`. The package name is
-`time-tracker`, the visible product name is `Time Tracker`, the author and Linux
+`time-tracker`, the visible product name is `Daymark`, the author and Linux
 maintainer name are `Isaac Zepeda`, and the description is
 `A local-first desktop time tracker.`
+
+Daymark retains the established `Time Tracker` operating-system profile directory
+and `time-tracker.sqlite` database filename so replacement installations open
+existing data in place. These compatibility identifiers do not represent the
+current visible product name.
 
 Linux temporarily uses `isaaczepeda@users.noreply.github.com` as its maintainer
 email and intentionally omits homepage metadata. Before signed or general-public
@@ -26,10 +31,10 @@ Each version has exactly four primary artifacts:
 
 | Platform | Architecture | Filename pattern |
 | --- | --- | --- |
-| macOS | arm64 | `Time-Tracker-{version}-darwin-arm64.dmg` |
-| macOS | x64 | `Time-Tracker-{version}-darwin-x64.dmg` |
-| Windows | x64 | `Time-Tracker-{version}-win32-x64 Setup.exe` |
-| Linux | x64 | `Time-Tracker-{version}-linux-x64.deb` |
+| macOS | arm64 | `Daymark-{version}-darwin-arm64.dmg` |
+| macOS | x64 | `Daymark-{version}-darwin-x64.dmg` |
+| Windows | x64 | `Daymark-{version}-win32-x64 Setup.exe` |
+| Linux | x64 | `Daymark-{version}-linux-x64.deb` |
 
 The normalized `darwin`, `win32`, and `linux` values are explicit packaging
 platform identifiers. The filename, not a CI job label, carries product, version,
@@ -75,7 +80,7 @@ malformed, suffixed, or mismatched values fail before making or publication.
 
 Run `npm run make:macos:arm64` on a native Apple Silicon host and
 `npm run make:macos:x64` on a native Intel host. The committed Forge
-configuration produces separate `Time-Tracker-{version}-darwin-{architecture}.dmg`
+configuration produces separate `Daymark-{version}-darwin-{architecture}.dmg`
 files. `npm run inspect:macos:arm64` or `npm run inspect:macos:x64` verifies the
 matching packaged application executable, `better-sqlite3` native binary, bundle
 identity, ASAR renderer and migration content, application icon, and tray assets.
@@ -83,8 +88,8 @@ identity, ASAR renderer and migration content, application icon, and tray assets
 The DMGs are unsigned and not notarized, so Gatekeeper may block first launch.
 After confirming the DMG came from this repository's own GitHub Release page,
 macOS testers may use the documented graphical per-application override: try to
-open Time Tracker once, then open System Settings, choose Privacy & Security, and
-choose **Open Anyway** for Time Tracker. Confirm the subsequent macOS prompt.
+open Daymark once, then open System Settings, choose Privacy & Security, and
+choose **Open Anyway** for Daymark. Confirm the subsequent macOS prompt.
 Do not disable Gatekeeper globally or change machine-wide security settings.
 
 ## Windows x64 Squirrel installer
@@ -92,7 +97,7 @@ Do not disable Gatekeeper globally or change machine-wide security settings.
 Run `npm run icon:windows` to reproduce the committed ICO from the source-owned
 local PNG, and run `npm run make:windows:x64` on a native Windows x64 host. The
 Windows-only Forge maker produces the unsigned per-user
-`Time-Tracker-{version}-win32-x64 Setup.exe` plus Squirrel's `.nupkg` and
+`Daymark-{version}-win32-x64 Setup.exe` plus Squirrel's `.nupkg` and
 `RELEASES` ancillary files. The Setup executable is the supported installation
 entry point; MSI, machine-wide installation, and automatic updates are not
 supported.
@@ -107,20 +112,20 @@ machine-wide security controls.
 Squirrel install, update, uninstall, and obsolete invocations exit before normal
 database, tray, timer, or window initialization. Normal installed launch uses the
 stable Squirrel identity above and a single-instance lock; a second launch brings
-the existing Time Tracker window forward.
+the existing Daymark window forward.
 
 ## Linux x64 Debian package
 
 Run `npm run make:linux:x64` on a native Ubuntu x64 host with `dpkg`, `fakeroot`,
 and the lockfile-installed Node dependencies. The Linux-only Forge maker produces
-`Time-Tracker-{version}-linux-x64.deb`. Run `npm run inspect:linux:x64` to verify
+`Daymark-{version}-linux-x64.deb`. Run `npm run inspect:linux:x64` to verify
 the artifact filename, `amd64` control metadata, generated dependencies, launcher,
 icon, application executable, x64 `better-sqlite3` module, migrations, renderer,
 and tray assets. The package intentionally omits homepage metadata and retains the
 temporary maintainer-contact follow-up above.
 
 Install the package using Ubuntu's standard package tooling with normal
-administrator authorization, then launch **Time Tracker** from the Ubuntu GNOME
+administrator authorization, then launch **Daymark** from the Ubuntu GNOME
 application launcher as the disposable ordinary desktop user. Do not launch the
 application with `sudo`. Confirm its profile beneath that user's configuration
 directory is owned by the ordinary user. Removal may use normal administrator

@@ -14,6 +14,13 @@ SPEC-010 and every preceding specification must be Verified before implementatio
 of any task below begins. That external prerequisite does not change the internal
 dependency order in this file.
 
+SPEC-014 renamed the current product to Daymark while preserving the established
+`Time Tracker` profile directory and other stable identifiers. Completed evidence
+below remains an exact historical record. Any earlier evidence that asserted a
+`Time Tracker` visible name, executable, installer, DMG, launcher, icon filename,
+or primary artifact filename is stale and must be rerun against Daymark before
+SPEC-011 acceptance or release assembly.
+
 ---
 
 # Execution Rules
@@ -242,7 +249,7 @@ Pending — implementation is locally complete; native Windows acceptance remain
 ### Outcome
 
 Electron Forge produces an unsigned per-user Windows x64 Squirrel Setup executable,
-and installer lifecycle invocations exit before normal Time Tracker initialization.
+and installer lifecycle invocations exit before normal Daymark initialization.
 
 ### Dependencies
 
@@ -252,7 +259,7 @@ and installer lifecycle invocations exit before normal Time Tracker initializati
 
 - Add the maintained Electron Forge Squirrel maker restricted to Windows x64.
 - Supply required author/description and stable no-space package identity while
-  retaining the visible product name `Time Tracker`.
+  retaining the visible product name `Daymark`.
 - Derive and configure the Windows icon from SPEC-010's source-owned master.
 - Add the smallest maintained Squirrel startup-event handling required by the
   selected maker.
@@ -327,7 +334,7 @@ In Progress
 ### Outcome
 
 Electron Forge produces a Linux x64 Debian package that installs a normal Ubuntu
-GNOME launcher entry and runs Time Tracker as the desktop user with correct local
+GNOME launcher entry and runs Daymark as the desktop user with correct local
 assets and per-user data ownership.
 
 ### Dependencies
@@ -352,7 +359,7 @@ assets and per-user data ownership.
 - package repository publication or signing;
 - RPM, AppImage, Snap, Flatpak, or arm64 packages;
 - Debian environments outside the Ubuntu GNOME acceptance matrix;
-- running Time Tracker as root;
+- running Daymark as root;
 - macOS or Windows makers.
 
 ### Deliverables
@@ -612,7 +619,8 @@ matrix before manual publication.
 - Cover current supported Windows 11 x64 and the preceding release when it remains
   vendor-supported and available, with an explicit exception record otherwise.
 - Cover Ubuntu 26.04 LTS GNOME x64 and Ubuntu 24.04 LTS GNOME x64.
-- Require disposable OS users/VMs/profiles isolated from real Time Tracker data.
+- Require disposable OS users/VMs/profiles isolated from real Daymark data in the
+  compatibility-preserved `Time Tracker` profile directory.
 - Verify release download origin and SHA-256 before install.
 - Document graphical per-application Gatekeeper/SmartScreen override paths without
   disabling global security.

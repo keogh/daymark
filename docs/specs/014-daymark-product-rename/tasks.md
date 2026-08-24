@@ -31,7 +31,7 @@ to match the specification.
 | TASK-014-001 | Establish the Daymark identity and profile-compatibility contract | Complete | None | AC-014-002, AC-014-003, AC-014-005, AC-014-006 |
 | TASK-014-002 | Rename renderer and native desktop presentation | Complete | TASK-014-001 | AC-014-001, AC-014-006 |
 | TASK-014-003 | Rename packaging presentation and asset references | Complete | TASK-014-001 | AC-014-002, AC-014-003, AC-014-007 |
-| TASK-014-004 | Align current documentation and downstream release specifications | Pending | TASK-014-001, TASK-014-002, TASK-014-003 | AC-014-008 |
+| TASK-014-004 | Align current documentation and downstream release specifications | Complete | TASK-014-001, TASK-014-002, TASK-014-003 | AC-014-008 |
 | TASK-014-005 | Verify packaged upgrade compatibility and final acceptance | Pending | TASK-014-002, TASK-014-003, TASK-014-004 | AC-014-004, AC-014-005, AC-014-006, AC-014-009 |
 
 ---
@@ -270,7 +270,7 @@ TASK-014-001.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -315,8 +315,26 @@ TASK-014-001, TASK-014-002, and TASK-014-003.
 
 ### Completion Evidence
 
-Record files updated, search commands/results, intentional historical exceptions,
-and downstream evidence that must be rerun.
+- Updated `AGENTS.md`, `CLAUDE.md`, `docs/README.md`, `docs/context.md`,
+  `docs/product/prd.md`, `docs/product/ux-design.md`, `docs/release.md`, and
+  `docs/progress.md` so current contributor, product, UX, distribution, and
+  progress material identifies Daymark. Architecture, domain, and roadmap files
+  had no current visible-product references requiring a rename.
+- Updated the active SPEC-011 and SPEC-012 specifications and task breakdowns so
+  future product metadata, artifacts, executables, launchers, installation,
+  screenshots, profile-isolation checks, and release acceptance use Daymark.
+  Both downstream breakdowns explicitly require rerunning presentation evidence
+  invalidated by the rename before acceptance or release assembly.
+- Preserved exact pre-rename completion evidence and historical progress output,
+  including observed `Time-Tracker-*` artifact names. Remaining old-name matches
+  in current documentation were classified as the compatibility-preserved
+  `Time Tracker` profile directory, the internal `TimeTrackerAPI` contract, or
+  clearly labeled historical evidence. Completed SPEC-000 through SPEC-010 files
+  remain unchanged historical records.
+- `rg -n --glob '*.md' 'Time Tracker|Time-Tracker|TimeTracker'` over current
+  project documentation plus SPEC-011/SPEC-012 — reviewed; no unclassified
+  current-brand occurrence remains.
+- `npm run format:check` and `git diff --check` — passed.
 
 ---
 

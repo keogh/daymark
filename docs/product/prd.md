@@ -2,7 +2,7 @@
 
 ## Product
 
-Time Tracker
+Daymark
 
 ## Version
 
@@ -16,7 +16,7 @@ Draft
 
 # 1. Overview
 
-Time Tracker is a lightweight local-first desktop application that allows a user to track how much time they spend on tasks.
+Daymark is a lightweight local-first desktop application that allows a user to track how much time they spend on tasks.
 
 The primary interaction is deliberately simple:
 
@@ -355,7 +355,7 @@ The exact operating-system presentation may differ by platform.
 
 The tray should provide at minimum:
 
-    Open Time Tracker
+    Open Daymark
     -----------------
     Current task information, when applicable
     Pause / Resume

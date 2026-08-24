@@ -14,6 +14,12 @@ SPEC-011 and every preceding specification must be `Verified` before implementat
 of any task below begins. That external prerequisite does not change the internal
 dependency order in this file.
 
+SPEC-014 renamed the current product and release candidate to Daymark while
+preserving the established `Time Tracker` profile directory and other stable
+identifiers. All SPEC-012 candidate, packaged, installation, screenshot, path,
+artifact, and acceptance evidence must be newly collected against Daymark; no
+pre-rename visible-name evidence may be treated as current.
+
 ---
 
 # Execution Rules
@@ -25,7 +31,8 @@ dependency order in this file.
 - Record verification evidence before marking a task `Complete`.
 - Do not use task completion as a substitute for specification acceptance or the
   project Definition of Done.
-- Never run acceptance against the owner's normal Time Tracker profile.
+- Never run acceptance against the owner's normal Daymark data in the
+  compatibility-preserved `Time Tracker` profile directory.
 - Preserve failed evidence and link passing reruns instead of rewriting history.
 - Do not publish the GitHub Release from any SPEC-012 task.
 - Only the owner may complete final macOS sign-off and record the final `GO`.
@@ -301,7 +308,8 @@ logging, and persisted-state behavior.
 
 ### Excluded
 
-- using the owner's real Time Tracker profile;
+- using the owner's real Daymark data in the compatibility-preserved `Time Tracker`
+  profile directory;
 - owner sign-off, which belongs to TASK-012-006;
 - Windows, Linux, or Intel macOS installation runs;
 - publishing the release;
@@ -434,7 +442,8 @@ exact macOS arm64 candidate on Apple Silicon using only synthetic isolated data.
 ### Excluded
 
 - Codex or automation impersonating owner sign-off;
-- using personal Task data or the normal Time Tracker profile;
+- using personal Task data or the normal Daymark data in the
+  compatibility-preserved `Time Tracker` profile directory;
 - requiring the owner to test Intel macOS, Windows, or Linux;
 - system-wide Gatekeeper disablement;
 - publication or final `GO`, which belongs to TASK-012-008.

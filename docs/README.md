@@ -1,4 +1,4 @@
-# Time Tracker — Product Documentation
+# Daymark — Product Documentation
 
 ## Status
 
@@ -6,7 +6,7 @@ Draft — MVP Definition
 
 ## Product
 
-Time Tracker is a simple, local-first desktop application for tracking time spent on personal tasks.
+Daymark is a simple, local-first desktop application for tracking time spent on personal tasks.
 
 The product prioritizes:
 

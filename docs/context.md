@@ -2,7 +2,7 @@
 
 ## Product
 
-Time Tracker
+Daymark
 
 ## Stage
 
@@ -36,7 +36,7 @@ Many existing time-tracking applications include concepts that are unnecessary f
 - projects;
 - cloud synchronization.
 
-Time Tracker intentionally avoids this complexity.
+Daymark intentionally avoids this complexity.
 
 ---
 

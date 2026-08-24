@@ -1,6 +1,6 @@
 # AGENTS.md
 
-# Time Tracker — Coding Agent Working Instructions
+# Daymark — Coding Agent Working Instructions
 
 ## 1. Purpose
 

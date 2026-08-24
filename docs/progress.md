@@ -2,13 +2,20 @@
 
 ## Current Phase
 
-Cross-Platform Packaging and Distribution active
+Daymark Product Rename active
 
 ## Current Specification
 
-SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation)
+SPEC-014 — Daymark Product Rename (Ready for Implementation)
 
 ## Current Status
+
+TASK-014-004 aligns current contributor, project, product, UX, release, and
+downstream release-readiness documentation with Daymark. Stable identifiers and
+completed historical evidence remain unchanged. SPEC-011 and SPEC-012 now require
+future artifact, installation, screenshot, path, and acceptance evidence against
+Daymark, with invalidated pre-rename presentation evidence explicitly requiring a
+rerun.
 
 SPEC-000 maintenance TASK-000-013 is complete. Development launches now select a
 separate OS-appropriate Electron `userData` directory before readiness, while
@@ -282,6 +289,12 @@ None.
 
 # Active Work
 
+SPEC-014 — Daymark Product Rename is in progress. TASK-014-001 through
+TASK-014-003 established the identity/profile contract and renamed current desktop
+and package presentation. TASK-014-004 aligns current documentation and downstream
+release specifications. TASK-014-005 remains next for packaged upgrade
+compatibility and final acceptance.
+
 SPEC-010 — Settings and UX Polish is Verified. All eight implementation tasks and
 AC-010-001 through AC-010-019 are complete.
 
@@ -353,6 +366,14 @@ dependency change is planned.
 ---
 
 # Last Updated
+
+2026-08-23 — Aligned current documentation and active SPEC-011/SPEC-012 contracts
+with Daymark while retaining the stable `Time Tracker` profile directory,
+technical identifiers, and exact historical evidence. Pre-rename release evidence
+that asserted visible product or artifact presentation must be rerun against
+Daymark before downstream acceptance.
+
+Historical entry:
 
 2026-08-22 — Implemented SPEC-011 TASK-011-004's Linux x64 Debian maker, stable
 metadata/launcher/icon configuration, artifact-name normalization, package

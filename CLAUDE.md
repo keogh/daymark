@@ -1,3 +1,3 @@
-# Time Tracker — Claude Code Instructions
+# Daymark — Claude Code Instructions
 
 @AGENTS.md

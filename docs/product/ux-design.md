@@ -40,7 +40,7 @@ Suggested application navigation:
 
 ```text
 ┌─────────────────────────────────────────┐
-│  Time Tracker                           │
+│  Daymark                                │
 │                                         │
 │  Timer       Analytics       Settings   │
 └─────────────────────────────────────────┘
@@ -54,7 +54,7 @@ The application opens to Timer.
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Time Tracker                    Analytics     Settings    │
+│ Daymark                         Analytics     Settings    │
 │                                                          │
 │                                                          │
 │                 What are you working on?                 │
@@ -129,7 +129,7 @@ Escape           Close suggestions
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Time Tracker                    Analytics     Settings    │
+│ Daymark                         Analytics     Settings    │
 │                                                          │
 │                 Implement authentication                 │
 │                                                          │
@@ -479,7 +479,7 @@ The tray should expose lightweight timer management.
 Example:
 
 ```text
-Time Tracker
+Daymark
 
 Implement authentication
 01:23:42
@@ -487,7 +487,7 @@ Implement authentication
 Pause
 Stop
 
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
@@ -495,7 +495,7 @@ Quit
 Paused:
 
 ```text
-Time Tracker
+Daymark
 
 Implement authentication
 Paused · 01:23:42
@@ -503,7 +503,7 @@ Paused · 01:23:42
 Resume
 Stop
 
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
@@ -511,11 +511,11 @@ Quit
 Idle:
 
 ```text
-Time Tracker
+Daymark
 
 No active timer
 
-Open Time Tracker
+Open Daymark
 -----------------
 Quit
 ```
