@@ -2,20 +2,24 @@
 
 ## Current Phase
 
-Daymark Product Rename active
+Daymark Product Rename complete
 
 ## Current Specification
 
-SPEC-014 — Daymark Product Rename (Ready for Implementation)
+SPEC-014 — Daymark Product Rename (Verified 2026-08-23)
 
 ## Current Status
 
-TASK-014-004 aligns current contributor, project, product, UX, release, and
-downstream release-readiness documentation with Daymark. Stable identifiers and
-completed historical evidence remain unchanged. SPEC-011 and SPEC-012 now require
-future artifact, installation, screenshot, path, and acceptance evidence against
-Daymark, with invalidated pre-rename presentation evidence explicitly requiring a
-rerun.
+SPEC-014 is Verified. Daymark now appears across current renderer, native desktop,
+packaging, artifact, and documentation presentation while every stable technical
+identifier and the established `Time Tracker/time-tracker.sqlite` profile contract
+remain unchanged. Final acceptance passed all 721 tests, formatting, typecheck,
+lint, release validation, macOS arm64 packaging/inspection, clean disposable
+startup, and an in-place equivalent pre-rename-profile compatibility run. The
+fixture's exact database path, inode, size, mtime, SHA-256, schema, migration rows,
+Tasks, intervals, Sunday/Dark Settings, and paused Timer state were unchanged after
+Daymark launch; the app reconstructed all projections without a competing profile,
+HTTP(S) request, renderer warning/error, or unexpected main-process failure.
 
 SPEC-000 maintenance TASK-000-013 is complete. Development launches now select a
 separate OS-appropriate Electron `userData` directory before readiness, while
@@ -61,6 +65,7 @@ so TASK-011-005 is still In Progress and no GitHub Release is created.
 - SPEC-008 — System Tray and Window Lifecycle (Verified 2026-08-21)
 - SPEC-009 — Analytics (Verified 2026-08-22)
 - SPEC-010 — Settings and UX Polish (Verified 2026-08-22)
+- SPEC-014 — Daymark Product Rename (Verified 2026-08-23)
 
 SPEC-010 delivered:
 
@@ -289,11 +294,10 @@ None.
 
 # Active Work
 
-SPEC-014 — Daymark Product Rename is in progress. TASK-014-001 through
-TASK-014-003 established the identity/profile contract and renamed current desktop
-and package presentation. TASK-014-004 aligns current documentation and downstream
-release specifications. TASK-014-005 remains next for packaged upgrade
-compatibility and final acceptance.
+SPEC-014 — Daymark Product Rename is Verified. All five tasks and AC-014-001
+through AC-014-009 are complete. Packaged clean-profile and in-place compatibility
+verification passed against disposable established-name profiles; SPEC-011 remains
+responsible for its native supported-platform installation evidence using Daymark.
 
 SPEC-010 — Settings and UX Polish is Verified. All eight implementation tasks and
 AC-010-001 through AC-010-019 are complete.
@@ -366,6 +370,16 @@ dependency change is planned.
 ---
 
 # Last Updated
+
+2026-08-23 — Verified SPEC-014 after all 721 tests and required checks, macOS arm64
+packaging/inspection, release validation, clean disposable-profile operation, and
+an in-place equivalent pre-rename-profile compatibility run passed. Daymark opened
+the same `Time Tracker/time-tracker.sqlite` inode with an unchanged SHA-256,
+schema, migration history, Tasks, intervals, Sunday/Dark Settings, and paused
+Timer. No competing profile, HTTP(S) request, renderer warning/error, unexpected
+main-process failure, schema migration, or data mutation was observed.
+
+Historical entry:
 
 2026-08-23 — Aligned current documentation and active SPEC-011/SPEC-012 contracts
 with Daymark while retaining the stable `Time Tracker` profile directory,

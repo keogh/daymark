@@ -342,7 +342,7 @@ TASK-014-001, TASK-014-002, and TASK-014-003.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -396,9 +396,47 @@ TASK-014-002, TASK-014-003, and TASK-014-004.
 
 ### Completion Evidence
 
-Record commands, results, package identity, profile/database paths, before/after
-state inspection, console/network observations, and the criterion-by-criterion
-acceptance result.
+- `npm run format:check`, `npm run typecheck`, `npm run lint`, and `npm test`
+  passed; the full suite contained 87 files and 721 tests. `npm run package`,
+  `npm run inspect:macos:arm64`, `npm run release:validate -- --tag v0.1.0`, and
+  `git diff --check` also passed.
+- The primary package was `out/Daymark-darwin-arm64/Daymark.app`, with executable
+  and display name `Daymark`, version `0.1.0`, preserved bundle ID
+  `com.isaaczepeda.timetracker`, and a valid Electron ASAR integrity record.
+- A clean packaged launch used only the disposable profile
+  `/tmp/daymark-task014-005-clean2-root/Time Tracker` and created
+  `time-tracker.sqlite` there. It created no sibling `Daymark` profile. The
+  `file://` renderer showed the exact Daymark title/heading, exposed the narrow
+  `window.timeTracker` API, returned valid idle Timer, default Settings, History,
+  and Analytics results, and completed Timer → Analytics → Timer navigation with
+  no horizontal overflow, HTTP(S) request, or renderer warning/error.
+- The attributable compatibility fixture was created from that current schema in
+  an isolated established-name profile before Daymark launch, then seeded with two
+  Tasks, two closed intervals totaling 90 minutes, Sunday/Dark Settings, and a
+  paused Timer on `Pre-rename focus task`. This is the specification-permitted
+  equivalent pre-rename fixture: it uses the exact stable profile, filename,
+  schema, migration history, and data contracts and was inspected before launch.
+- Packaged Daymark opened
+  `/tmp/daymark-task014-005-upgrade-root/Time Tracker/time-tracker.sqlite` in
+  place. Before and after launch it retained inode `89108960`, size `61440`, mtime
+  `1787553856`, and SHA-256
+  `5316b799f4e4cc92f65890edb9a069cc732c05a28d129205abfb6859515335ec`.
+  Every Task, interval, AppState, Settings, and migration row remained exact;
+  `user_version` remained `0`, `integrity_check` returned `ok`, and
+  `foreign_key_check` returned no rows. No competing `Daymark` profile existed.
+- The renderer reconstructed the paused Task at exactly 30 minutes, projected the
+  90-minute day and both lifetime totals, restored Sunday/Dark, and returned the
+  matching Analytics projection. Visual inspection at 1040×688 confirmed the
+  Daymark shell and restored paused state; navigation remained interactive and
+  there were no HTTP(S) requests or renderer warning/error entries. Packaged main
+  process output contained only the expected local DevTools-listening message and
+  no unexpected failure.
+- AC-014-001 through AC-014-009 all pass. Automated presentation, packaging,
+  stable-identity, artwork-hash, documentation, boundary, and regression tests
+  cover AC-014-001/002/003/006/007/008; the clean and compatibility runs directly
+  cover AC-014-004/005/009. SPEC-011 and SPEC-012 require new Daymark evidence,
+  while retained old-name references are limited to the stable profile contract
+  or truthful historical completion evidence.
 
 ---
 
