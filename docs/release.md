@@ -75,6 +75,14 @@ release can result; any release already created remains an incomplete draft. A
 person must keep the release draft until the required clean-system acceptance
 record is complete and has no blocking defect.
 
+The versioned acceptance procedure and evidence ledger for the first candidate is
+[`docs/release-acceptance/v0.1.0.md`](release-acceptance/v0.1.0.md). Preserve that
+record as historical evidence and create a new versioned record for each later
+release. It defines the disposable-profile matrix, synthetic fixture, offline
+smoke, replacement/reinstall, uninstall/reinstall, forward-upgrade policy, defect
+ledger, and human publication gate. Any `PENDING`, `BLOCKED`, or open blocking
+defect means the release stays draft.
+
 ## Local commands and version gate
 
 - `npm run package` packages the current host for development acceptance.

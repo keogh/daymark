@@ -617,7 +617,7 @@ permission audit, and actual `draft: true` / `prerelease: true` flags here.
 
 ### Status
 
-Pending
+Pending — acceptance procedure implemented; draft-artifact dry run blocked by TASK-011-006
 
 ### Outcome
 
@@ -690,8 +690,21 @@ matrix before manual publication.
 
 ### Completion Evidence
 
-Record checklist dry-run environment, isolation method, fixture values, checksum,
-install/smoke/reinstall results, privacy review, and traceability audit here.
+Implementation completed 2026-08-28. The versioned record at
+`docs/release-acceptance/v0.1.0.md` defines the complete §21 platform matrix,
+privacy-safe isolation, exact draft-origin and SHA-256 checks, bounded online and
+offline workflows, a synthetic non-ASCII/long-description fixture,
+same-candidate replacement, uninstall/reinstall preservation, first-release and
+later-release upgrade policy, unsupported downgrade warning, defect ledger,
+AC-011-011 through AC-011-017 traceability, and a human-only publication gate.
+`docs/release.md` links release operators to the record and requires later
+versions to preserve historical evidence.
+
+The procedure and privacy/security review are implemented. The required
+host-compatible draft-artifact dry run cannot occur until TASK-011-006 produces
+the checksummed draft prerelease. Record its environment, isolation method,
+checksum, install/smoke/reinstall results, and final validation here before
+changing this task to `Complete`.
 
 ---
 

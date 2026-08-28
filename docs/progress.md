@@ -316,6 +316,15 @@ and emulated x64 structural build/inspection pass, while native Ubuntu x64 maker
 GNOME launcher/runtime, ordinary-user profile ownership, removal, and preserved
 profile evidence remain required.
 
+TASK-011-007's versioned acceptance procedure is implemented at
+`docs/release-acceptance/v0.1.0.md`. It defines the complete disposable-platform
+matrix, privacy-safe synthetic fixture, offline smoke, same-candidate replacement,
+uninstall/reinstall preservation, first-versus-later-release upgrade policy,
+defect ledger, and human-only publication gate. The task remains pending because
+TASK-011-006 has not yet supplied the checksummed draft prerelease required for
+the host-compatible dry run; no installation result has been inferred from build
+evidence.
+
 SPEC-012 — MVP QA and Release Readiness is designed and queued as Ready for
 Implementation. It defines one exact candidate and acceptance-evidence ledger;
 connected whole-product regression; persistence, recovery, accessibility,
