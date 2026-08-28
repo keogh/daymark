@@ -2,42 +2,32 @@
 
 ## Current Specification
 
-SPEC-014 — Daymark Product Rename
+SPEC-011 — Cross-Platform Packaging and Distribution
 
 ## Active Task
 
-TASK-014-006 — Establish the clean first-release Daymark identity
+TASK-011-005 — Add Native CI Builds and Artifact Validation
 
 ## Status
 
-Complete
+In Progress
 
 ---
 
 # Immediate Plan
 
-1. Revise the specification and decision record to remove provisional-profile
-   compatibility from the first-release contract.
-2. Rename platform, package, profile, database, preload, workflow, source, test,
-   and current documentation identities consistently to Daymark.
-3. Run focused identity tests, the full project validation, macOS arm64 make, and
-   structural package inspection.
-4. Record verified evidence in the task breakdown and progress log.
+1. Audit the existing native-build workflow against the task and specification
+   contracts.
+2. Verify tag/SHA fan-out, native runner guards, package inspection, isolated
+   artifact manifests, and complete-set gating with focused tests.
+3. Run the repository baseline validation required by the workflow.
+4. Record local results and identify any hosted-run evidence that cannot be
+   produced from the local checkout.
 
 ---
 
 # Scope Guard
 
-No data import or migration is included. Existing local provisional-profile data
-is intentionally left untouched and Daymark starts with its own fresh profile.
-Publishing, signing, notarization, and moving the repository directory are
-excluded.
-
----
-
-# Completion
-
-The canonical identity was updated across runtime, persistence, process boundary,
-packaging, CI, tests, and documentation. All automated checks and the macOS arm64
-make/inspection passed, and the tracked tree contains no earlier product-name
-identifier.
+GitHub Release creation, checksummed release assembly, signing, notarization, and
+manual fresh-install acceptance remain assigned to later tasks. This task may
+upload read-only workflow artifacts but must not publish a release.

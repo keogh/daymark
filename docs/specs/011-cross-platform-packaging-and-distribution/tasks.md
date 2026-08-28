@@ -418,7 +418,7 @@ that evidence is recorded.
 
 ### Status
 
-Pending
+In Progress
 
 ### Outcome
 
@@ -510,14 +510,16 @@ assets.
 Local verification:
 
 - workflow YAML parsed successfully;
-- focused packaging/workflow/release tests — 32 passed;
-- full suite — 713 tests in 86 files passed;
+- focused packaging/workflow/release tests rerun 2026-08-26 — 35 passed;
+- full suite rerun 2026-08-26 — 721 tests in 87 files passed;
 - `npm run release:validate -- --tag v0.1.0`, `npm run typecheck`,
   `npm run lint`, `npm run format:check`, and `git diff --check` — passed.
 
 The task remains In Progress. Record the workflow URL/run ID, tag SHA, native job
 results, uploaded artifact names/architectures, smoke output, permission inspection,
-and manual dry-run evidence after this workflow is committed, pushed, and run.
+and manual dry-run evidence after this workflow is committed, tagged, pushed, and
+run. The local repository had no release tag and no GitHub CLI available during
+the 2026-08-26 verification, so hosted evidence was not claimed.
 
 ---
 
