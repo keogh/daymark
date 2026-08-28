@@ -1,42 +1,43 @@
 # Implementation Plan
 
-## Current Specification
+Specification: SPEC-011 — Cross-Platform Packaging and Distribution
 
-SPEC-011 — Cross-Platform Packaging and Distribution
-
-## Active Task
-
-TASK-011-007 — Define Repeatable Installation and Data-Preservation Acceptance
+Task: TASK-011-008 — Verify Cross-Platform Distribution and Reconcile Documentation
 
 ## Status
 
-In Progress — Documentation Implementation; Draft-Artifact Dry Run Blocked by TASK-011-006
+In Progress — Native Candidate Verification
 
 ---
 
-# Immediate Plan
+# Immediate Steps
 
-1. Add a versioned, privacy-safe acceptance record covering the complete platform
-   matrix and every evidence field in SPEC-011 §21.
-2. Define synthetic representative data and the bounded offline, reinstall,
-   uninstall/reinstall, and forward-upgrade procedures.
-3. Add platform-specific installation, removal, checksum, and unsigned-warning
-   instructions that preserve ordinary-user ownership and machine-wide security.
-4. Trace the publication gate to AC-011-011 through AC-011-017 and validate the
-   documentation mechanically where practical.
-
----
-
-# Scope Guard
-
-Executing final cross-platform acceptance, publishing the release, signing,
-notarization, automatic updates, downgrade testing, and deleting preserved user
-data remain excluded. Evidence must use disposable profiles and synthetic data.
+1. Resolve repository-owned failures from the first unpublished native candidate
+   run and rerun clean locked validation.
+2. Run the corrected immutable tag through all four native build jobs and draft
+   prerelease assembly.
+3. Verify the final release assets, tag/commit agreement, checksums, permissions,
+   and draft/prerelease flags.
+4. Complete the host-compatible acceptance record and collect the remaining
+   required clean-system macOS Intel, Windows 11, and Ubuntu evidence.
+5. Audit AC-011-001 through AC-011-018 and reconcile task, specification,
+   progress, architecture, decision, release, and acceptance documentation.
+6. Rerun the complete Definition of Done validation and inspect the final diff.
 
 ---
 
-# Known Blocker
+# Current Evidence
 
-TASK-011-006 has not yet produced the required checksummed draft GitHub
-prerelease, so the host-compatible artifact dry run and final task completion
-evidence cannot be recorded yet.
+- The first `v0.1.0` run, GitHub Actions run `33220448584`, failed safely in
+  baseline lint before any native build or release assembly job ran.
+- No GitHub Release was created or modified by the failed run.
+- Clean `npm ci` validation passes after expressing the checksum separator as an
+  explicit two-character regex quantifier.
+
+---
+
+# Scope Boundary
+
+The release remains an unsigned personal-testing draft. Publication, signing,
+notarization, automatic updates, exhaustive SPEC-012 QA, and unrelated product
+changes remain excluded.

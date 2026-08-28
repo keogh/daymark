@@ -54,7 +54,7 @@ export async function verifyChecksumManifest(directory: string): Promise<void> {
     .split(/\r?\n/u)
     .filter((line) => line.length > 0);
   const entries = lines.map((line) => {
-    const match = /^([a-f0-9]{64})  (.+)$/u.exec(line);
+    const match = /^([a-f0-9]{64}) {2}(.+)$/u.exec(line);
     if (match === null) {
       throw new Error(`invalid checksum line: ${line}`);
     }
