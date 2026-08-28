@@ -40,7 +40,7 @@ The normalized `darwin`, `win32`, and `linux` values are explicit packaging
 platform identifiers. The filename, not a CI job label, carries product, version,
 platform, and architecture identity.
 
-## Native CI dry runs
+## Native CI builds and draft prerelease assembly
 
 `.github/workflows/native-builds.yml` runs for `v*` tag pushes and supports a
 manual dry run for an existing tag. It validates the exact `vX.Y.Z` tag and commit
@@ -60,9 +60,20 @@ on 2026-08-22 are:
 | Windows x64 | `windows-2025` | x64 |
 | Linux x64 | `ubuntu-24.04` | x64 |
 
-Every job has only `contents: read`. The workflow contains no release-creation or
-publication step, so both tag runs and manual runs are non-publishing during this
-task. Draft prerelease assembly remains separate work.
+Validation and native build jobs have only `contents: read`. A final assembly job
+alone receives `contents: write`, runs only for a tag push, and is gated by all
+four native jobs plus complete-set validation. Manual runs remain non-publishing.
+The final job downloads only the current run's versioned artifacts, verifies their
+tag, commit, names, architectures, and build hashes, then creates and verifies one
+`SHA256SUMS.txt` over the exact four final files. It creates or safely refreshes a
+GitHub Release for the exact tag with both `draft: true` and `prerelease: true`.
+Automation never publishes the release.
+
+An unpublished rerun may replace assets only on an existing draft for that tag.
+If validation, assembly, checksum generation, or upload fails, no published
+release can result; any release already created remains an incomplete draft. A
+person must keep the release draft until the required clean-system acceptance
+record is complete and has no blocking defect.
 
 ## Local commands and version gate
 
@@ -71,6 +82,10 @@ task. Draft prerelease assembly remains separate work.
   added by the applicable follow-up task.
 - `npm run release:validate -- --tag v0.1.0` validates package metadata, stable
   identity, the artifact matrix, and exact tag/version agreement.
+- `npm run release:assemble -- --input <workflow-artifacts> --output <release> --tag v0.1.0 --commit <sha>`
+  assembles and checksum-verifies the exact final files.
+- `npm run release:verify -- --input <release>` recomputes and verifies every
+  entry in `SHA256SUMS.txt` and rejects missing, duplicate, changed, or extra files.
 
 `package.json` is the version authority. A release tag must be exactly
 `v${package.json.version}` using stable `X.Y.Z` semantic versioning. Missing,
@@ -144,3 +159,9 @@ per-application graphical override. Do not disable platform security globally.
 Checksums verify transfer integrity; they do not authenticate the publisher.
 Automatic updates and update checks are unavailable. Signing and macOS
 notarization remain required before general-public production distribution.
+
+After downloading all five release assets, verify from macOS or Linux with
+`shasum -a 256 -c SHA256SUMS.txt` (GNU systems may use
+`sha256sum -c SHA256SUMS.txt`). On Windows, run
+`Get-FileHash -Algorithm SHA256 <file>` for each downloaded artifact and compare
+the displayed hash with its exact filename entry in `SHA256SUMS.txt`.

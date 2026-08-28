@@ -232,3 +232,59 @@ jobs:
           --root out/downloaded-artifacts
           --tag "${{ needs.validate.outputs.tag }}"
           --commit "${{ needs.validate.outputs.commit }}"
+
+  release-draft:
+    name: Assemble draft GitHub prerelease
+    if: github.event_name == 'push'
+    needs:
+      - validate
+      - macos-arm64
+      - macos-x64
+      - windows-x64
+      - linux-x64
+      - artifacts-valid
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Daymark-${{ needs.validate.outputs.version }}-*
+          path: out/downloaded-artifacts
+      - name: Assemble and verify final release files
+        run: >-
+          npm run release:assemble --
+          --input out/downloaded-artifacts
+          --output out/release
+          --tag "${{ needs.validate.outputs.tag }}"
+          --commit "${{ needs.validate.outputs.commit }}"
+      - name: Create release notes
+        run: >-
+          node --experimental-strip-types scripts/release-assembly.ts notes
+          --output out/release-notes.md
+          --tag "${{ needs.validate.outputs.tag }}"
+          --commit "${{ needs.validate.outputs.commit }}"
+      - name: Create or update unpublished prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+          RELEASE_COMMIT: ${{ needs.validate.outputs.commit }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
+            gh release edit "$RELEASE_TAG" --draft --prerelease --target "$RELEASE_COMMIT" --notes-file out/release-notes.md
+            while IFS= read -r asset; do
+              gh release delete-asset "$RELEASE_TAG" "$asset" --yes
+            done < <(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')
+            gh release upload "$RELEASE_TAG" out/release/*
+          else
+            gh release create "$RELEASE_TAG" out/release/* --draft --prerelease --target "$RELEASE_COMMIT" --title "Daymark $RELEASE_TAG" --notes-file out/release-notes.md
+          fi

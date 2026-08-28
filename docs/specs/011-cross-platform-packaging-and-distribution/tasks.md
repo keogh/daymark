@@ -527,7 +527,7 @@ the 2026-08-26 verification, so hosted evidence was not claimed.
 
 ### Status
 
-Pending
+Pending — implementation is locally complete; hosted draft evidence remains
 
 ### Outcome
 
@@ -591,8 +591,25 @@ unsigned-personal-testing guidance.
 
 ### Completion Evidence
 
-Record workflow/release URL, tag, commit, artifact list, checksum verification,
-permission audit, failure fixture results, and draft/prerelease flags here.
+Implementation and local verification completed 2026-08-28. The tag-only
+`release-draft` job is gated by validation, all four native builds, and complete
+artifact-set validation. Only that job has `contents: write`; manual workflow runs
+skip it. Repository-owned assembly revalidates artifact names, version, target,
+tag, commit, uniqueness, and build hashes before copying final files, creates one
+stable `SHA256SUMS.txt`, and verifies exact one-to-one coverage before invoking
+GitHub CLI. New releases and unpublished reruns remain both draft and prerelease;
+automation has no path that publishes a release, and an existing published release
+cannot be overwritten.
+
+Focused release/workflow tests passed (26 tests). Fixtures proved changed,
+missing, duplicate, extra, and incomplete-platform inputs fail. The final full
+suite rerun passed all 726 tests in 88 files. `npm run typecheck`, `npm run lint`,
+`npm run format:check`, and `git diff --check` passed.
+
+This task remains pending behind TASK-011-005's hosted prerequisite. After the
+workflow is committed, tagged, pushed, and run, record the workflow/release URL,
+tag, immutable commit, final five-asset list, downloaded checksum verification,
+permission audit, and actual `draft: true` / `prerelease: true` flags here.
 
 ---
 

@@ -6,28 +6,26 @@ SPEC-011 — Cross-Platform Packaging and Distribution
 
 ## Active Task
 
-TASK-011-005 — Add Native CI Builds and Artifact Validation
+TASK-011-006 — Assemble a Checksummed Draft GitHub Prerelease
 
 ## Status
 
-In Progress
+Implementation Complete — Hosted Evidence Pending
 
 ---
 
 # Immediate Plan
 
-1. Audit the existing native-build workflow against the task and specification
-   contracts.
-2. Verify tag/SHA fan-out, native runner guards, package inspection, isolated
-   artifact manifests, and complete-set gating with focused tests.
-3. Run the repository baseline validation required by the workflow.
-4. Record local results and identify any hosted-run evidence that cannot be
-   produced from the local checkout.
+1. Add deterministic final-file assembly plus SHA-256 generation and verification.
+2. Add a tag-only, least-privilege job that creates or updates one unpublished
+   draft prerelease after every native build succeeds.
+3. Add complete unsigned-testing release notes and focused failure-path tests.
+4. Run focused and baseline validation, then record local versus hosted evidence.
 
 ---
 
 # Scope Guard
 
-GitHub Release creation, checksummed release assembly, signing, notarization, and
-manual fresh-install acceptance remain assigned to later tasks. This task may
-upload read-only workflow artifacts but must not publish a release.
+Manual publication, signing, notarization, and fresh-install acceptance remain
+excluded. The workflow may create only a draft prerelease for a tag push; a manual
+dry run must not receive write permission or create a release.

@@ -27,7 +27,9 @@
     "inspect:macos:x64": "node --experimental-strip-types scripts/inspect-macos-package.ts --arch x64",
     "inspect:windows:x64": "node --experimental-strip-types scripts/inspect-windows-package.ts",
     "inspect:linux:x64": "node --experimental-strip-types scripts/inspect-linux-deb.ts",
-    "release:validate": "node --experimental-strip-types scripts/release-contract.ts"
+    "release:validate": "node --experimental-strip-types scripts/release-contract.ts",
+    "release:assemble": "node --experimental-strip-types scripts/release-assembly.ts assemble",
+    "release:verify": "node --experimental-strip-types scripts/release-assembly.ts verify"
   },
   "dependencies": {
     "better-sqlite3": "13.0.3",
