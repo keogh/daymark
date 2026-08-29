@@ -82,6 +82,9 @@
   "engines": {
     "node": "24.18.1"
   },
+  "overrides": {
+    "@electron/node-gyp": "10.2.0-electron.1"
+  },
   "allowScripts": {
     "esbuild@0.18.20": true,
     "esbuild@0.25.12": true,

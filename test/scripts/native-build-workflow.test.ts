@@ -32,10 +32,22 @@ describe('native distribution build workflow', () => {
     expect(workflow).toContain('ref: ${{ needs.validate.outputs.commit }}');
   });
 
-  it('uses HTTPS for the public GitHub dependency on the isolated Windows runner', async () => {
+  it('installs the Electron node-gyp fork from the npm registry on Windows', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
-    expect(workflow).toMatch(
-      /windows-x64:[\s\S]*Use HTTPS for public GitHub dependencies[\s\S]*url\.https:\/\/github\.com\/\.insteadOf[\s\S]*ssh:\/\/git@github\.com\/[\s\S]*- run: npm ci/,
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
+      overrides: Record<string, string>;
+    };
+    const packageLock = await readFile('package-lock.json', 'utf8');
+
+    expect(workflow).toMatch(/windows-x64:[\s\S]*- run: npm ci/);
+    expect(packageJson.overrides['@electron/node-gyp']).toBe(
+      '10.2.0-electron.1',
+    );
+    expect(packageLock).toContain(
+      'https://registry.npmjs.org/@electron/node-gyp/-/node-gyp-10.2.0-electron.1.tgz',
+    );
+    expect(packageLock).not.toContain(
+      'git+ssh://git@github.com/electron/node-gyp.git',
     );
   });
 

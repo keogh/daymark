@@ -48,6 +48,15 @@ the CI matrix supplies that evidence. Local workflow contracts and all 713 tests
 pass. A committed/pushed manual dry run and valid-tag hosted run remain pending,
 so TASK-011-005 is still In Progress and no GitHub Release is created.
 
+TASK-011-008 candidate verification has begun without claiming final acceptance.
+Native run `33222598544` passed baseline validation, macOS arm64, and Linux x64,
+then failed safely at Windows dependency installation and Intel macOS DMG creation;
+complete-set validation and draft release assembly remained gated. The Windows
+Git-fetch dependency was replaced by the exact published npm registry package,
+and clean installation, all 727 tests, baseline checks, plus local macOS x64
+make/inspection now pass. A new immutable candidate and the complete physical/VM
+acceptance matrix remain required.
+
 ---
 
 # Completed Specifications

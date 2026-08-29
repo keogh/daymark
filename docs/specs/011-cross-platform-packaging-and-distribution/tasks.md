@@ -787,9 +787,26 @@ distribution stage and future public-release prerequisites.
 
 ### Completion Evidence
 
-Record every command and result, workflow and draft release references, all
-platform evidence, defects/deviations and resolutions, version-upgrade status,
-documentation changes, and final Definition of Done audit here.
+Candidate run `33222598544` at tagged commit
+`9d16bd893aceae7620b7d8984ed5a6bf0bf000c9` passed baseline validation, macOS
+arm64, and Linux x64. Windows failed during clean dependency installation and
+native Intel macOS failed during DMG creation, so complete-set validation and
+draft-prerelease assembly were correctly skipped. No release was created.
+
+The Windows failure exposed a remaining Git transport dependency for Electron's
+node-gyp fork. The root package now overrides that transitive dependency with the
+exact published npm version `10.2.0-electron.1`; the lockfile resolves its npm
+registry tarball and no longer contains the Git+SSH resolution. Clean `npm ci`,
+27 focused workflow/packaging/release tests, all 727 tests, formatting, typecheck,
+lint, and diff checks pass locally. A clean-install macOS x64 make and structural
+inspection also pass locally. The Intel hosted failure remains pending a corrected
+immutable candidate rerun, and no final acceptance or documentation status is
+claimed yet.
+
+Final evidence must still record every successful workflow and draft release
+reference, all platform acceptance results, defects/deviations and resolutions,
+version-upgrade status, documentation changes, and the final Definition of Done
+audit.
 
 ---
 
