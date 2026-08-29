@@ -57,6 +57,14 @@ and clean installation, all 727 tests, baseline checks, plus local macOS x64
 make/inspection now pass. A new immutable candidate and the complete physical/VM
 acceptance matrix remain required.
 
+The next native candidate, run `33236105473`, passed baseline validation, macOS
+arm64, native macOS Intel x64, and Linux x64, confirming the earlier Intel DMG
+failure was transient. Windows still failed during `npm ci`, and downstream
+validation/release assembly remained safely gated. The Windows install step now
+publishes a sanitized npm diagnostic tail as a failed-check annotation so the
+remaining platform-specific cause can be resolved without broader repository
+permissions or secret-bearing logs.
+
 ---
 
 # Completed Specifications

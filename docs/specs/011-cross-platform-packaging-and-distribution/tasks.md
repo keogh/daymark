@@ -803,6 +803,16 @@ inspection also pass locally. The Intel hosted failure remains pending a correct
 immutable candidate rerun, and no final acceptance or documentation status is
 claimed yet.
 
+Candidate run `33236105473` at commit
+`29ddbbe4551fccb655c32950140b8de5ea0657b0` subsequently passed baseline
+validation, macOS arm64, native macOS Intel x64, and Linux x64. This establishes
+that the prior Intel DMG failure was transient. Windows continued to fail during
+`npm ci`; all downstream complete-set and release jobs remained safely skipped.
+Because the public check API exposed only exit code 1, the Windows install step
+now preserves normal output while also emitting a percent/newline-escaped final
+80-line diagnostic as a failed-check annotation. This contains only npm technical
+output and does not broaden workflow permissions or upload repository/user data.
+
 Final evidence must still record every successful workflow and draft release
 reference, all platform acceptance results, defects/deviations and resolutions,
 version-upgrade status, documentation changes, and the final Definition of Done

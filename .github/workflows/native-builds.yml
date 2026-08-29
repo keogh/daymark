@@ -148,7 +148,17 @@ jobs:
           if (-not [Environment]::Is64BitOperatingSystem -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') {
             throw 'Windows build requires a native x64 runner'
           }
-      - run: npm ci
+      - name: Install locked dependencies with actionable diagnostics
+        shell: pwsh
+        run: |
+          npm ci 2>&1 | Tee-Object -FilePath npm-ci.log
+          $npmExitCode = $LASTEXITCODE
+          if ($npmExitCode -ne 0) {
+            $diagnostic = (Get-Content npm-ci.log -Tail 80) -join "`n"
+            $diagnostic = $diagnostic.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=Windows npm ci failed::$diagnostic"
+            exit $npmExitCode
+          }
       - run: npm run release:validate -- --tag "${{ needs.validate.outputs.tag }}"
       - run: npm run make:windows:x64
       - run: npm run inspect:windows:x64

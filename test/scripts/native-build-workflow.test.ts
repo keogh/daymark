@@ -28,7 +28,8 @@ describe('native distribution build workflow', () => {
       expect(workflow).toContain(contract);
     }
     expect(workflow.match(/needs: validate/g)).toHaveLength(4);
-    expect(workflow.match(/run: npm ci/g)).toHaveLength(5);
+    expect(workflow.match(/run: npm ci/g)).toHaveLength(4);
+    expect(workflow.match(/npm ci 2>&1/g)).toHaveLength(1);
     expect(workflow).toContain('ref: ${{ needs.validate.outputs.commit }}');
   });
 
@@ -39,7 +40,9 @@ describe('native distribution build workflow', () => {
     };
     const packageLock = await readFile('package-lock.json', 'utf8');
 
-    expect(workflow).toMatch(/windows-x64:[\s\S]*- run: npm ci/);
+    expect(workflow).toMatch(
+      /windows-x64:[\s\S]*Install locked dependencies with actionable diagnostics[\s\S]*npm ci 2>&1 \| Tee-Object -FilePath npm-ci\.log[\s\S]*Get-Content npm-ci\.log -Tail 80[\s\S]*::error title=Windows npm ci failed/,
+    );
     expect(packageJson.overrides['@electron/node-gyp']).toBe(
       '10.2.0-electron.1',
     );

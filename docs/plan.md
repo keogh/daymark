@@ -44,6 +44,13 @@ In Progress — Native Candidate Verification
   pass. The next immutable candidate must determine whether the prior native
   Intel DMG failure was transient; it remains unresolved until hosted evidence
   passes.
+- Candidate run `33236105473` at commit
+  `29ddbbe4551fccb655c32950140b8de5ea0657b0` passed baseline validation and all
+  three non-Windows native builds, including Intel macOS DMG creation. Windows
+  still failed within `npm ci`, while the public API exposed no underlying npm
+  diagnostic. The Windows install step now emits its sanitized final 80 lines as
+  a failed-check annotation so a subsequent failure is actionable through the
+  least-privilege public API.
 
 ---
 
