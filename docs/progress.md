@@ -71,6 +71,13 @@ Visual Studio discovery exceeding its PowerShell output buffer while rebuilding
 toolchain with `vswhere.exe` and supplies explicit node-gyp environment inputs
 before clean installation; missing toolchain state remains a controlled failure.
 
+Run `33237480382` found the selected Visual Studio installation and v143 toolset
+but showed the Windows SDK was not initialized by direct variables alone. Windows
+CI now runs clean installation inside the selected installation's
+`vcvars64.bat` environment, supplying SDK/compiler/library paths together while
+retaining the Visual Studio 2022-compatible identity required by Electron
+node-gyp 10.
+
 ---
 
 # Completed Specifications

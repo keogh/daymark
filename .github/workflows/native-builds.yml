@@ -156,10 +156,12 @@ jobs:
           if (-not $visualStudioPath) {
             throw 'Visual Studio 2022 with the C++ toolchain is required'
           }
-          $env:VCINSTALLDIR = Join-Path $visualStudioPath 'VC'
-          $env:VSCMD_VER = '17.0'
-          $env:npm_config_msvs_version = '2022'
-          npm ci 2>&1 | Tee-Object -FilePath npm-ci.log
+          $vcvars = Join-Path $visualStudioPath 'VC\Auxiliary\Build\vcvars64.bat'
+          if (-not (Test-Path $vcvars)) {
+            throw "Visual Studio native environment script not found: $vcvars"
+          }
+          $installCommand = "call `"$vcvars`" && set `"VSCMD_VER=17.0`" && set `"npm_config_msvs_version=2022`" && npm ci"
+          & $env:ComSpec /d /s /c $installCommand 2>&1 | Tee-Object -FilePath npm-ci.log
           $npmExitCode = $LASTEXITCODE
           if ($npmExitCode -ne 0) {
             $diagnostic = (Get-Content npm-ci.log -Tail 80) -join "`n"

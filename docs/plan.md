@@ -56,6 +56,11 @@ In Progress — Native Candidate Verification
   before rebuilding `better-sqlite3`. The Windows step now uses the runner's
   `vswhere.exe` to select the installed Visual Studio 2022 C++ toolchain and sets
   its explicit node-gyp inputs before clean installation.
+- Candidate run `33237480382` confirmed the explicit installation path and v143
+  toolset but showed that direct variables did not initialize a Windows SDK. The
+  step now executes `npm ci` inside the installation's `vcvars64.bat` environment,
+  which supplies compiler, SDK, and library paths while retaining the compatible
+  VS 2022 identity required by Electron node-gyp.
 
 ---
 

@@ -821,6 +821,15 @@ runner's installed Visual Studio 2022 C++ workload through `vswhere.exe` and set
 `VCINSTALLDIR`, `VSCMD_VER`, and `npm_config_msvs_version` explicitly before
 `npm ci`. Missing toolchain detection still fails with a controlled error.
 
+Candidate run `33237480382` confirmed that node-gyp then found the selected
+installation and v143 toolset, but the direct environment did not initialize a
+Windows SDK. The install step now runs inside that installation's
+`VC\Auxiliary\Build\vcvars64.bat` environment so the SDK, compiler, library, and
+MSBuild paths are initialized together. It retains `VSCMD_VER=17.0` and
+`npm_config_msvs_version=2022` because the runner's current Visual Studio 18
+installation provides v143 while Electron node-gyp 10 recognizes versions only
+through Visual Studio 2022.
+
 Final evidence must still record every successful workflow and draft release
 reference, all platform acceptance results, defects/deviations and resolutions,
 version-upgrade status, documentation changes, and the final Definition of Done
