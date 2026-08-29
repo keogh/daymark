@@ -32,6 +32,13 @@ describe('native distribution build workflow', () => {
     expect(workflow).toContain('ref: ${{ needs.validate.outputs.commit }}');
   });
 
+  it('uses HTTPS for the public GitHub dependency on the isolated Windows runner', async () => {
+    const workflow = await readFile(workflowPath, 'utf8');
+    expect(workflow).toMatch(
+      /windows-x64:[\s\S]*Use HTTPS for public GitHub dependencies[\s\S]*url\.https:\/\/github\.com\/\.insteadOf[\s\S]*ssh:\/\/git@github\.com\/[\s\S]*- run: npm ci/,
+    );
+  });
+
   it('uploads isolated artifacts and gates complete-set validation on every build', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
     expect(workflow.match(/actions\/upload-artifact@v4/g)).toHaveLength(4);
