@@ -65,6 +65,12 @@ publishes a sanitized npm diagnostic tail as a failed-check annotation so the
 remaining platform-specific cause can be resolved without broader repository
 permissions or secret-bearing logs.
 
+Run `33237012131` then identified that cause as Electron node-gyp's automatic
+Visual Studio discovery exceeding its PowerShell output buffer while rebuilding
+`better-sqlite3`. Windows CI now selects the installed Visual Studio 2022 C++
+toolchain with `vswhere.exe` and supplies explicit node-gyp environment inputs
+before clean installation; missing toolchain state remains a controlled failure.
+
 ---
 
 # Completed Specifications

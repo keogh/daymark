@@ -813,6 +813,14 @@ now preserves normal output while also emitting a percent/newline-escaped final
 80-line diagnostic as a failed-check annotation. This contains only npm technical
 output and does not broaden workflow permissions or upload repository/user data.
 
+Candidate run `33237012131` used that annotation to identify the remaining cause:
+while rebuilding `better-sqlite3`, Electron node-gyp found Python and downloaded
+Node headers successfully, but its automatic Visual Studio discovery exceeded the
+PowerShell child-process output buffer. The Windows step now resolves the native
+runner's installed Visual Studio 2022 C++ workload through `vswhere.exe` and sets
+`VCINSTALLDIR`, `VSCMD_VER`, and `npm_config_msvs_version` explicitly before
+`npm ci`. Missing toolchain detection still fails with a controlled error.
+
 Final evidence must still record every successful workflow and draft release
 reference, all platform acceptance results, defects/deviations and resolutions,
 version-upgrade status, documentation changes, and the final Definition of Done

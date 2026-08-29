@@ -41,7 +41,7 @@ describe('native distribution build workflow', () => {
     const packageLock = await readFile('package-lock.json', 'utf8');
 
     expect(workflow).toMatch(
-      /windows-x64:[\s\S]*Install locked dependencies with actionable diagnostics[\s\S]*npm ci 2>&1 \| Tee-Object -FilePath npm-ci\.log[\s\S]*Get-Content npm-ci\.log -Tail 80[\s\S]*::error title=Windows npm ci failed/,
+      /windows-x64:[\s\S]*Install locked dependencies with actionable diagnostics[\s\S]*vswhere\.exe[\s\S]*Microsoft\.VisualStudio\.Component\.VC\.Tools\.x86\.x64[\s\S]*VCINSTALLDIR[\s\S]*npm_config_msvs_version = '2022'[\s\S]*npm ci 2>&1 \| Tee-Object -FilePath npm-ci\.log[\s\S]*Get-Content npm-ci\.log -Tail 80[\s\S]*::error title=Windows npm ci failed/,
     );
     expect(packageJson.overrides['@electron/node-gyp']).toBe(
       '10.2.0-electron.1',

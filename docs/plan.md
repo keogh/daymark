@@ -51,6 +51,11 @@ In Progress — Native Candidate Verification
   diagnostic. The Windows install step now emits its sanitized final 80 lines as
   a failed-check annotation so a subsequent failure is actionable through the
   least-privilege public API.
+- Candidate run `33237012131` exposed the remaining failure: Electron node-gyp's
+  Visual Studio discovery exceeded its PowerShell child-process output buffer
+  before rebuilding `better-sqlite3`. The Windows step now uses the runner's
+  `vswhere.exe` to select the installed Visual Studio 2022 C++ toolchain and sets
+  its explicit node-gyp inputs before clean installation.
 
 ---
 

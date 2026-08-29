@@ -151,6 +151,14 @@ jobs:
       - name: Install locked dependencies with actionable diagnostics
         shell: pwsh
         run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $visualStudioPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $visualStudioPath) {
+            throw 'Visual Studio 2022 with the C++ toolchain is required'
+          }
+          $env:VCINSTALLDIR = Join-Path $visualStudioPath 'VC'
+          $env:VSCMD_VER = '17.0'
+          $env:npm_config_msvs_version = '2022'
           npm ci 2>&1 | Tee-Object -FilePath npm-ci.log
           $npmExitCode = $LASTEXITCODE
           if ($npmExitCode -ne 0) {
