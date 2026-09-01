@@ -48,19 +48,13 @@ function descriptor(
   architecture: string,
 ): PrimaryArtifactDescriptor {
   const extension =
-    platform === 'darwin'
-      ? '.dmg'
-      : platform === 'win32'
-        ? ' Setup.exe'
-        : platform === 'linux'
-          ? '.deb'
-          : undefined;
+    platform === 'darwin' ? '.dmg' : platform === 'linux' ? '.deb' : undefined;
   if (
     extension === undefined ||
     !(
       (platform === 'darwin' &&
         (architecture === 'arm64' || architecture === 'x64')) ||
-      ((platform === 'win32' || platform === 'linux') && architecture === 'x64')
+      (platform === 'linux' && architecture === 'x64')
     )
   ) {
     throw new Error(`unsupported artifact target: ${platform}/${architecture}`);
@@ -112,9 +106,9 @@ export async function validateDownloadedWorkflowArtifacts(options: {
   const manifestPaths = files.filter(
     (filePath) => path.basename(filePath) === 'artifact-manifest.json',
   );
-  if (manifestPaths.length !== 4) {
+  if (manifestPaths.length !== 3) {
     throw new Error(
-      `expected four artifact manifests; received ${manifestPaths.length}`,
+      `expected three artifact manifests; received ${manifestPaths.length}`,
     );
   }
   const manifests = await Promise.all(

@@ -27,16 +27,15 @@ homepage. No company, publisher, support, license, or copyright claim is implied
 
 ## Artifact contract
 
-Each version has exactly four primary artifacts:
+Each SPEC-011 version has exactly three primary artifacts:
 
 | Platform | Architecture | Filename pattern |
 | --- | --- | --- |
 | macOS | arm64 | `Daymark-{version}-darwin-arm64.dmg` |
 | macOS | x64 | `Daymark-{version}-darwin-x64.dmg` |
-| Windows | x64 | `Daymark-{version}-win32-x64 Setup.exe` |
 | Linux | x64 | `Daymark-{version}-linux-x64.deb` |
 
-The normalized `darwin`, `win32`, and `linux` values are explicit packaging
+The normalized `darwin` and `linux` values are explicit packaging
 platform identifiers. The filename, not a CI job label, carries product, version,
 platform, and architecture identity.
 
@@ -44,10 +43,10 @@ platform, and architecture identity.
 
 `.github/workflows/native-builds.yml` runs for `v*` tag pushes and supports a
 manual dry run for an existing tag. It validates the exact `vX.Y.Z` tag and commit
-before four isolated jobs check out that immutable commit, use Node from `.nvmrc`,
+before three isolated jobs check out that immutable commit, use Node from `.nvmrc`,
 install the committed lockfile with `npm ci`, make the target, inspect its native
 module and local packaged resources, and upload a unique workflow artifact. A
-final read-only job accepts the set only when all four jobs produced the expected
+final read-only job accepts the set only when all three jobs produced the expected
 names, metadata, tag, commit, and unchanged bytes.
 
 The stable runner selections verified against GitHub's hosted runner image catalog
@@ -57,15 +56,14 @@ on 2026-08-22 are:
 | --- | --- | --- |
 | macOS arm64 | `macos-15` | arm64 |
 | macOS x64 | `macos-15-intel` | x64 |
-| Windows x64 | `windows-2025` | x64 |
 | Linux x64 | `ubuntu-24.04` | x64 |
 
 Validation and native build jobs have only `contents: read`. A final assembly job
 alone receives `contents: write`, runs only for a tag push, and is gated by all
-four native jobs plus complete-set validation. Manual runs remain non-publishing.
+three native jobs plus complete-set validation. Manual runs remain non-publishing.
 The final job downloads only the current run's versioned artifacts, verifies their
 tag, commit, names, architectures, and build hashes, then creates and verifies one
-`SHA256SUMS.txt` over the exact four final files. It creates or safely refreshes a
+`SHA256SUMS.txt` over the exact three final files. It creates or safely refreshes a
 GitHub Release for the exact tag with both `draft: true` and `prerelease: true`.
 Automation never publishes the release.
 
@@ -117,6 +115,11 @@ Do not disable Gatekeeper globally or change machine-wide security settings.
 
 ## Windows x64 Squirrel installer
 
+Windows distribution is deferred to planned SPEC-019. The commands and
+implementation notes below describe retained preparatory code only; they are not
+part of the current artifact contract, CI workflow, draft release, or acceptance
+claim.
+
 Run `npm run icon:windows` to reproduce the committed ICO from the source-owned
 local PNG, and run `npm run make:windows:x64` on a native Windows x64 host. The
 Windows-only Forge maker produces the unsigned per-user
@@ -159,17 +162,16 @@ ordinary user to confirm the data remains available.
 
 ## Trust and update limitations
 
-Artifacts are unsigned. macOS Gatekeeper and Windows SmartScreen may warn or block
-first launch. Only proceed after obtaining the artifact from this repository's own
-GitHub Release page and intentionally accepting the operating system's documented
+The macOS artifacts are unsigned and Gatekeeper may warn or block first launch.
+Only proceed after obtaining an artifact from this repository's own GitHub Release
+page and intentionally accepting the operating system's documented
 per-application graphical override. Do not disable platform security globally.
 
 Checksums verify transfer integrity; they do not authenticate the publisher.
 Automatic updates and update checks are unavailable. Signing and macOS
 notarization remain required before general-public production distribution.
 
-After downloading all five release assets, verify from macOS or Linux with
+After downloading all four release assets (three artifacts plus the manifest),
+verify from macOS or Linux with
 `shasum -a 256 -c SHA256SUMS.txt` (GNU systems may use
-`sha256sum -c SHA256SUMS.txt`). On Windows, run
-`Get-FileHash -Algorithm SHA256 <file>` for each downloaded artifact and compare
-the displayed hash with its exact filename entry in `SHA256SUMS.txt`.
+`sha256sum -c SHA256SUMS.txt`).

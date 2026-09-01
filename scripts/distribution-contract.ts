@@ -1,5 +1,10 @@
 import { productIdentity } from '../src/shared/product-identity.ts';
 
+export type PrimaryArtifactDescriptor =
+  | { platform: 'darwin'; architecture: 'arm64' | 'x64'; extension: '.dmg' }
+  | { platform: 'win32'; architecture: 'x64'; extension: ' Setup.exe' }
+  | { platform: 'linux'; architecture: 'x64'; extension: '.deb' };
+
 export const distributionContract = {
   identity: {
     packageName: productIdentity.stable.npmPackageName,
@@ -19,13 +24,9 @@ export const distributionContract = {
   primaryArtifacts: [
     { platform: 'darwin', architecture: 'arm64', extension: '.dmg' },
     { platform: 'darwin', architecture: 'x64', extension: '.dmg' },
-    { platform: 'win32', architecture: 'x64', extension: ' Setup.exe' },
     { platform: 'linux', architecture: 'x64', extension: '.deb' },
-  ],
+  ] satisfies readonly PrimaryArtifactDescriptor[],
 } as const;
-
-export type PrimaryArtifactDescriptor =
-  (typeof distributionContract.primaryArtifacts)[number];
 
 export type MacosArchitecture = 'arm64' | 'x64';
 

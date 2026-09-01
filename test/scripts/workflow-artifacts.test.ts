@@ -53,7 +53,7 @@ async function completeArtifactSet(): Promise<string> {
 }
 
 describe('workflow artifact manifests', () => {
-  it('records and validates the four exact artifacts from one tag commit', async () => {
+  it('records and validates the three exact artifacts from one tag commit', async () => {
     const root = await completeArtifactSet();
 
     await expect(
@@ -117,6 +117,6 @@ describe('workflow artifact manifests', () => {
         root,
         tag: 'v0.1.0',
       }),
-    ).rejects.toThrow('expected four artifact manifests');
+    ).rejects.toThrow('expected three artifact manifests');
   });
 });

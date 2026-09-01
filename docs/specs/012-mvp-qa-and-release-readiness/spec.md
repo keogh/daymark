@@ -42,7 +42,7 @@ assumptions, stale feature checks, or an unverified build.
 # 3. Background
 
 SPEC-000 through SPEC-010 define and verify the complete MVP product behavior.
-SPEC-011 produces native macOS, Windows, and Linux artifacts, checksums, a draft
+SPEC-011 produces native macOS and Linux artifacts, checksums, a draft
 GitHub prerelease, and fresh-install evidence across its required platform matrix.
 
 The roadmap's M10 milestone still requires a final whole-product QA pass. Earlier
@@ -53,7 +53,7 @@ evidence and that the integrated product is suitable for the owner's personal
 testing release.
 
 The owner has a macOS Apple Silicon system available for hands-on acceptance. The
-owner does not have local Intel macOS, Windows, or Linux systems. SPEC-012 therefore
+owner does not have local Intel macOS or Linux systems. SPEC-012 therefore
 requires direct owner acceptance on macOS Apple Silicon and reviews the native
 installation evidence already required by SPEC-011 for the remaining targets. It
 must not claim that the owner personally tested unavailable environments.
@@ -451,7 +451,6 @@ SPEC-012 must review, rather than unnecessarily repeat, its evidence for:
 
 - macOS arm64;
 - macOS x64;
-- Windows x64;
 - Linux x64;
 - each required representative operating-system version;
 - fresh install and launch;
@@ -466,10 +465,13 @@ the exact SPEC-011 evidence. CI build results alone remain insufficient for manu
 installation claims.
 
 The owner directly performs only the macOS Apple Silicon acceptance defined in
-§16. Intel macOS, Windows, and Linux readiness may rely on complete SPEC-011
+§16. Intel macOS and Linux readiness may rely on complete SPEC-011
 physical/VM evidence performed by another identified tester or service. Missing or
 incomplete required platform evidence produces `NO-GO`; it must not be represented
 as owner acceptance or waived because hardware is unavailable locally.
+
+Windows readiness is outside SPEC-012 after DEC-038 and must not be claimed until
+planned SPEC-019 is implemented and verified.
 
 ---
 

@@ -74,10 +74,10 @@ describe('release contract', () => {
     });
   });
 
-  it('defines four unique, versioned platform and architecture artifact names', () => {
+  it('defines three unique, versioned platform and architecture artifact names', () => {
     const manifest = expectedArtifactManifest('0.1.0');
     expect(validateArtifactManifest(manifest, '0.1.0')).toEqual([]);
-    expect(new Set(manifest.map(({ name }) => name))).toHaveLength(4);
+    expect(new Set(manifest.map(({ name }) => name))).toHaveLength(3);
   });
 
   it('defines distinct supported macOS DMG base names', () => {

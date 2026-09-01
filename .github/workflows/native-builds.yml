@@ -130,64 +130,6 @@ jobs:
             out/make/**/Daymark-${{ needs.validate.outputs.version }}-darwin-x64.dmg
             out/artifact-manifest.json
 
-  windows-x64:
-    name: Build Windows x64 on windows-2025
-    needs: validate
-    runs-on: windows-2025
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.validate.outputs.commit }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - name: Confirm native x64 host
-        shell: pwsh
-        run: |
-          if (-not [Environment]::Is64BitOperatingSystem -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') {
-            throw 'Windows build requires a native x64 runner'
-          }
-      - name: Install locked dependencies with actionable diagnostics
-        shell: pwsh
-        run: |
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $visualStudioPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-          if (-not $visualStudioPath) {
-            throw 'Visual Studio 2022 with the C++ toolchain is required'
-          }
-          $vcvars = Join-Path $visualStudioPath 'VC\Auxiliary\Build\vcvars64.bat'
-          if (-not (Test-Path $vcvars)) {
-            throw "Visual Studio native environment script not found: $vcvars"
-          }
-          $installCommand = "call `"$vcvars`" && set `"VSCMD_VER=17.0`" && set `"npm_config_msvs_version=2022`" && npm ci"
-          & $env:ComSpec /d /s /c $installCommand 2>&1 | Tee-Object -FilePath npm-ci.log
-          $npmExitCode = $LASTEXITCODE
-          if ($npmExitCode -ne 0) {
-            $diagnostic = (Get-Content npm-ci.log -Tail 80) -join "`n"
-            $diagnostic = $diagnostic.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
-            Write-Output "::error title=Windows npm ci failed::$diagnostic"
-            exit $npmExitCode
-          }
-      - run: npm run release:validate -- --tag "${{ needs.validate.outputs.tag }}"
-      - run: npm run make:windows:x64
-      - run: npm run inspect:windows:x64
-      - name: Record artifact metadata
-        run: >-
-          node --experimental-strip-types scripts/workflow-artifacts.ts create
-          --platform win32 --architecture x64 --search-root out/make
-          --output out/artifact-manifest.json
-          --tag "${{ needs.validate.outputs.tag }}"
-          --commit "${{ needs.validate.outputs.commit }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Daymark-${{ needs.validate.outputs.version }}-win32-x64
-          if-no-files-found: error
-          retention-days: 14
-          path: |
-            out/make/**/Daymark-${{ needs.validate.outputs.version }}-win32-x64 Setup.exe
-            out/artifact-manifest.json
-
   linux-x64:
     name: Build Linux x64 on ubuntu-24.04
     needs: validate
@@ -232,7 +174,6 @@ jobs:
       - validate
       - macos-arm64
       - macos-x64
-      - windows-x64
       - linux-x64
     runs-on: ubuntu-24.04
     steps:
@@ -260,7 +201,6 @@ jobs:
       - validate
       - macos-arm64
       - macos-x64
-      - windows-x64
       - linux-x64
       - artifacts-valid
     runs-on: ubuntu-24.04

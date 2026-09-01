@@ -13,36 +13,32 @@ describe('native distribution build workflow', () => {
     expect(workflow.match(/contents:\s*write/g)).toHaveLength(1);
   });
 
-  it('validates once before four stable native runner jobs fan out', async () => {
+  it('validates once before three stable native runner jobs fan out', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
     for (const contract of [
       'macos-arm64:',
       'runs-on: macos-15',
       'macos-x64:',
       'runs-on: macos-15-intel',
-      'windows-x64:',
-      'runs-on: windows-2025',
       'linux-x64:',
       'runs-on: ubuntu-24.04',
     ]) {
       expect(workflow).toContain(contract);
     }
-    expect(workflow.match(/needs: validate/g)).toHaveLength(4);
+    expect(workflow.match(/needs: validate/g)).toHaveLength(3);
     expect(workflow.match(/run: npm ci/g)).toHaveLength(4);
-    expect(workflow.match(/&& npm ci"/g)).toHaveLength(1);
+    expect(workflow).not.toContain('windows-x64:');
     expect(workflow).toContain('ref: ${{ needs.validate.outputs.commit }}');
   });
 
-  it('installs the Electron node-gyp fork from the npm registry on Windows', async () => {
+  it('keeps the deferred Windows dependency reproducible without building Windows', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
     const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
       overrides: Record<string, string>;
     };
     const packageLock = await readFile('package-lock.json', 'utf8');
 
-    expect(workflow).toMatch(
-      /windows-x64:[\s\S]*Install locked dependencies with actionable diagnostics[\s\S]*vswhere\.exe[\s\S]*Microsoft\.VisualStudio\.Component\.VC\.Tools\.x86\.x64[\s\S]*vcvars64\.bat[\s\S]*VSCMD_VER=17\.0[\s\S]*npm_config_msvs_version=2022[\s\S]*ComSpec \/d \/s \/c[\s\S]*Tee-Object -FilePath npm-ci\.log[\s\S]*Get-Content npm-ci\.log -Tail 80[\s\S]*::error title=Windows npm ci failed/,
-    );
+    expect(workflow).not.toContain('windows-x64:');
     expect(packageJson.overrides['@electron/node-gyp']).toBe(
       '10.2.0-electron.1',
     );
@@ -56,10 +52,10 @@ describe('native distribution build workflow', () => {
 
   it('uploads isolated artifacts and gates complete-set validation on every build', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
-    expect(workflow.match(/actions\/upload-artifact@v4/g)).toHaveLength(4);
+    expect(workflow.match(/actions\/upload-artifact@v4/g)).toHaveLength(3);
     expect(workflow).toContain('actions/download-artifact@v4');
     expect(workflow).toMatch(
-      /artifacts-valid:[\s\S]*needs:[\s\S]*- macos-arm64[\s\S]*- macos-x64[\s\S]*- windows-x64[\s\S]*- linux-x64/,
+      /artifacts-valid:[\s\S]*needs:[\s\S]*- macos-arm64[\s\S]*- macos-x64[\s\S]*- linux-x64/,
     );
     expect(workflow).toContain('scripts/workflow-artifacts.ts validate');
   });
@@ -67,7 +63,7 @@ describe('native distribution build workflow', () => {
   it('gates a tag-only draft prerelease on every build and checksum validation', async () => {
     const workflow = await readFile(workflowPath, 'utf8');
     expect(workflow).toMatch(
-      /release-draft:[\s\S]*if: github\.event_name == 'push'[\s\S]*needs:[\s\S]*- macos-arm64[\s\S]*- macos-x64[\s\S]*- windows-x64[\s\S]*- linux-x64[\s\S]*- artifacts-valid/,
+      /release-draft:[\s\S]*if: github\.event_name == 'push'[\s\S]*needs:[\s\S]*- macos-arm64[\s\S]*- macos-x64[\s\S]*- linux-x64[\s\S]*- artifacts-valid/,
     );
     expect(workflow).toMatch(
       /release-draft:[\s\S]*permissions:\n {6}contents: write/,

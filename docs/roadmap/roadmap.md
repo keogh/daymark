@@ -313,9 +313,7 @@ Produce installable builds.
 
 ### Windows
 
-- x64 build;
-- installer;
-- tray validation.
+- Deferred to SPEC-019 after repeated native CI dependency-installation failures.
 
 ### Linux
 
@@ -325,7 +323,8 @@ Produce installable builds.
 
 ## Exit Criteria
 
-Fresh-machine installation testing succeeds on all three target operating systems.
+Fresh-machine installation testing succeeds on macOS and Linux. Windows exits M9
+through the explicit SPEC-019 deferral rather than an unsupported release claim.
 
 ---
 
@@ -448,6 +447,7 @@ criteria before implementation may begin.
 016 Task Archiving
 017 Global Keyboard Shortcuts
 018 Automatic OS Startup
+019 Windows Packaging and Distribution
 ```
 
 Unless a later validated requirement changes priority, define and implement them
@@ -525,6 +525,30 @@ Expected scope:
 - startup registration failure and stale-registration handling;
 - interaction with hidden-window launch, tray availability, and timer recovery;
 - packaged acceptance on macOS, Windows, and the supported Linux environment.
+
+Windows packaged acceptance in this specification depends on SPEC-019.
+
+## SPEC-019 — Windows Packaging and Distribution
+
+Expected scope:
+
+- establish a reproducible locked dependency installation on a supported native
+  Windows x64 build environment;
+- review and reuse or replace the retained Squirrel maker, icon, application
+  identity, and installer-lifecycle implementation;
+- add a Windows x64 native CI job without weakening release permissions or
+  obscuring diagnostics;
+- produce and inspect a versioned per-user Windows installer and any required
+  ancillary files;
+- verify SmartScreen guidance, ordinary-user installation, Start menu and tray
+  behavior, installer lifecycle events, offline operation, profile ownership,
+  replacement, uninstall/reinstall, and data preservation on supported Windows
+  11 environments;
+- define how Windows artifacts join a checksummed draft release after the native
+  build and acceptance evidence are reliable.
+
+SPEC-019 must not infer acceptance from the preparatory Windows code retained
+after SPEC-011 or from the failed SPEC-011 workflow runs.
 
 ## Later Candidates
 

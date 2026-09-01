@@ -12,12 +12,27 @@ M9 — Cross-Platform Packaging
 
 P0
 
+## Scope Amendment — 2026-08-28
+
+SPEC-011 now covers macOS arm64, macOS x64, and Linux x64 distribution only.
+Windows packaging, native CI, installation, lifecycle, SmartScreen, and
+data-preservation acceptance are deferred in their entirety to planned SPEC-019
+— Windows Packaging and Distribution.
+
+This amendment is normative and supersedes every Windows requirement elsewhere
+in this specification, including Windows rows or references in the objective,
+user story, scope, artifact matrix, CI/release counts, acceptance environment
+matrix, acceptance criteria, tests, and Definition of Done. Existing Windows
+maker/lifecycle code may remain as unverified preparatory work, but it is not a
+SPEC-011 deliverable and must not gate or appear in a SPEC-011 release. SPEC-011
+uses three primary artifacts and three native build jobs.
+
 ---
 
 # 1. Objective
 
-Produce reproducible, installable Daymark artifacts for supported macOS,
-Windows, and Linux targets and assemble them into a version-consistent draft
+Produce reproducible, installable Daymark artifacts for supported macOS and Linux
+targets and assemble them into a version-consistent draft
 GitHub prerelease that can be verified on clean systems before a person publishes
 it.
 
@@ -35,7 +50,7 @@ As the application owner,
 I want versioned installers built on their native operating systems and collected
 in one reviewable GitHub prerelease,
 
-so that I can install and evaluate Daymark on macOS, Windows, and Linux
+so that I can install and evaluate Daymark on macOS and Linux
 without a development environment and without risking existing local data.
 
 ---
@@ -73,11 +88,10 @@ This specification includes:
 - deterministic Electron Forge makers for macOS DMG, Windows Squirrel Setup, and
   Debian package artifacts;
 - separate macOS arm64 and x64 artifacts;
-- Windows x64 and Linux x64 artifacts;
+- Linux x64 artifacts;
 - platform-specific application icon conversion from SPEC-010's source-owned
   master;
-- required installer metadata, stable application identity, and Windows installer
-  lifecycle handling;
+- required installer metadata and stable application identity;
 - native GitHub Actions build jobs for every supported artifact;
 - exact `package.json` version and `vX.Y.Z` tag matching;
 - unique version/platform/architecture artifact names;
@@ -108,6 +122,7 @@ This specification does not include:
   publication;
 - macOS Universal binaries;
 - Windows arm64 or x86 artifacts;
+- all Windows packaging and distribution, now owned by planned SPEC-019;
 - Linux arm64, RPM, AppImage, Snap, or Flatpak artifacts;
 - portable/no-install archives as supported release products;
 - downgrade support;
@@ -184,12 +199,7 @@ The required outputs are:
 | --- | --- | --- | --- |
 | macOS | arm64 | `.dmg` | native GitHub-hosted macOS arm64 runner |
 | macOS | x64 | `.dmg` | native GitHub-hosted macOS Intel runner |
-| Windows | x64 | Squirrel `{productName} Setup.exe` | native GitHub-hosted Windows x64 runner |
 | Linux | x64 | Debian `.deb` | native GitHub-hosted Ubuntu x64 runner |
-
-The Windows maker may also produce its required `.nupkg` and `RELEASES` files.
-They may be uploaded with the installer, but auto-update behavior remains out of
-scope. The Setup executable is the supported user installation entry point.
 
 Each uploaded primary artifact filename must contain, directly or through an
 unambiguous containing archive name:
@@ -213,7 +223,6 @@ Electron Forge remains the only packaging and maker framework.
 The configuration must add only focused, maintained makers needed by §8:
 
 - the Electron Forge DMG maker for macOS;
-- the Electron Forge Squirrel maker for Windows;
 - the Electron Forge Debian maker for Linux.
 
 Makers must be restricted explicitly to their applicable platform. Native modules,
@@ -377,7 +386,7 @@ The public repository must contain a GitHub Actions workflow that:
 4. checks out the exact tag commit;
 5. installs the committed Node version and dependencies with `npm ci`;
 6. runs the required project validation at least once in a clearly identified job;
-7. runs native maker jobs for all four matrix entries in §8;
+7. runs native maker jobs for all three matrix entries in §8;
 8. performs a packaged-application smoke check where the runner can do so safely;
 9. uploads immutable, uniquely named workflow artifacts;
 10. waits for all required jobs before release assembly;
@@ -410,8 +419,7 @@ prerelease: true
 The draft must include:
 
 - version and tagged commit;
-- the four primary artifacts from §8;
-- any explicitly retained Squirrel ancillary artifacts;
+- the three primary artifacts from §8;
 - `SHA256SUMS.txt`;
 - a concise platform/architecture download map;
 - unsigned personal-testing warnings from §7;
@@ -801,7 +809,7 @@ introduced.
 
 - release version validation accepts exact `vX.Y.Z` agreement and rejects missing
   `v`, malformed SemVer, mismatch, extra suffix, and absent version/tag values;
-- artifact manifest validation requires all four matrix entries, exact version,
+- artifact manifest validation requires all three matrix entries, exact version,
   correct platform/architecture, unique names, and no stale extra primary artifact;
 - checksum generation and verification cover exact files and reject changed,
   missing, duplicate, or unexpectedly added files;

@@ -26,8 +26,8 @@ builds use the Daymark application profile. Focused path tests, all
 data was copied, deleted, or migrated and no schema change was required.
 
 TASK-011-001 is complete. Distribution now has one validated source-controlled
-contract for package metadata, stable macOS/Windows/Linux identity, exact stable
-SemVer tag agreement, and four collision-free primary artifact descriptors. Local
+contract for package metadata, stable platform identity, exact stable SemVer tag
+agreement, and three collision-free macOS/Linux release artifact descriptors. Local
 package, make, and validation commands are explicit, and release documentation
 records unsigned personal-testing limitations, temporary Linux contact metadata,
 checksum trust boundaries, and the absence of automatic updates.
@@ -40,11 +40,11 @@ successfully built and inspected the 106 MB artifact. Native Ubuntu x64 GNOME
 installation and ordinary-user profile/removal evidence remains pending.
 
 TASK-011-005 implementation now adds a least-privilege native GitHub Actions
-pipeline with exact tag/SHA validation, stable macOS arm64, macOS Intel, Windows
-x64, and Ubuntu x64 jobs, platform package inspection, isolated immutable uploads,
+pipeline with exact tag/SHA validation, stable macOS arm64, macOS Intel, and
+Ubuntu x64 jobs, platform package inspection, isolated immutable uploads,
 and final artifact-set/provenance validation. The dependency cycle with the native
 evidence still required by TASK-011-003 and TASK-011-004 was explicitly reconciled:
-the CI matrix supplies that evidence. Local workflow contracts and all 713 tests
+the CI matrix supplies the Linux evidence. Local workflow contracts and all 713 tests
 pass. A committed/pushed manual dry run and valid-tag hosted run remain pending,
 so TASK-011-005 is still In Progress and no GitHub Release is created.
 
@@ -77,6 +77,14 @@ CI now runs clean installation inside the selected installation's
 `vcvars64.bat` environment, supplying SDK/compiler/library paths together while
 retaining the Visual Studio 2022-compatible identity required by Electron
 node-gyp 10.
+
+On 2026-08-28 the owner accepted DEC-038 and deferred Windows packaging and
+distribution to planned SPEC-019. SPEC-011 now requires three macOS/Linux release
+artifacts; its workflow no longer runs or gates on Windows, and release assembly
+and notes exclude Windows. Existing Windows maker and lifecycle implementation is
+retained only as unverified input to SPEC-019. TASK-011-008 remains pending until
+the revised native workflow, draft prerelease, and macOS/Linux installation matrix
+are complete.
 
 ---
 
@@ -307,6 +315,7 @@ specification and companion task breakdown.
 4. SPEC-016 — Task Archiving
 5. SPEC-017 — Global Keyboard Shortcuts
 6. SPEC-018 — Automatic OS Startup
+7. SPEC-019 — Windows Packaging and Distribution
 
 SPEC-013 is expected to gate any claim of trusted general-public production
 distribution. The product enhancements remain sequenced behind that
@@ -316,7 +325,9 @@ release-hardening work.
 
 # Known Blockers
 
-None.
+SPEC-011 still requires a new immutable three-platform candidate, draft release,
+and complete macOS/Linux installation acceptance. Windows is deferred work, not a
+SPEC-011 blocker.
 
 ---
 
@@ -337,11 +348,11 @@ rebuilds, local migrations/renderer/tray assets, focused inspection commands, an
 documented Gatekeeper expectations. Both targets built and passed structural
 inspection on macOS Apple Silicon; the arm64 app also launched with an isolated
 profile. Native Intel-host confirmation remains assigned to TASK-011-005.
-TASK-011-003 implementation now adds the Windows x64-only Squirrel maker,
+TASK-011-003 is deferred to SPEC-019. Its implementation adds the Windows x64-only Squirrel maker,
 source-owned ICO generation, stable Squirrel identity, early installer-event
 isolation, single-instance normal launch, and bounded SmartScreen guidance. Native
-Windows maker and installation evidence is still pending, so TASK-011-003 is
-deferred pending native-host acceptance. TASK-011-004 is active: its implementation
+Windows maker and installation evidence remains unverified and no longer gates
+SPEC-011. TASK-011-004 is active: its implementation
 and emulated x64 structural build/inspection pass, while native Ubuntu x64 maker,
 GNOME launcher/runtime, ordinary-user profile ownership, removal, and preserved
 profile evidence remain required.

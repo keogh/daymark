@@ -717,8 +717,10 @@ Packaging must be verified separately on:
 
 - macOS arm64;
 - macOS x64 if supported;
-- Windows x64;
 - Linux x64.
+
+Windows x64 packaging remains an architectural target but its distribution
+verification is deferred to planned SPEC-019.
 
 Additional architectures can be added based on release requirements.
 

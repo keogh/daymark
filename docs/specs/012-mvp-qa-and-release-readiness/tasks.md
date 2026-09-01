@@ -368,7 +368,7 @@ claim beyond macOS Apple Silicon.
 - Match every record to the candidate version, tag, commit, artifact, checksum,
   OS, and architecture.
 - Record actual tester/service and test date for each manual environment.
-- Confirm macOS arm64 and x64, Windows x64, Linux x64, and required representative
+- Confirm macOS arm64 and x64, Linux x64, and required representative
   OS versions are covered.
 - Confirm CI evidence is not used as a substitute for required installation
   evidence.
@@ -379,7 +379,7 @@ claim beyond macOS Apple Silicon.
 
 ### Excluded
 
-- claiming that the owner personally tested Intel macOS, Windows, or Linux;
+- claiming that the owner personally tested Intel macOS or Linux;
 - weakening SPEC-011's matrix because hardware is unavailable locally;
 - procuring new platform hardware;
 - signing/notarization;

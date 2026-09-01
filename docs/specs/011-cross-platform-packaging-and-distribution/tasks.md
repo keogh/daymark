@@ -45,9 +45,9 @@ SPEC-011 acceptance or release assembly.
 | --- | --- | --- | --- | --- |
 | TASK-011-001 | Establish Distribution Metadata and Release Contracts | Complete | None | AC-011-002, AC-011-003, AC-011-006, AC-011-018 |
 | TASK-011-002 | Build macOS arm64 and x64 DMG Targets | Complete | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-003 | Build the Windows x64 Squirrel Installer | Pending — native evidence assigned to TASK-011-005 | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-005, AC-011-006 |
+| TASK-011-003 | Build the Windows x64 Squirrel Installer | Deferred to SPEC-019 | TASK-011-001 | Deferred |
 | TASK-011-004 | Build the Linux x64 Debian Package | Pending — native evidence assigned to TASK-011-005 | TASK-011-001 | AC-011-001, AC-011-002, AC-011-004, AC-011-006 |
-| TASK-011-005 | Add Native CI Builds and Artifact Validation | In Progress | TASK-011-002; implementation portions of TASK-011-003 and TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
+| TASK-011-005 | Add Native CI Builds and Artifact Validation | In Progress | TASK-011-002; implementation portion of TASK-011-004 | AC-011-001, AC-011-002, AC-011-003, AC-011-004, AC-011-007, AC-011-010 |
 | TASK-011-006 | Assemble a Checksummed Draft GitHub Prerelease | Pending | TASK-011-005 | AC-011-008, AC-011-009, AC-011-010, AC-011-012, AC-011-017 |
 | TASK-011-007 | Define Repeatable Installation and Data-Preservation Acceptance | Pending | TASK-011-006 | AC-011-011, AC-011-012, AC-011-013, AC-011-014, AC-011-015, AC-011-016, AC-011-017 |
 | TASK-011-008 | Verify Cross-Platform Distribution and Reconcile Documentation | Pending | TASK-011-007 | AC-011-001 through AC-011-018 |
@@ -244,12 +244,15 @@ Verification:
 
 ### Status
 
-Pending — implementation is locally complete; native Windows acceptance remains
+Deferred to SPEC-019
 
 ### Outcome
 
 Electron Forge produces an unsigned per-user Windows x64 Squirrel Setup executable,
 and installer lifecycle invocations exit before normal Daymark initialization.
+
+This task is no longer required for SPEC-011 completion. Its existing preparatory
+implementation and all remaining native evidence transfer to planned SPEC-019.
 
 ### Dependencies
 
@@ -423,7 +426,7 @@ In Progress
 ### Outcome
 
 A least-privilege GitHub Actions workflow validates one tagged commit and builds,
-smoke-checks, and uploads all four required artifacts on compatible stable native
+smoke-checks, and uploads all three required artifacts on compatible stable native
 runners without granting publication rights to build jobs.
 
 ### Dependencies
@@ -445,7 +448,7 @@ evidence; their final statuses are reconciled from the resulting native runs.
 - Use the exact tag commit, repository Node version, committed lockfile, and
   `npm ci` in every native job.
 - Run the complete baseline validation in a clearly identified job.
-- Build macOS arm64, macOS x64, Windows x64, and Linux x64 natively.
+- Build macOS arm64, macOS x64, and Linux x64 natively.
 - Install only build-host tooling actually required by the relevant maker.
 - Run safe packaged-content/native-module smoke checks per job.
 - Normalize and validate unique artifact names and manifest metadata.
@@ -468,7 +471,7 @@ evidence; their final statuses are reconciled from the resulting native runs.
 
 - Native GitHub Actions validation/build matrix.
 - Per-platform dependency and maker steps.
-- Uploaded versioned workflow artifacts from all four entries.
+- Uploaded versioned workflow artifacts from all three entries.
 - Workflow and artifact-manifest contract tests.
 - Documented runner labels and architectures.
 
@@ -476,7 +479,7 @@ evidence; their final statuses are reconciled from the resulting native runs.
 
 - Validate workflow syntax and repository-owned workflow contract tests.
 - Run a non-publishing manual dry run and prove no release is created.
-- Run or inspect one valid tagged workflow covering all four native jobs.
+- Run or inspect one valid tagged workflow covering all three native jobs.
 - Confirm the same tag SHA/version/lockfile across jobs.
 - Confirm each artifact architecture, unique name, packaged native module, and
   required local contents.
@@ -501,7 +504,7 @@ with an explicit native-architecture guard in each build job. Every job has only
 All four jobs use `.nvmrc`, `npm ci`, their platform Forge maker, and package
 inspection. Each uploads one collision-free primary artifact plus a manifest
 binding its name, version, platform, architecture, tag, commit, and bytes. The
-final read-only job depends on all four builds, downloads only this run's matching
+final read-only job depends on all three builds, downloads only this run's matching
 workflow artifacts, and rejects an incomplete, renamed, mixed-commit, or changed
 set. Windows inspection newly checks the packaged x64 executable and
 `better-sqlite3` PE architecture plus local renderer, migrations, icons, and tray
@@ -592,7 +595,7 @@ unsigned-personal-testing guidance.
 ### Completion Evidence
 
 Implementation and local verification completed 2026-08-28. The tag-only
-`release-draft` job is gated by validation, all four native builds, and complete
+`release-draft` job is gated by validation, all three native builds, and complete
 artifact-set validation. Only that job has `contents: write`; manual workflow runs
 skip it. Repository-owned assembly revalidates artifact names, version, target,
 tag, commit, uniqueness, and build hashes before copying final files, creates one
@@ -759,7 +762,8 @@ distribution stage and future public-release prerequisites.
 ### Deliverables
 
 - Complete automated validation evidence.
-- Successful four-entry native build evidence.
+- Successful three-entry native build evidence for macOS arm64, macOS x64, and
+  Linux x64.
 - Complete draft GitHub prerelease with verified checksums.
 - Complete cross-platform install, smoke, reinstall, uninstall/reinstall, and
   applicable-upgrade evidence.
@@ -830,10 +834,13 @@ MSBuild paths are initialized together. It retains `VSCMD_VER=17.0` and
 installation provides v143 while Electron node-gyp 10 recognizes versions only
 through Visual Studio 2022.
 
-Final evidence must still record every successful workflow and draft release
-reference, all platform acceptance results, defects/deviations and resolutions,
-version-upgrade status, documentation changes, and the final Definition of Done
-audit.
+Windows remediation ended here by owner decision on 2026-08-28. The Windows job
+is removed from the SPEC-011 workflow and release gate; all remaining Windows
+build, installer, and acceptance evidence is deferred to planned SPEC-019. Final
+SPEC-011 evidence must still record the successful three-entry workflow and draft
+release reference, required macOS/Linux acceptance results, defects/deviations and
+resolutions, version-upgrade status, documentation changes, and the final
+Definition of Done audit.
 
 ---
 
@@ -845,7 +852,7 @@ After all implementation tasks are complete:
 - verify every earlier specification is still Verified;
 - run all validation required by specification §32 and the project Definition of
   Done;
-- verify all four native distributables originate from the exact tagged commit;
+- verify all three native distributables originate from the exact tagged commit;
 - verify the GitHub Release is complete, checksummed, draft, and prerelease;
 - complete the full fresh-install platform matrix with disposable profiles;
 - verify offline smoke, replacement/reinstall, uninstall/reinstall, and applicable

@@ -6,20 +6,19 @@ Task: TASK-011-008 — Verify Cross-Platform Distribution and Reconcile Document
 
 ## Status
 
-In Progress — Native Candidate Verification
+In Progress — macOS/Linux Candidate Verification; Windows Deferred
 
 ---
 
 # Immediate Steps
 
-1. Resolve repository-owned failures from unpublished native candidate runs and
-   rerun clean locked validation.
-2. Run the corrected immutable tag through all four native build jobs and draft
+1. Reconcile SPEC-011 and release contracts around the approved Windows deferral.
+2. Run the corrected immutable tag through all three native build jobs and draft
    prerelease assembly.
 3. Verify the final release assets, tag/commit agreement, checksums, permissions,
    and draft/prerelease flags.
 4. Complete the host-compatible acceptance record and collect the remaining
-   required clean-system macOS Intel, Windows 11, and Ubuntu evidence.
+   required clean-system macOS Intel and Ubuntu evidence.
 5. Audit AC-011-001 through AC-011-018 and reconcile task, specification,
    progress, architecture, decision, release, and acceptance documentation.
 6. Rerun the complete Definition of Done validation and inspect the final diff.
@@ -61,11 +60,15 @@ In Progress — Native Candidate Verification
   step now executes `npm ci` inside the installation's `vcvars64.bat` environment,
   which supplies compiler, SDK, and library paths while retaining the compatible
   VS 2022 identity required by Electron node-gyp.
+- On 2026-08-28 the owner deferred Windows packaging and distribution to planned
+  SPEC-019. The SPEC-011 workflow, artifact contract, draft notes, and acceptance
+  gate now cover only macOS arm64, macOS x64, and Linux x64; retained Windows code
+  is preparatory and unverified.
 
 ---
 
 # Scope Boundary
 
 The release remains an unsigned personal-testing draft. Publication, signing,
-notarization, automatic updates, exhaustive SPEC-012 QA, and unrelated product
-changes remain excluded.
+notarization, automatic updates, Windows distribution, exhaustive SPEC-012 QA,
+and unrelated product changes remain excluded.

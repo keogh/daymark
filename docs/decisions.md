@@ -689,7 +689,7 @@ avoids forcing the application into a generic dashboard design.
 
 ## Status
 
-Accepted
+Superseded by DEC-038
 
 ## Decision
 
@@ -734,6 +734,42 @@ architecture.
 - No signing secret, certificate placeholder, auto-updater, telemetry, or runtime
   networking is introduced.
 - SPEC-011 defines the exact artifact, CI, release, and acceptance contracts.
+
+---
+
+# DEC-038 — Defer Windows Distribution
+
+## Status
+
+Accepted
+
+## Decision
+
+SPEC-011 and its GitHub Actions release workflow produce and gate only macOS
+arm64, macOS x64, and Linux x64 artifacts. Windows packaging, native builds,
+installer acceptance, and distribution are deferred to planned SPEC-019.
+
+Existing Windows Forge configuration and lifecycle code remain as unverified
+preparatory work. They do not constitute Windows support evidence and do not
+appear in or gate a SPEC-011 draft release.
+
+## Context
+
+Repeated GitHub-hosted Windows builds failed during clean native dependency
+installation despite resolving the Git dependency, selecting the Visual Studio
+C++ toolchain, and initializing its SDK environment. The failures prevented an
+otherwise successful native artifact set from reaching draft assembly.
+
+## Consequences
+
+- SPEC-011 can finish its macOS and Linux distribution acceptance independently.
+- The product remains architecturally cross-platform, but Windows is not a
+  distributed or verified MVP target.
+- SPEC-019 must revisit the retained implementation, establish a reliable native
+  Windows build, and supply all installer, SmartScreen, lifecycle, profile, and
+  data-preservation evidence before Windows distribution is claimed.
+- SPEC-012 must assess only the completed SPEC-011 platform matrix and must not
+  claim Windows release readiness.
 
 ---
 

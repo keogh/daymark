@@ -74,7 +74,7 @@ describe('release assembly', () => {
       'utf8',
     );
 
-    expect(manifest.trim().split('\n')).toHaveLength(4);
+    expect(manifest.trim().split('\n')).toHaveLength(3);
     for (const artifact of expectedArtifactManifest('0.1.0')) {
       expect(manifest).toContain(`  ${artifact.name}\n`);
     }
@@ -144,7 +144,7 @@ describe('release assembly', () => {
       'Tagged commit: `abc123`',
       'Unsigned personal-testing prerelease',
       'Gatekeeper',
-      'SmartScreen',
+      'Windows packaging and distribution are deferred to SPEC-019',
       'Checksums verify transfer integrity; they do not authenticate the publisher',
       'Automatic updates and update checks are unavailable',
       'Uninstall removes installer-owned files but preserves',

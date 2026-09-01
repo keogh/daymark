@@ -128,21 +128,21 @@ export function releaseNotes(options: { commit: string; tag: string }): string {
   return (
     `# Daymark ${options.tag}\n\n` +
     `Tagged commit: \`${options.commit}\`\n\n` +
-    `> **Unsigned personal-testing prerelease.** These artifacts are not signed or notarized. macOS Gatekeeper and Windows SmartScreen may warn or block first launch. Install only files obtained from this repository's own GitHub Release page when you intentionally accept that warning. Checksums verify transfer integrity; they do not authenticate the publisher.\n\n` +
+    `> **Unsigned personal-testing prerelease.** The macOS artifacts are not signed or notarized, so Gatekeeper may warn or block first launch. Install only files obtained from this repository's own GitHub Release page when you intentionally accept that warning. Checksums verify transfer integrity; they do not authenticate the publisher.\n\n` +
     `## Downloads\n\n` +
     `| Target | File |\n| --- | --- |\n` +
     `| macOS 15+, Apple silicon | \`Daymark-${packageMetadata.version}-darwin-arm64.dmg\` |\n` +
     `| macOS 15+, Intel | \`Daymark-${packageMetadata.version}-darwin-x64.dmg\` |\n` +
-    `| Windows 11 x64 | \`Daymark-${packageMetadata.version}-win32-x64 Setup.exe\` |\n` +
     `| Ubuntu 24.04 LTS x64 | \`Daymark-${packageMetadata.version}-linux-x64.deb\` |\n\n` +
     `Verify downloads with \`SHA256SUMS.txt\` before installation.\n\n` +
     `## Expected unsigned warnings\n\n` +
-    `On macOS, first try opening Daymark, then use **System Settings → Privacy & Security → Open Anyway** for this application. On Windows, use the SmartScreen dialog's **More info → Run anyway** only after checking the source. Do not disable Gatekeeper, SmartScreen, antivirus, or other machine-wide security controls.\n\n` +
+    `On macOS, first try opening Daymark, then use **System Settings → Privacy & Security → Open Anyway** for this application. Do not disable Gatekeeper or other machine-wide security controls.\n\n` +
     `## Limitations and acceptance status\n\n` +
     `- Intended only for personal installation and testing; this is not a general-public production release.\n` +
     `- Automatic updates and update checks are unavailable.\n` +
     `- Uninstall removes installer-owned files but preserves the per-user Daymark profile and personal data.\n` +
     `- Downgrades are unsupported.\n` +
+    `- Windows packaging and distribution are deferred to SPEC-019 and are not part of this prerelease.\n` +
     `- Linux temporarily uses \`isaaczepeda@users.noreply.github.com\` as maintainer metadata and omits a homepage; both must be confirmed before signed or general-public distribution.\n` +
     `- Required clean-system installation and data-preservation acceptance evidence is **pending**. Keep this release draft until every required environment passes and a person approves publication.\n`
   );
