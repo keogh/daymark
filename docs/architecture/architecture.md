@@ -388,6 +388,18 @@ PRAGMA journal_mode = WAL;
 
 Do not introduce configuration only because it is conventional; benchmark or validate behavior where needed.
 
+## Interval overlap policy
+
+The application-service mutation path determines whether overlap is permitted.
+Manual interval creation rejects a conflict with any closed interval or the
+elapsed portion of the current open interval. Updating an existing closed
+interval may persist the same conflicts without changing the timer or `AppState`.
+The database continues to enforce at most one open interval globally.
+
+History, Task totals, and analytics project every persisted interval
+independently. Concurrent durations are additive and are not reduced to their
+wall-clock union.
+
 ---
 
 # 12. Repository Layer

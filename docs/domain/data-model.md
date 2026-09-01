@@ -522,9 +522,12 @@ Aug 14 = 30m
 
 ---
 
-# 16. Manual Interval Overlap
+# 16. Interval Overlap
 
-The MVP does not permit overlapping intervals.
+New manually created intervals must not overlap existing tracked intervals.
+Edits to existing closed intervals may create overlap with other closed intervals
+or with the elapsed portion of the current open interval. Such edits do not alter
+the current timer, and only one interval may remain open globally.
 
 Given proposed interval:
 
@@ -547,7 +550,12 @@ For currently open intervals:
 existingEnd = now/infinity
 ```
 
-The application should validate overlaps in the domain/service layer.
+The manual-creation service validates conflicts using this predicate. The
+closed-interval edit path does not perform conflict validation.
+
+Overlapping intervals remain distinct. Daily history, Task totals, and analytics
+sum each interval's applicable clipped duration independently rather than
+calculating the union of concurrent ranges.
 
 ---
 

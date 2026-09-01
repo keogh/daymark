@@ -137,7 +137,9 @@ This exists because users may:
 - forget to stop the timer;
 - record an incorrect period.
 
-Manual intervals must not overlap other tracked intervals.
+New manually created intervals must not overlap other tracked intervals. An edit
+to an existing closed interval may create overlap; every overlapping interval
+remains distinct and contributes its full duration to derived totals.
 
 ---
 

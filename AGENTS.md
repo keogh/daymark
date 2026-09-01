@@ -319,6 +319,12 @@ The following invariants must be enforced:
 - deleting a task deletes its intervals;
 - timer state transitions must be atomic.
 
+New manually created intervals must not overlap existing closed intervals or the
+elapsed portion of the current open interval. An edit to an existing closed
+interval may create those overlaps. Overlapping intervals remain independent and
+their durations are additive in history, Task totals, and analytics; only one
+interval may be open globally.
+
 Where possible, enforce important invariants both:
 
 - in application/domain logic;

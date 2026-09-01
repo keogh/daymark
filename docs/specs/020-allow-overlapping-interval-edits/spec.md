@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready for Implementation
 
 ## Milestone
 
@@ -470,6 +470,6 @@ Prefer the smallest service change that removes overlap rejection only from the
 closed-interval update path. Do not remove overlap protection from manual entry,
 open a second running interval, or change projection math.
 
-Before promoting this draft to `Ready for Implementation`, confirm the intended
-additive duration rule and accept the decision that partially supersedes DEC-026.
-
+The owner confirmed the additive duration rule and authorized post-MVP sequencing
+on 2026-09-01. DEC-039 records the accepted decision that partially supersedes
+DEC-026.

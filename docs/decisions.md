@@ -478,13 +478,16 @@ Design should not intentionally prevent adding it later.
 
 ## Status
 
-Accepted
+Partially superseded by DEC-039
 
 ## Decision
 
 The MVP supports manual time creation and correction.
 
 Manual intervals must not overlap existing tracked intervals.
+
+DEC-039 supersedes this restriction only for edits to existing closed intervals.
+It remains accepted for creation of new manual intervals.
 
 ---
 
@@ -822,3 +825,45 @@ matrix.
   claims signed general-public production distribution.
 - SPEC-012 defines the evidence ledger, defect policy, integrated regression,
   owner acceptance, and final decision contract.
+
+---
+
+# DEC-039 — Scoped Overlap for Closed-Interval Editing
+
+## Status
+
+Accepted
+
+## Decision
+
+An edit to an existing closed interval may create overlap with any closed
+interval or with the elapsed portion of the single currently open interval.
+Manual interval creation continues to reject overlap, and editing never permits a
+second open interval or changes the current timer.
+
+Overlapping intervals remain independent source-of-truth records. History, Task
+totals, and analytics add each interval's full applicable duration; they do not
+collapse concurrent ranges into their wall-clock union. Reported tracked duration
+may therefore exceed wall-clock duration.
+
+This decision supersedes DEC-026 only where its unqualified non-overlap statement
+applied to editing existing closed intervals. It also supersedes the global
+non-overlap invariant established by SPEC-006. DEC-026 and SPEC-005 remain
+authoritative for manual interval creation, and the one-open-interval invariant
+remains unchanged.
+
+## Context
+
+Legitimate correction can require preserving concurrent work records. The schema
+already permits overlapping closed intervals, while edit-specific service
+validation previously rejected them.
+
+## Consequences
+
+- Persistence may contain overlapping closed intervals created through editing.
+- A closed interval may overlap a running interval without pausing, stopping, or
+  otherwise mutating the timer or `AppState`.
+- Manual creation still rejects conflicts with closed intervals and the elapsed
+  portion of the open interval.
+- Projection arithmetic remains additive and requires no schema migration or
+  existing-data rewrite.

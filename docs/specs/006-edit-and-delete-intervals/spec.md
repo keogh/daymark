@@ -1,5 +1,9 @@
 # SPEC-006 — Edit and Delete Intervals
 
+> Historical acceptance record: SPEC-020 and DEC-039 supersede this
+> specification's edit-specific and global non-overlap requirements. Manual
+> interval creation and the single-open-interval invariant remain unchanged.
+
 ## Status
 
 Verified

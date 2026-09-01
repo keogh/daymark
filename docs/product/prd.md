@@ -494,7 +494,12 @@ An interval must satisfy:
 
     end > start
 
-Manual intervals must not overlap another recorded interval.
+New manually created intervals must not overlap another recorded interval. An
+edit to an existing closed interval may overlap another closed interval or the
+elapsed portion of the current running interval.
+
+Overlapping records contribute additively to derived totals rather than being
+collapsed into a union of wall-clock time.
 
 The application supports only one simultaneously active tracked task.
 

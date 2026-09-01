@@ -3,7 +3,7 @@
 ## Source
 
 - Specification: `docs/specs/020-allow-overlapping-interval-edits/spec.md`
-- Specification status: Draft
+- Specification status: Ready for Implementation
 - Last reviewed against specification: 2026-09-01
 
 The specification is the source of truth for behavior. This file only decomposes
@@ -29,7 +29,7 @@ to match the specification.
 
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
-| TASK-020-001 | Accept and document scoped overlap semantics | Pending | None | AC-020-004, AC-020-007 |
+| TASK-020-001 | Accept and document scoped overlap semantics | Complete | None | AC-020-004, AC-020-007 |
 | TASK-020-002 | Allow overlaps in the interval update service | Pending | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
 | TASK-020-003 | Reconcile edit boundary and renderer behavior | Pending | TASK-020-002 | AC-020-008 |
 | TASK-020-004 | Verify persistence, projections, and restart | Pending | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
@@ -43,7 +43,7 @@ to match the specification.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -89,7 +89,19 @@ sequencing must permit post-MVP product work.
 
 ### Completion Evidence
 
-Record the accepted decision, reviewed files, and contradiction audit.
+- 2026-09-01: Promoted SPEC-020 to `Ready for Implementation` after explicit
+  owner approval for post-MVP sequencing and additive duration semantics.
+- Added accepted DEC-039, which partially supersedes DEC-026 and SPEC-006 only
+  for closed-interval editing while retaining manual-creation conflict rejection
+  and the single-open-interval invariant.
+- Reconciled `AGENTS.md`, current product context and PRD, domain model,
+  architecture, Definition of Done, progress, and the historical SPEC-006
+  supersession pointer. Confirmed overlapping intervals remain distinct and all
+  projections add their applicable durations without union or deduplication.
+- `rg` contradiction audit found no unresolved universal non-overlap requirement
+  in current normative documentation. Remaining global wording is either
+  historical SPEC-006 text with its supersession pointer or explanatory text in
+  SPEC-020 and progress history. `git diff --check` passed.
 
 ---
 

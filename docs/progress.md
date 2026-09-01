@@ -299,6 +299,14 @@ renderer console.
 
 # Upcoming Specifications
 
+SPEC-020 — Allow Overlapping Interval Edits was promoted to Ready for
+Implementation on 2026-09-01 with explicit owner approval for post-MVP sequencing
+and additive overlap semantics. TASK-020-001 is complete: DEC-039 and current
+normative documentation now allow edit-created overlap while preserving manual
+creation rejection and the single-open-interval invariant. TASK-020-002 is next;
+SPEC-011 and SPEC-012 remain incomplete and are not implied complete by this
+sequencing exception.
+
 1. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation)
 2. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
    behind SPEC-011)

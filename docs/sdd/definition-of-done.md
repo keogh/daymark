@@ -75,7 +75,8 @@ Examples:
 
 - only one open timer interval;
 - valid interval timestamps;
-- no forbidden interval overlap;
+- manual interval creation rejects forbidden overlap while closed-interval edits
+  may create overlap;
 - valid task references.
 
 ---
