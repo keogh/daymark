@@ -30,7 +30,7 @@ to match the specification.
 | ID | Task | Status | Depends on | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | TASK-020-001 | Accept and document scoped overlap semantics | Complete | None | AC-020-004, AC-020-007 |
-| TASK-020-002 | Allow overlaps in the interval update service | Pending | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
+| TASK-020-002 | Allow overlaps in the interval update service | Complete | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
 | TASK-020-003 | Reconcile edit boundary and renderer behavior | Pending | TASK-020-002 | AC-020-008 |
 | TASK-020-004 | Verify persistence, projections, and restart | Pending | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
 | TASK-020-005 | Run final acceptance and reconcile documentation | Pending | TASK-020-004 | AC-020-001 through AC-020-009 |
@@ -109,7 +109,7 @@ sequencing must permit post-MVP product work.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -156,7 +156,20 @@ timer invariant.
 
 ### Completion Evidence
 
-Record focused commands, overlap cases, timer-state assertions, and results.
+- 2026-09-01: Removed closed-range and elapsed-open conflict checks from the
+  interval update transaction while retaining target existence, closed-only
+  mutation, valid-range validation, Task association, transaction rollback, and
+  authoritative timer-state guards.
+- Removed the update-only `findOverlappingClosedRangeExcluding` repository query;
+  retained the global closed-overlap query used by manual interval creation and
+  its existing behavior.
+- Added service coverage for partial overlap, containment, identical same-Task and
+  cross-Task ranges, multiple overlapping rows, and elapsed running time. Added
+  disposable-SQLite repository and integration assertions that other rows, the
+  open interval, and `AppState` remain unchanged.
+- Focused interval/repository/manual-time verification passed: 5 files and 48
+  tests. `npm run typecheck`, `npm run lint`, `git diff --check`, and the full
+  `npm test` suite passed (88 files, 731 tests).
 
 ---
 

@@ -164,9 +164,13 @@ describe('IntervalService', () => {
     expect(intervals.findOpen()).toEqual(openBefore);
   });
 
-  it('rejects overlap with another closed interval without mutation', () => {
+  it.each([
+    ['partial overlap', '10:30', '11:30'],
+    ['complete containment', '10:30', '12:30'],
+    ['identical range', '11:00', '12:00'],
+  ])('allows %s with a closed interval across tasks', (_case, startTime, endTime) => {
     const target = seedInterval();
-    seedInterval({
+    const neighbor = seedInterval({
       id: 'neighbor',
       taskId: 'task-2',
       startedAt: localTime(2026, 8, 13, 11),
@@ -177,18 +181,49 @@ describe('IntervalService', () => {
       service.update({
         intervalId: target.id,
         startDate: '2026-08-13',
-        startTime: '10:30',
+        startTime,
         endDate: '2026-08-13',
-        endTime: '11:30',
+        endTime,
       }),
-    ).toMatchObject({
-      ok: false,
-      error: { code: 'TIME_INTERVAL_OVERLAP' },
+    ).toEqual({ ok: true, value: { intervalId: target.id } });
+    expect(intervals.findById(target.id)).toMatchObject({
+      id: target.id,
+      taskId: target.taskId,
+      startedAt: localTime(2026, 8, 13, ...clockParts(startTime)),
+      endedAt: localTime(2026, 8, 13, ...clockParts(endTime)),
+      createdAt: target.createdAt,
     });
-    expect(intervals.findById(target.id)).toEqual(target);
+    expect(intervals.findById(neighbor.id)).toEqual(neighbor);
   });
 
-  it('rejects overlap with elapsed running time and leaves timer state unchanged', () => {
+  it('allows an identical range on the same task and overlap across multiple closed intervals', () => {
+    const target = seedInterval();
+    const first = seedInterval({
+      id: 'first',
+      startedAt: localTime(2026, 8, 13, 10),
+      endedAt: localTime(2026, 8, 13, 12),
+    });
+    const second = seedInterval({
+      id: 'second',
+      taskId: 'task-2',
+      startedAt: localTime(2026, 8, 13, 11),
+      endedAt: localTime(2026, 8, 13, 12),
+    });
+
+    expect(
+      service.update({
+        intervalId: target.id,
+        startDate: '2026-08-13',
+        startTime: '10:00',
+        endDate: '2026-08-13',
+        endTime: '12:00',
+      }),
+    ).toEqual({ ok: true, value: { intervalId: target.id } });
+    expect(intervals.findById(first.id)).toEqual(first);
+    expect(intervals.findById(second.id)).toEqual(second);
+  });
+
+  it('allows overlap with elapsed running time and leaves timer state unchanged', () => {
     const target = seedInterval();
     seedRunningState(localTime(2026, 8, 14, 11, 30));
     const stateBefore = appState.get();
@@ -202,11 +237,13 @@ describe('IntervalService', () => {
         endDate: '2026-08-14',
         endTime: '12:30',
       }),
-    ).toMatchObject({
-      ok: false,
-      error: { code: 'TIME_INTERVAL_OVERLAP' },
+    ).toEqual({ ok: true, value: { intervalId: target.id } });
+    expect(intervals.findById(target.id)).toMatchObject({
+      id: target.id,
+      taskId: target.taskId,
+      startedAt: localTime(2026, 8, 14, 11, 45),
+      endedAt: localTime(2026, 8, 14, 12, 30),
     });
-    expect(intervals.findById(target.id)).toEqual(target);
     expect(intervals.findOpen()).toEqual(openBefore);
     expect(appState.get()).toEqual(stateBefore);
   });
@@ -374,6 +411,11 @@ describe('IntervalService', () => {
 });
 
 const minutes = (value: number): number => value * 60_000;
+
+const clockParts = (value: string): [number, number] => {
+  const [hour, minute] = value.split(':').map(Number);
+  return [hour ?? 0, minute ?? 0];
+};
 
 const localTime = (
   year: number,

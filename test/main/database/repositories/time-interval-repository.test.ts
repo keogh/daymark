@@ -48,13 +48,13 @@ describe('TimeIntervalRepository', () => {
     expect(repository.close(interval.id, 1_600, 1_600)).toBeUndefined();
   });
 
-  it('updates exactly one closed interval while preserving identity and task', () => {
+  it('updates exactly one closed interval to an overlapping range while preserving identity and task', () => {
     const target = createInterval();
     const other = createInterval({
       id: 'interval-2',
       taskId: 'task-2',
-      startedAt: 2_000,
-      endedAt: 2_200,
+      startedAt: 1_200,
+      endedAt: 1_600,
     });
     repository.insert(target);
     repository.insert(other);
@@ -227,25 +227,6 @@ describe('TimeIntervalRepository', () => {
       taskOneOverlap,
       taskTwoOverlap,
     ]);
-  });
-
-  it('excludes the correction target from global closed overlap detection', () => {
-    const target = createInterval();
-    const overlap = createInterval({
-      id: 'overlap',
-      taskId: 'task-2',
-      startedAt: 1_150,
-      endedAt: 1_300,
-    });
-    repository.insert(target);
-    repository.insert(overlap);
-
-    expect(
-      repository.findOverlappingClosedRangeExcluding(target.id, 1_000, 1_200),
-    ).toEqual([overlap]);
-    expect(
-      repository.findOverlappingClosedRangeExcluding(target.id, 900, 1_150),
-    ).toEqual([]);
   });
 
   it('lists all intervals for a task and preserves task deletion cascade', () => {

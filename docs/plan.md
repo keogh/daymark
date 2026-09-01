@@ -2,7 +2,7 @@
 
 Specification: SPEC-020 — Allow Overlapping Interval Edits
 
-Task: TASK-020-001 — Accept and Document Scoped Overlap Semantics
+Task: TASK-020-002 — Allow Overlaps in the Interval Update Service
 
 ## Status
 
@@ -12,9 +12,10 @@ Complete
 
 # Immediate Steps
 
-1. Promote SPEC-020 after the owner's sequencing and semantic approval.
-2. Add the accepted scoped-overlap decision.
-3. Reconcile current product, domain, architecture, agent, and Definition of Done
-   documentation while preserving historical specification records.
-4. Audit current normative documentation for contradictory universal non-overlap
-   requirements and inspect the scoped diff.
+1. Remove closed-range and elapsed-open conflict detection from interval updates.
+2. Remove the edit-only repository query and replace its coverage with overlapping
+   closed-update persistence coverage.
+3. Add focused service and SQLite integration coverage for partial, containment,
+   identical, cross-Task, multiple, and running-timer overlap cases.
+4. Run focused interval, repository, and manual-time regression tests plus affected
+   type checking.

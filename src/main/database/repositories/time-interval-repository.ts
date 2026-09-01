@@ -8,7 +8,6 @@ import {
   isNull,
   lt,
   lte,
-  ne,
   or,
 } from 'drizzle-orm';
 
@@ -129,26 +128,6 @@ export class TimeIntervalRepository {
       .from(timeIntervals)
       .where(
         and(
-          isNotNull(timeIntervals.endedAt),
-          lt(timeIntervals.startedAt, rangeEndedAt),
-          gt(timeIntervals.endedAt, rangeStartedAt),
-        ),
-      )
-      .orderBy(asc(timeIntervals.startedAt))
-      .all();
-  }
-
-  findOverlappingClosedRangeExcluding(
-    excludedIntervalId: string,
-    rangeStartedAt: number,
-    rangeEndedAt: number,
-  ): TimeInterval[] {
-    return this.#db
-      .select()
-      .from(timeIntervals)
-      .where(
-        and(
-          ne(timeIntervals.id, excludedIntervalId),
           isNotNull(timeIntervals.endedAt),
           lt(timeIntervals.startedAt, rangeEndedAt),
           gt(timeIntervals.endedAt, rangeStartedAt),

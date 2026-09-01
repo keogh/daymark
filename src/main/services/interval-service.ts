@@ -132,17 +132,6 @@ export class IntervalService {
     const openBefore = this.#intervals.findOpen();
     this.#stateReader.getStateAt(now);
 
-    if (
-      this.#intervals.findOverlappingClosedRangeExcluding(
-        target.id,
-        command.startedAt,
-        command.endedAt,
-      ).length > 0 ||
-      overlapsOpenInterval(openBefore, now, command)
-    ) {
-      return timeIntervalOverlap();
-    }
-
     const updated = this.#intervals.updateClosed(
       target.id,
       command.startedAt,
@@ -169,15 +158,6 @@ export class IntervalService {
     return { ok: true, value: { intervalId: updated.id } };
   }
 }
-
-const overlapsOpenInterval = (
-  openInterval: TimeInterval | undefined,
-  now: number,
-  input: { readonly startedAt: number; readonly endedAt: number },
-): boolean =>
-  openInterval !== undefined &&
-  input.startedAt < now &&
-  input.endedAt > openInterval.startedAt;
 
 const sameAppState = (
   left: ReturnType<AppStateRepository['get']>,
@@ -215,14 +195,6 @@ const openIntervalNotEditable = (): AppResult<never> => ({
   error: {
     code: 'OPEN_INTERVAL_NOT_EDITABLE',
     message: 'A running interval cannot be edited.',
-  },
-});
-
-const timeIntervalOverlap = (): AppResult<never> => ({
-  ok: false,
-  error: {
-    code: 'TIME_INTERVAL_OVERLAP',
-    message: 'The proposed interval overlaps an existing interval.',
   },
 });
 
