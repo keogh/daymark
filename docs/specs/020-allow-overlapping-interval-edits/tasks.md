@@ -33,7 +33,7 @@ to match the specification.
 | TASK-020-002 | Allow overlaps in the interval update service | Complete | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
 | TASK-020-003 | Reconcile edit boundary and renderer behavior | Complete | TASK-020-002 | AC-020-008 |
 | TASK-020-004 | Verify persistence, projections, and restart | Complete | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
-| TASK-020-005 | Run final acceptance and reconcile documentation | Pending | TASK-020-004 | AC-020-001 through AC-020-009 |
+| TASK-020-005 | Run final acceptance and reconcile documentation | Complete | TASK-020-004 | AC-020-001 through AC-020-009 |
 
 ---
 
@@ -314,7 +314,7 @@ invariants.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -365,8 +365,45 @@ documentation accurately describes the scoped rule.
 
 ### Completion Evidence
 
-Record full commands, test counts, packaged environment and profile isolation,
-acceptance results, documentation changes, and any deviations.
+- 2026-09-02: `npm run format:check`, `npm run typecheck`, `npm run lint`, and
+  `npm test` passed; the complete suite contained 88 files and 735 tests.
+  `npm run package` produced the macOS arm64 package successfully. The build
+  emitted only the existing Vite `inlineDynamicImports` deprecation warning.
+- Browser plugin tooling was unavailable, so packaged rendered acceptance used
+  the established Electron CDP fallback against
+  `out/Daymark-darwin-arm64/Daymark.app` at its normal viewport. The unique
+  Chromium root `/tmp/daymark-spec020-final-root.0dA2JF/Chromium` resolved by the
+  application identity contract to the isolated profile
+  `/tmp/daymark-spec020-final-root.0dA2JF/Daymark`; the ordinary macOS Daymark
+  profile was not opened or modified.
+- The packaged workflow created adjacent one-hour Alpha and Beta intervals, then
+  edited Alpha to 10:30–11:30 over Beta's 10:00–11:00 range. The dialog followed
+  its ordinary success path without overlap feedback. Daily History and
+  Analytics retained both full one-hour contributions, reporting two hours for
+  the pair rather than their 90-minute wall-clock union.
+- While `Acceptance Running` remained active, the workflow edited a separate
+  closed Gamma interval across the timer's elapsed range. The running Task and
+  controls remained unchanged. A manual 10:45–11:00 creation attempt was still
+  rejected with `This time overlaps an existing entry. Choose a different time
+  range.` and created no Task or interval.
+- After a complete process termination and relaunch with the same isolated
+  profile, the packaged renderer reconstructed `Acceptance Running`, retained
+  Alpha at 10:30–11:30 and the edited Gamma interval, and continued to report
+  additive Alpha and Beta totals. Direct SQLite inspection confirmed all closed
+  rows, exactly one open `Acceptance Running` row, and running `AppState` with
+  matching Task, open-interval, and session timestamps.
+- Both packaged phases rendered the Daymark file URL with meaningful content,
+  no framework error overlay, no renderer warning/error or exception, and no
+  HTTP(S) resource request. Screenshots were captured outside the repository at
+  `/tmp/daymark-spec020-before-restart.png` and
+  `/tmp/daymark-spec020-after-restart.png`.
+- AC-020-001 through AC-020-009 were audited against focused service,
+  repository, disposable-SQLite integration, IPC/preload, renderer, full-suite,
+  and packaged evidence and all passed. The current normative-document audit
+  found no unresolved universal non-overlap statement; DEC-039 remains accurate,
+  SPEC-005 remains authoritative for manual creation, and historical SPEC-006
+  retains its explicit supersession pointer. No additional normative edit was
+  required.
 
 ---
 

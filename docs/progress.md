@@ -2,22 +2,26 @@
 
 ## Current Phase
 
-Daymark Product Rename complete
+Post-MVP interval correction refinement
 
 ## Current Specification
 
-SPEC-014 — Daymark Product Rename (Verified 2026-08-23)
+SPEC-020 — Allow Overlapping Interval Edits (Verified 2026-09-02)
 
 ## Current Status
 
-SPEC-014 is Verified under DEC-037. Daymark now uses one consistent visible and
+SPEC-020 is Verified under DEC-039. Closed-interval edits may now create overlap
+with closed intervals or the elapsed open interval, while manual creation still
+rejects overlap and only one interval may remain open. Every interval contributes
+its full applicable duration to history, Task totals, and analytics. Final
+acceptance passed formatting, typecheck, lint, all 735 tests in 88 files, macOS
+arm64 packaging, isolated packaged edit/running/manual-create/restart workflows,
+documentation and acceptance-criteria audits, and final diff checks.
+
+SPEC-014 remains Verified under DEC-037. Daymark uses one consistent visible and
 technical identity across renderer, desktop integration, package metadata,
 platform identifiers, CI artifacts, `Daymark/daymark.sqlite`, `window.daymark`,
-tests, and documentation. No compatibility or import path exists for an earlier
-owner-only development profile. Final acceptance passed all 721 tests, formatting,
-typecheck, lint, release validation, and macOS arm64 make/inspection. The rebuilt
-DMG contains `Daymark.app` with executable `Daymark` and bundle ID
-`com.isaaczepeda.daymark`; the tracked tree contains no earlier product identifier.
+tests, and documentation.
 
 SPEC-000 maintenance TASK-000-013 is complete. Development launches now select a
 separate OS-appropriate Electron `userData` directory before readiness. Packaged
@@ -102,6 +106,7 @@ are complete.
 - SPEC-009 — Analytics (Verified 2026-08-22)
 - SPEC-010 — Settings and UX Polish (Verified 2026-08-22)
 - SPEC-014 — Daymark Product Rename (Verified 2026-08-23)
+- SPEC-020 — Allow Overlapping Interval Edits (Verified 2026-09-02)
 
 SPEC-010 delivered:
 
@@ -299,17 +304,10 @@ renderer console.
 
 # Upcoming Specifications
 
-SPEC-020 — Allow Overlapping Interval Edits was promoted to Ready for
-Implementation on 2026-09-01 with explicit owner approval for post-MVP sequencing
-and additive overlap semantics. TASK-020-001 is complete: DEC-039 and current
-normative documentation now allow edit-created overlap while preserving manual
-creation rejection and the single-open-interval invariant. TASK-020-002 through
-TASK-020-004 are also complete: closed-interval updates accept overlap, the edit
-UI follows its ordinary success path, and disposable-SQLite coverage verifies
-additive history and analytics, persisted restart reconstruction with a running
-timer, and unchanged manual-creation guards. TASK-020-005 final acceptance is
-next; SPEC-011 and SPEC-012 remain incomplete and are not implied complete by
-this sequencing exception.
+SPEC-020 was verified on 2026-09-02 after all five tasks, AC-020-001 through
+AC-020-009, complete repository validation, macOS arm64 packaging, and isolated
+packaged restart acceptance passed. This authorized post-MVP sequencing exception
+does not imply that SPEC-011 or SPEC-012 is complete.
 
 1. SPEC-011 — Cross-Platform Packaging and Distribution (Ready for Implementation)
 2. SPEC-012 — MVP QA and Release Readiness (Ready for Implementation; queued
