@@ -46,6 +46,20 @@ describe('interval mutation IPC handlers', () => {
     expect(operations.synchronize?.refreshAfter).toHaveBeenCalledTimes(2);
   });
 
+  it('passes a successful overlapping update through the existing synchronization boundary', () => {
+    const operations = createOperations();
+    const { handlers } = setup({ error: vi.fn() }, operations);
+
+    expect(
+      getHandler(handlers, INTERVALS_UPDATE_CHANNEL)({}, updateInput),
+    ).toEqual({ ok: true, value: { intervalId: 'interval-1' } });
+    expect(operations.commands.update).toHaveBeenCalledWith(updateInput);
+    expect(operations.synchronize?.refreshAfter).toHaveBeenCalledWith({
+      ok: true,
+      value: { intervalId: 'interval-1' },
+    });
+  });
+
   it.each([
     [INTERVALS_UPDATE_CHANNEL, undefined, 'INVALID_INTERVAL_UPDATE'],
     [

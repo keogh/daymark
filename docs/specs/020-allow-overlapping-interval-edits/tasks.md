@@ -31,7 +31,7 @@ to match the specification.
 | --- | --- | --- | --- | --- |
 | TASK-020-001 | Accept and document scoped overlap semantics | Complete | None | AC-020-004, AC-020-007 |
 | TASK-020-002 | Allow overlaps in the interval update service | Complete | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
-| TASK-020-003 | Reconcile edit boundary and renderer behavior | Pending | TASK-020-002 | AC-020-008 |
+| TASK-020-003 | Reconcile edit boundary and renderer behavior | Complete | TASK-020-002 | AC-020-008 |
 | TASK-020-004 | Verify persistence, projections, and restart | Pending | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
 | TASK-020-005 | Run final acceptance and reconcile documentation | Pending | TASK-020-004 | AC-020-001 through AC-020-009 |
 
@@ -177,7 +177,7 @@ timer invariant.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -222,7 +222,22 @@ process-boundary behavior remains intact.
 
 ### Completion Evidence
 
-Record focused commands, UI states verified, and results.
+- 2026-09-01: Removed the Edit interval dialog's edit-specific
+  `TIME_INTERVAL_OVERLAP` guidance while preserving invalid-range, missing-target,
+  open-target, generic retry, entered-value, pending, cancellation, and focus
+  behavior. The shared public error contract remains unchanged for manual entry.
+- Added direct dialog coverage showing valid overlapping values follow the normal
+  save, authoritative-refresh, and close path without a warning or confirmation;
+  an unexpected stale overlap result now receives generic edit failure guidance.
+- Added Daily History coverage with a second conflicting persisted interval to
+  verify the update payload, authoritative refresh, dialog closure, absence of an
+  overlap alert, and focus restoration. Added IPC synchronization coverage for a
+  successful overlapping update and retained preload validation coverage.
+- Manual-entry renderer regression coverage confirms its overlap-specific message
+  remains. Focused boundary/renderer verification passed (5 files, 88 tests), as
+  did `npm run typecheck`, `npm run lint`, `git diff --check`, and the full
+  `npm test` suite (88 files, 734 tests). The tightened conflicting-history fixture
+  also passed its focused 26-test file and a final typecheck.
 
 ---
 

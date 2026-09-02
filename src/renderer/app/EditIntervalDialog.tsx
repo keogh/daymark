@@ -29,8 +29,6 @@ const editErrorMessage = (error: AppError): string => {
   switch (error.code) {
     case 'INVALID_INTERVAL_UPDATE':
       return 'Enter a valid range whose end is after its start.';
-    case 'TIME_INTERVAL_OVERLAP':
-      return 'This time overlaps an existing entry. Choose a different range.';
     case 'TIME_INTERVAL_NOT_FOUND':
       return 'This time entry no longer exists. Close the dialog and refresh history.';
     case 'OPEN_INTERVAL_NOT_EDITABLE':

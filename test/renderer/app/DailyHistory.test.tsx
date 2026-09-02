@@ -452,6 +452,72 @@ describe('DailyHistory', () => {
     await waitFor(() => expect(edit).toHaveFocus());
   });
 
+  it('saves overlapping edit values, refreshes authoritatively, closes, and restores focus', async () => {
+    const update = vi.fn().mockResolvedValue({
+      ok: true,
+      value: { intervalId: 'interval-1' },
+    });
+    const onIntervalSaved = vi.fn().mockResolvedValue(undefined);
+    const conflictingPage: HistoryPage = {
+      ...loadedPage,
+      days: [
+        {
+          ...loadedPage.days[0]!,
+          tasks: [
+            loadedPage.days[0]!.tasks[0]!,
+            {
+              ...loadedPage.days[0]!.tasks[1]!,
+              intervals: [
+                {
+                  ...loadedPage.days[0]!.tasks[1]!.intervals[0]!,
+                  startedAt: new Date(2026, 7, 14, 10, 30).getTime(),
+                  endedAt: new Date(2026, 7, 14, 12).getTime(),
+                },
+              ],
+            },
+          ],
+        },
+        loadedPage.days[1]!,
+      ],
+    };
+    setHistoryApi(
+      vi.fn().mockResolvedValue({ ok: true, value: conflictingPage }),
+      { updateInterval: update },
+    );
+    render(<DailyHistory onIntervalSaved={onIntervalSaved} />);
+    fireEvent.click(
+      (
+        await screen.findAllByRole('button', {
+          name: 'Implement authentication',
+        })
+      )[0]!,
+    );
+    const edit = screen.getByRole('button', {
+      name: /Edit Implement authentication, .* to/,
+    });
+    fireEvent.click(edit);
+    fireEvent.change(screen.getByLabelText('Start time'), {
+      target: { value: '09:30' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '11:30' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(onIntervalSaved).toHaveBeenCalledOnce());
+    expect(update).toHaveBeenCalledWith({
+      intervalId: 'interval-1',
+      startDate: '2026-08-14',
+      startTime: '09:30',
+      endDate: '2026-08-14',
+      endTime: '11:30',
+    });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() => expect(edit).toHaveFocus());
+  });
+
   it('renders state-aware history-row play labels for idle, paused, and running states', async () => {
     setHistoryApi(vi.fn().mockResolvedValue({ ok: true, value: loadedPage }));
 
@@ -848,12 +914,21 @@ const setHistoryApi = (
   taskOverrides: {
     readonly delete?: ReturnType<typeof vi.fn>;
     readonly getDeletionSummary?: ReturnType<typeof vi.fn>;
+    readonly updateInterval?: ReturnType<typeof vi.fn>;
   } = {},
 ) => {
   Object.defineProperty(window, 'daymark', {
     configurable: true,
     value: {
       history: { getPage },
+      intervals: {
+        update:
+          taskOverrides.updateInterval ??
+          vi.fn().mockResolvedValue({
+            ok: true,
+            value: { intervalId: 'interval-1' },
+          }),
+      },
       tasks: {
         rename: vi.fn().mockResolvedValue({
           ok: true,

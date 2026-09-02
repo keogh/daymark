@@ -95,7 +95,34 @@ describe('EditIntervalDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('preserves corrected values and presents a controlled overlap failure inline', async () => {
+  it('treats valid overlapping values as a normal success without warning or confirmation', async () => {
+    const update = setUpdateApi(
+      vi.fn().mockResolvedValue({
+        ok: true,
+        value: { intervalId: 'interval-1' },
+      }),
+    );
+    const onSaved = vi.fn().mockResolvedValue(undefined);
+    const onOpenChange = vi.fn();
+    renderDialog({ onOpenChange, onSaved });
+    fireEvent.change(screen.getByLabelText('Start time'), {
+      target: { value: '22:45' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '23:45' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(onSaved).toHaveBeenCalledOnce());
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ startTime: '22:45', endTime: '23:45' }),
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('does not expose edit-specific guidance for an unexpected overlap result', async () => {
     setUpdateApi(
       vi.fn().mockResolvedValue({
         ok: false,
@@ -110,8 +137,9 @@ describe('EditIntervalDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'overlaps an existing entry',
+      'could not be saved',
     );
+    expect(screen.getByRole('alert')).not.toHaveTextContent(/overlap/i);
     expect(screen.getByLabelText('Start time')).toHaveValue('22:45');
     expect(screen.getByRole('dialog')).toBeVisible();
   });
