@@ -2,7 +2,7 @@
 
 Specification: SPEC-020 — Allow Overlapping Interval Edits
 
-Task: TASK-020-003 — Reconcile Edit Boundary and Renderer Behavior
+Task: TASK-020-004 — Verify Persistence, Projections, and Restart
 
 ## Status
 
@@ -12,10 +12,11 @@ Complete
 
 # Immediate Steps
 
-1. Remove edit-specific overlap guidance while preserving all remaining error
-   handling and entered values.
-2. Add Edit dialog and Daily History coverage for successful overlapping values,
-   authoritative refresh, dialog closure, and focus restoration.
-3. Confirm IPC/preload validation and the public update contract remain unchanged.
-4. Run focused interval boundary, renderer edit, and manual-entry regression tests
-   plus typecheck and lint.
+1. Add a disposable-SQLite scenario that creates overlapping closed intervals
+   through editing while a timer remains running.
+2. Verify additive history and analytics totals, all persisted interval records,
+   and unchanged reconstructed timer state after a full database restart.
+3. Verify manual creation still rejects both edit-created closed overlap and
+   elapsed-open overlap without mutation.
+4. Run focused projection, interval, timer reconstruction, manual-entry, and
+   repository integration tests, then typecheck and lint.

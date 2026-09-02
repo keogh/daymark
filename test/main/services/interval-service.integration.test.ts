@@ -1,14 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { DatabaseContext } from '@/main/database/database';
+import { AnalyticsQueryRepository } from '@/main/database/repositories/analytics-query-repository';
 import { AppStateRepository } from '@/main/database/repositories/app-state-repository';
 import { HistoryQueryRepository } from '@/main/database/repositories/history-query-repository';
+import { SettingsRepository } from '@/main/database/repositories/settings-repository';
 import { TaskRepository } from '@/main/database/repositories/task-repository';
 import { TimeIntervalRepository } from '@/main/database/repositories/time-interval-repository';
 import { TransactionRunner } from '@/main/database/transaction-runner';
+import { AnalyticsService } from '@/main/services/analytics-service';
 import { DurationProjector } from '@/main/services/duration-projections';
 import { HistoryService } from '@/main/services/history-service';
 import { IntervalService } from '@/main/services/interval-service';
+import { ManualTimeService } from '@/main/services/manual-time-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 
 import {
@@ -29,12 +33,32 @@ describe('IntervalService SQLite integration', () => {
   let reader: TimerStateReader;
   let service: IntervalService;
   let history: HistoryService;
+  let analytics: AnalyticsService;
+  let manualTime: ManualTimeService;
 
   beforeEach(async () => {
     process.env.TZ = 'America/New_York';
     fixture = await createDisposableDatabase();
-    context = fixture.lifecycle.initialize();
     clock = new FakeClock(localTime(2026, 8, 15, 12));
+    initializeApplication();
+    tasks.insert({
+      id: 'task-1',
+      description: 'Correction Task',
+      normalizedDescription: 'correction task',
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    tasks.insert({
+      id: 'task-2',
+      description: 'Running Task',
+      normalizedDescription: 'running task',
+      createdAt: 100,
+      updatedAt: 100,
+    });
+  });
+
+  const initializeApplication = (): void => {
+    context = fixture.lifecycle.initialize();
     tasks = new TaskRepository(context.db);
     intervals = new TimeIntervalRepository(context.db);
     appState = new AppStateRepository(context.db);
@@ -56,21 +80,21 @@ describe('IntervalService SQLite integration', () => {
       clock,
       historyQueries: new HistoryQueryRepository(context.db),
     });
-    tasks.insert({
-      id: 'task-1',
-      description: 'Correction Task',
-      normalizedDescription: 'correction task',
-      createdAt: 100,
-      updatedAt: 100,
+    analytics = new AnalyticsService({
+      clock,
+      analyticsQueries: new AnalyticsQueryRepository(context.db),
+      settings: new SettingsRepository(context.db),
     });
-    tasks.insert({
-      id: 'task-2',
-      description: 'Running Task',
-      normalizedDescription: 'running task',
-      createdAt: 100,
-      updatedAt: 100,
+    manualTime = new ManualTimeService({
+      appState,
+      tasks,
+      intervals,
+      transactions: new TransactionRunner(context.sqlite),
+      stateReader: reader,
+      clock,
+      generateId: () => 'unexpected-manual-id',
     });
-  });
+  };
 
   afterEach(async () => {
     process.env.TZ = originalTimezone;
@@ -195,6 +219,130 @@ describe('IntervalService SQLite integration', () => {
       currentTask: { id: 'task-2' },
       activeIntervalStartedAt: openStartedAt,
     });
+  });
+
+  it('restarts with edit-created overlaps, additive projections, and creation guards intact', () => {
+    const openStartedAt = localTime(2026, 8, 15, 11);
+    intervals.insert({
+      id: 'target',
+      taskId: 'task-1',
+      startedAt: localTime(2026, 8, 15, 8),
+      endedAt: localTime(2026, 8, 15, 9),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'other',
+      taskId: 'task-2',
+      startedAt: localTime(2026, 8, 15, 9, 30),
+      endedAt: localTime(2026, 8, 15, 11, 30),
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    intervals.insert({
+      id: 'open',
+      taskId: 'task-2',
+      startedAt: openStartedAt,
+      endedAt: null,
+      createdAt: 100,
+      updatedAt: 100,
+    });
+    context.sqlite
+      .prepare(
+        'update app_state set timer_status = ?, current_task_id = ?, session_started_at = ?, updated_at = ? where id = 1',
+      )
+      .run('running', 'task-2', openStartedAt, 100);
+
+    expect(
+      service.update({
+        intervalId: 'target',
+        startDate: '2026-08-15',
+        startTime: '10:00',
+        endDate: '2026-08-15',
+        endTime: '12:00',
+      }),
+    ).toEqual({ ok: true, value: { intervalId: 'target' } });
+
+    fixture.lifecycle.close();
+    initializeApplication();
+
+    expect(intervals.findByTask('task-1')).toEqual([
+      expect.objectContaining({
+        id: 'target',
+        taskId: 'task-1',
+        startedAt: localTime(2026, 8, 15, 10),
+        endedAt: localTime(2026, 8, 15, 12),
+      }),
+    ]);
+    expect(intervals.findByTask('task-2')).toEqual([
+      expect.objectContaining({ id: 'other' }),
+      expect.objectContaining({ id: 'open', endedAt: null }),
+    ]);
+    expect(reader.getState()).toMatchObject({
+      status: 'running',
+      currentTask: { id: 'task-2' },
+      sessionStartedAt: openStartedAt,
+      activeIntervalStartedAt: openStartedAt,
+      sessionDurationMs: minutes(60),
+      taskTodayDurationMs: minutes(180),
+      taskLifetimeDurationMs: minutes(180),
+    });
+
+    const today = history.getPage({}).days[0]!;
+    expect(today.totalDurationMs).toBe(minutes(300));
+    expect(today.tasks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          task: { id: 'task-1', description: 'Correction Task' },
+          dayDurationMs: minutes(120),
+          lifetimeDurationMs: minutes(120),
+        }),
+        expect.objectContaining({
+          task: { id: 'task-2', description: 'Running Task' },
+          dayDurationMs: minutes(180),
+          lifetimeDurationMs: minutes(180),
+        }),
+      ]),
+    );
+    expect(today.tasks.flatMap((task) => task.intervals)).toHaveLength(3);
+
+    expect(analytics.getSummary({ range: 'last-7-days' })).toMatchObject({
+      totalDurationMs: minutes(300),
+      topTasks: [
+        { task: { id: 'task-2' }, durationMs: minutes(180) },
+        { task: { id: 'task-1' }, durationMs: minutes(120) },
+      ],
+      runningTask: {
+        task: { id: 'task-2' },
+        durationMs: minutes(180),
+        intervalStartedAt: openStartedAt,
+      },
+    });
+
+    const stateBeforeRejectedCreates = appState.get();
+    const intervalsBeforeRejectedCreates = context.sqlite
+      .prepare('select * from time_intervals order by id')
+      .all();
+    expect(
+      manualTime.createInterval({
+        taskId: 'task-1',
+        date: '2026-08-15',
+        startTime: '10:15',
+        endTime: '10:45',
+      }),
+    ).toMatchObject({ ok: false, error: { code: 'TIME_INTERVAL_OVERLAP' } });
+    expect(
+      manualTime.createInterval({
+        taskId: 'task-1',
+        date: '2026-08-15',
+        startTime: '11:45',
+        endTime: '12:15',
+      }),
+    ).toMatchObject({ ok: false, error: { code: 'TIME_INTERVAL_OVERLAP' } });
+    expect(appState.get()).toEqual(stateBeforeRejectedCreates);
+    expect(
+      context.sqlite.prepare('select * from time_intervals order by id').all(),
+    ).toEqual(intervalsBeforeRejectedCreates);
   });
 
   it('edits a closed current-session interval while preserving running state and refreshing timer totals', () => {

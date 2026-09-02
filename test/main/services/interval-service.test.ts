@@ -168,33 +168,36 @@ describe('IntervalService', () => {
     ['partial overlap', '10:30', '11:30'],
     ['complete containment', '10:30', '12:30'],
     ['identical range', '11:00', '12:00'],
-  ])('allows %s with a closed interval across tasks', (_case, startTime, endTime) => {
-    const target = seedInterval();
-    const neighbor = seedInterval({
-      id: 'neighbor',
-      taskId: 'task-2',
-      startedAt: localTime(2026, 8, 13, 11),
-      endedAt: localTime(2026, 8, 13, 12),
-    });
+  ])(
+    'allows %s with a closed interval across tasks',
+    (_case, startTime, endTime) => {
+      const target = seedInterval();
+      const neighbor = seedInterval({
+        id: 'neighbor',
+        taskId: 'task-2',
+        startedAt: localTime(2026, 8, 13, 11),
+        endedAt: localTime(2026, 8, 13, 12),
+      });
 
-    expect(
-      service.update({
-        intervalId: target.id,
-        startDate: '2026-08-13',
-        startTime,
-        endDate: '2026-08-13',
-        endTime,
-      }),
-    ).toEqual({ ok: true, value: { intervalId: target.id } });
-    expect(intervals.findById(target.id)).toMatchObject({
-      id: target.id,
-      taskId: target.taskId,
-      startedAt: localTime(2026, 8, 13, ...clockParts(startTime)),
-      endedAt: localTime(2026, 8, 13, ...clockParts(endTime)),
-      createdAt: target.createdAt,
-    });
-    expect(intervals.findById(neighbor.id)).toEqual(neighbor);
-  });
+      expect(
+        service.update({
+          intervalId: target.id,
+          startDate: '2026-08-13',
+          startTime,
+          endDate: '2026-08-13',
+          endTime,
+        }),
+      ).toEqual({ ok: true, value: { intervalId: target.id } });
+      expect(intervals.findById(target.id)).toMatchObject({
+        id: target.id,
+        taskId: target.taskId,
+        startedAt: localTime(2026, 8, 13, ...clockParts(startTime)),
+        endedAt: localTime(2026, 8, 13, ...clockParts(endTime)),
+        createdAt: target.createdAt,
+      });
+      expect(intervals.findById(neighbor.id)).toEqual(neighbor);
+    },
+  );
 
   it('allows an identical range on the same task and overlap across multiple closed intervals', () => {
     const target = seedInterval();

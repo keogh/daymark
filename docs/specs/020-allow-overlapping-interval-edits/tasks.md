@@ -32,7 +32,7 @@ to match the specification.
 | TASK-020-001 | Accept and document scoped overlap semantics | Complete | None | AC-020-004, AC-020-007 |
 | TASK-020-002 | Allow overlaps in the interval update service | Complete | TASK-020-001 | AC-020-001, AC-020-002, AC-020-003, AC-020-005, AC-020-006 |
 | TASK-020-003 | Reconcile edit boundary and renderer behavior | Complete | TASK-020-002 | AC-020-008 |
-| TASK-020-004 | Verify persistence, projections, and restart | Pending | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
+| TASK-020-004 | Verify persistence, projections, and restart | Complete | TASK-020-003 | AC-020-004, AC-020-007, AC-020-009 |
 | TASK-020-005 | Run final acceptance and reconcile documentation | Pending | TASK-020-004 | AC-020-001 through AC-020-009 |
 
 ---
@@ -245,7 +245,7 @@ process-boundary behavior remains intact.
 
 ### Status
 
-Pending
+Complete
 
 ### Outcome
 
@@ -289,7 +289,24 @@ invariants.
 
 ### Completion Evidence
 
-Record projection totals, restart scenario, regression commands, and results.
+- 2026-09-02: Added one disposable-SQLite integration scenario that updates a
+  closed interval to overlap a second closed interval and the elapsed portion of
+  a running interval, fully closes and reopens the database lifecycle, and
+  verifies all three source records plus `AppState` reconstruct unchanged.
+- After restart, authoritative history and last-7-days analytics each report the
+  additive 300-minute total: 120 minutes for the edited Task and 180 minutes for
+  the running Task (120 closed plus 60 elapsed). History returns all three
+  interval records, analytics preserves both Task totals, and the timer reader
+  reconstructs the original running Task, session, and open-interval start.
+- Manual creation remains guarded after the edit-created overlaps: attempts
+  intersecting persisted closed and elapsed-open ranges return
+  `TIME_INTERVAL_OVERLAP`, with unchanged interval rows and `AppState`.
+- Focused history, analytics, interval, timer reconstruction, manual-entry, and
+  repository verification passed (12 files, 95 tests). `npm run format:check`,
+  `npm run typecheck`, `npm run lint`, and `git diff --check` passed. The format
+  check also exposed and mechanically corrected formatting in the prior
+  TASK-020-002 parameterized interval-service regression test; behavior was
+  unchanged.
 
 ---
 
