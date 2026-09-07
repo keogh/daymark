@@ -1,8 +1,8 @@
 # Implementation Plan
 
-Specification: SPEC-020 — Allow Overlapping Interval Edits
+Specification: SPEC-008 — System Tray and Window Lifecycle
 
-Task: TASK-020-005 — Run Final Acceptance and Reconcile Documentation
+Task: TASK-008-007 — Correct Native Application Quit Ordering
 
 ## Status
 
@@ -12,14 +12,10 @@ Complete
 
 # Immediate Steps
 
-1. Audit AC-020-001 through AC-020-009 and current normative documentation for
-   complete, non-contradictory evidence.
-2. Run formatting, typecheck, lint, the complete automated test suite, and
-   packaging.
-3. Exercise the packaged application with a disposable profile, covering an
-   overlapping edit, additive projections, running-timer preservation, restart
-   persistence, and manual-create overlap rejection.
-4. Reconcile the specification, task breakdown, progress record, decision, and
-   affected normative documentation with the final evidence.
-5. Run final diff checks and inspect the scoped change before marking SPEC-020
-   Verified.
+1. Register the existing shutdown coordinator for Electron's `before-quit`
+   event while retaining idempotent `will-quit` cleanup.
+2. Add a focused regression test that follows native quit ordering and proves
+   the main-window close is not converted into Hide.
+3. Run focused lifecycle tests, baseline validation, macOS arm64 packaging, and
+   the packaged Command-Q workflow.
+4. Record verification evidence and reconcile task/progress status.

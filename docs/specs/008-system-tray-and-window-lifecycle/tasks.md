@@ -37,6 +37,7 @@ breakdown to match the specification.
 | TASK-008-004 | Synchronize tray and renderer timer presentation | Complete | TASK-008-003 | AC-008-005, AC-008-008, AC-008-012, AC-008-017 |
 | TASK-008-005 | Compose startup, assets, lifecycle, and recovery | Complete | TASK-008-002, TASK-008-004 | AC-008-001, AC-008-009–018 |
 | TASK-008-006 | Verify System Tray and update documentation | Complete | TASK-008-005 | AC-008-001–018 |
+| TASK-008-007 | Correct native application quit ordering | Complete | TASK-008-006 | AC-008-013, AC-008-015 |
 
 ---
 
@@ -468,6 +469,50 @@ TASK-008-005.
 - No HTTP(S) renderer resources or unexpected process errors were observed.
 
 Record commands run, results, and relevant implementation notes when complete.
+
+---
+
+## TASK-008-007 — Correct Native Application Quit Ordering
+
+### Status
+
+Complete
+
+### Outcome
+
+Native application quit requests, including macOS Command-Q, mark shutdown
+before Electron closes the main window so close-to-hide cannot cancel exit.
+
+### Included
+
+- Route Electron `before-quit` and `will-quit` through the existing idempotent
+  shutdown coordinator.
+- Add a regression test that reproduces Electron's native quit event ordering.
+- Verify focused lifecycle tests, baseline checks, and the packaged macOS arm64
+  quit workflow.
+
+### Excluded
+
+- Changes to timer persistence, normal close-to-hide behavior, or tray commands.
+
+### Traceability
+
+- Acceptance criteria: AC-008-013, AC-008-015
+- Specification sections: 12, 16, 19, 25
+
+### Completion Evidence
+
+- Registered the idempotent shutdown coordinator on Electron `before-quit`, so
+  native quit marks the lifecycle before Electron asks the retained window to
+  close; retained `will-quit` handling provides defensive repeated cleanup.
+- Added a focused native-event-order regression test. Focused application
+  lifecycle validation passed 17 tests across 3 files.
+- `npm run typecheck`, `npm run lint`, and the complete suite of 736 tests across
+  88 files passed.
+- `npm run package` passed for macOS arm64. The rebuilt packaged application was
+  launched with `/tmp/daymark-cmdq-regression-profile`, activated, and sent an
+  actual Command-Q keystroke through macOS System Events; the executable exited
+  cleanly with status 0 and left no retained Daymark process from that launch.
 
 ---
 

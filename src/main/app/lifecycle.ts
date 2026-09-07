@@ -35,7 +35,10 @@ import { TimerService } from '@/main/services/timer-service';
 import { TimerStateReader } from '@/main/services/timer-state-reader';
 import { TaskService } from '@/main/services/task-service';
 import { createMainWindow } from './create-window';
-import { ApplicationShutdown } from './shutdown';
+import {
+  ApplicationShutdown,
+  registerApplicationShutdownEvents,
+} from './shutdown';
 import { startApplication } from './startup';
 import { MainWindowOwner } from './window-owner';
 import { nativeErrorPresentation } from './error-presentation';
@@ -249,9 +252,7 @@ export const registerApplicationLifecycle = (): void => {
     }
   });
 
-  app.on('will-quit', () => {
-    shutdown.handleApplicationShutdown();
-  });
+  registerApplicationShutdownEvents(app, shutdown);
 
   // The ready application remains reachable through its tray even when an
   // exceptional window destruction leaves no normal windows open.

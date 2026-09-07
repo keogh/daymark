@@ -3,6 +3,10 @@ export interface ApplicationShutdownDependencies {
   readonly logCleanupFailure?: (error: unknown) => void;
 }
 
+export interface ApplicationQuitEvents {
+  on(event: 'before-quit' | 'will-quit', listener: () => void): void;
+}
+
 export class ApplicationShutdown {
   private quitting = false;
   private cleanedUp = false;
@@ -54,3 +58,15 @@ export class ApplicationShutdown {
     }
   }
 }
+
+export const registerApplicationShutdownEvents = (
+  events: ApplicationQuitEvents,
+  shutdown: ApplicationShutdown,
+): void => {
+  events.on('before-quit', () => {
+    shutdown.handleApplicationShutdown();
+  });
+  events.on('will-quit', () => {
+    shutdown.handleApplicationShutdown();
+  });
+};

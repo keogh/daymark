@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { ApplicationShutdown } from '@/main/app/shutdown';
+import {
+  ApplicationShutdown,
+  registerApplicationShutdownEvents,
+} from '@/main/app/shutdown';
 
 describe('application shutdown', () => {
   it('marks quitting before cleanup and asks Electron to quit exactly once', () => {
@@ -33,6 +36,26 @@ describe('application shutdown', () => {
     expect(shutdown.isQuitting()).toBe(true);
     expect(cleanup).toHaveBeenCalledOnce();
     expect(quitApplication).not.toHaveBeenCalled();
+  });
+
+  it('marks shutdown before Electron closes windows during a native quit', () => {
+    const listeners = new Map<string, () => void>();
+    const cleanup = vi.fn();
+    const shutdown = new ApplicationShutdown({ quitApplication: vi.fn() });
+    shutdown.addCleanupHook(cleanup);
+    registerApplicationShutdownEvents(
+      {
+        on: (event, listener) => listeners.set(event, listener),
+      },
+      shutdown,
+    );
+
+    listeners.get('before-quit')?.();
+    const shouldHideWindow = !shutdown.isQuitting();
+    listeners.get('will-quit')?.();
+
+    expect(shouldHideWindow).toBe(false);
+    expect(cleanup).toHaveBeenCalledOnce();
   });
 
   it('continues cleanup after one resource fails and reports only technical failure', () => {

@@ -18,6 +18,13 @@ acceptance passed formatting, typecheck, lint, all 735 tests in 88 files, macOS
 arm64 packaging, isolated packaged edit/running/manual-create/restart workflows,
 documentation and acceptance-criteria audits, and final diff checks.
 
+SPEC-008 maintenance TASK-008-007 is complete. Native application quit now
+enters the existing idempotent shutdown path on Electron `before-quit`, before
+the retained window receives `close`, so macOS Command-Q can no longer be
+converted into close-to-hide. Focused lifecycle tests, typecheck, lint, all 736
+tests, macOS arm64 packaging, and an isolated packaged Command-Q process-exit
+workflow pass.
+
 SPEC-014 remains Verified under DEC-037. Daymark uses one consistent visible and
 technical identity across renderer, desktop integration, package metadata,
 platform identifiers, CI artifacts, `Daymark/daymark.sqlite`, `window.daymark`,
